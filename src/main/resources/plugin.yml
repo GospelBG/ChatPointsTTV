@@ -1,0 +1,7 @@
+name: 'ChatPointsTTV'
+version: 1.0.0
+main: 'com.gospelbg.chatpointsttv.Main'
+api-version: '1.20'
+libraries:
+  - com.github.twitch4j:twitch4j:1.16.0
+  - io.github.cdimascio:dotenv-java:3.0.0

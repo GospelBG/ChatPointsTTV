@@ -1,0 +1,24 @@
+# You need to create an application on https://dev.twitch.tv/console to use this plugin.
+# Copy your Client ID and your Secret token below
+CLIENT_ID: {YOUR CLIENT ID HERE}
+SECRET: {YOUR SECRET HERE}
+
+CHANNEL_USERNAME: {YOUR CHANNEL}
+
+# Configure your channel rewards.
+# Add lines as many times as needed. Replace {REWARD_NAME} as your reward's name.
+# {REWARD_NAME}: {ACTION}
+
+# For the action, follow this format:
+#     ACTION: "SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}"
+#     ACTION: "RUN {PLAYER_NAME / CONSOLE}, {COMMAND}" // TODO
+
+# If your reward contains a text message, you can reference it as:
+#     {TEXT}
+
+REWARDS:
+  {REWARD NAME}: 
+
+# Add here the reward names that you don't want to be prompted on an in-game title.
+TITLE_BLACKLIST:
+  - 
