@@ -11,7 +11,7 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # For the action, follow this format:
 #     ACTION: "SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}"
-#     ACTION: "RUN {PLAYER_NAME / CONSOLE}, {COMMAND}" // TODO
+#     ACTION: "RUN {PLAYER_NAME / CONSOLE}, {COMMAND}"
 
 # If your reward contains a text message, you can reference it as:
 #     {TEXT}
@@ -20,7 +20,7 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 HAS_REDEEMED_STRING: "has redeemed"
 
 REWARDS:
-  {REWARD NAME}: 
+  {REWARD NAME}: {ACTION}
 
 # Customize the title's colors.
 # You can use the following options:
