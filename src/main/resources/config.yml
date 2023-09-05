@@ -17,7 +17,7 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 #     {TEXT}
 
 # You can change the text that appears on screen to localize it to your language or to customize it (the whitespace after the string is already added).
-HAS_REDEEMED_STRING: "has redeemed"
+
 
 REWARDS:
   {REWARD NAME}: {ACTION}
@@ -41,6 +41,8 @@ REWARD_NAME_BOLD: true
 COLORS:
   USER_COLOR: GOLD
   REWARD_NAME_COLOR: YELLOW
+
+HAS_REDEEMED_STRING: "has redeemed"
 
 # Add here the reward names that you don't want to be prompted on an in-game title.
 TITLE_BLACKLIST:
