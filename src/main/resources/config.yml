@@ -16,8 +16,31 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 # If your reward contains a text message, you can reference it as:
 #     {TEXT}
 
+# You can change the text that appears on screen to localize it to your language or to customize it (the whitespace after the string is already added).
+HAS_REDEEMED_STRING: "has redeemed"
+
 REWARDS:
   {REWARD NAME}: 
+
+# Customize the title's colors.
+# You can use the following options:
+
+#  Colors:
+#   AQUA, BLACK, BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_GREEN, DARK_PURPLE,
+#   DARK_RED, GOLD, GRAY, GREEN, ITALIC, LIGHT_PURPLE, RED, WHITE, YELLOW
+
+#  Formatting:
+#   BOLD
+#   STRIKETHROUGH
+#   UNDERLINE
+
+# Misc:
+#   MAGIC
+
+REWARD_NAME_BOLD: true
+COLORS:
+  USER_COLOR: GOLD
+  REWARD_NAME_COLOR: YELLOW
 
 # Add here the reward names that you don't want to be prompted on an in-game title.
 TITLE_BLACKLIST:

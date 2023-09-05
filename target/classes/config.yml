@@ -1,13 +1,13 @@
 # You need to create an application on https://dev.twitch.tv/console to use this plugin.
 # Copy your Client ID and your Secret token below
-CLIENT_ID: "{YOUR CLIENT ID HERE}"
-SECRET: "{YOUR SECRET HERE}"
+CLIENT_ID: {YOUR CLIENT ID HERE}
+SECRET: {YOUR SECRET HERE}
 
-CHANNEL_USERNAME: "{YOUR CHANNEL}"
+CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # Configure your channel rewards.
 # Add lines as many times as needed. Replace {REWARD_NAME} as your reward's name.
-# {REWARD_NAME}: "{ACTION}"
+# {REWARD_NAME}: {ACTION}
 
 # For the action, follow this format:
 #     ACTION: "SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}"
@@ -17,10 +17,28 @@ CHANNEL_USERNAME: "{YOUR CHANNEL}"
 #     {TEXT}
 
 REWARDS:
-  {REWARD NAME}: "SPAWN CREEPER 10"
+  {REWARD NAME}: 
 
-  {REWARD_NAME_2}: "RUN CONSOLE /tell @a {TEXT}"
+# Customize the title's colors.
+# You can use the following options:
+
+#  Colors:
+#   AQUA, BLACK, BLUE, DARK_AQUA, DARK_BLUE, DARK_GRAY, DARK_GREEN, DARK_PURPLE,
+#   DARK_RED, GOLD, GRAY, GREEN, ITALIC, LIGHT_PURPLE, RED, WHITE, YELLOW
+
+#  Formatting:
+#   BOLD
+#   STRIKETHROUGH
+#   UNDERLINE
+
+# Misc:
+#   MAGIC
+
+REWARD_NAME_BOLD: true
+COLORS:
+  USER_COLOR: GOLD
+  REWARD_NAME_COLOR: YELLOW
 
 # Add here the reward names that you don't want to be prompted on an in-game title.
 TITLE_BLACKLIST:
-  - ""
+  - 

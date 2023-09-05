@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -35,6 +36,7 @@ public class Main extends JavaPlugin {
     public FileConfiguration config;
     private Map<String, Object> rewards;
     private List<String> titleBlacklist = new ArrayList<String>();
+    private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
 
     @Override
     public void onEnable() {
@@ -47,6 +49,10 @@ public class Main extends JavaPlugin {
         config.getList("TITLE_BLACKLIST").forEach(i -> {
             titleBlacklist.add(i.toString());
             log.info(i.toString());
+        });
+
+        config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
+            colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
         
         //titleBlacklist = config.getList("TITLE_BLACK_LIST").toString();
@@ -78,8 +84,11 @@ public class Main extends JavaPlugin {
             String rewardTitle = event.getRedemption().getReward().getTitle();
 
             if (!titleBlacklist.contains(rewardTitle)) {
+                ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+                log.info(isBold.toString());
+
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
-                    p.sendTitle(event.getRedemption().getUser().getDisplayName(), "ha canjeado " + rewardTitle, 10, 70, 20);
+                    p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
                 });
             }
             //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.CREEPER);}});
