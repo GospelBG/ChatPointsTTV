@@ -1,4 +1,4 @@
-# ChatPointsTTV
+<img src="icon.png" style="width: 40px; float: left; padding-right: 10px; vertical-align: baseline;"/> <h1>ChatPointsTTV</h1>
 
 ChatPointsTTV is an Spigot plugin that helps you to create interactions between your Twitch chat and your Minecraft world. You can setup custom channel points rewards on your channel that can spawn mobs and execute commands.
 
