@@ -47,6 +47,7 @@ public class Main extends JavaPlugin {
         rewards = config.getConfigurationSection("REWARDS").getValues(false);
 
         config.getList("TITLE_BLACKLIST").forEach(i -> {
+            if (i == null) return;
             titleBlacklist.add(i.toString());
         });
 
