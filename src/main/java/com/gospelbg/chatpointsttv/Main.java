@@ -48,7 +48,6 @@ public class Main extends JavaPlugin {
 
         config.getList("TITLE_BLACKLIST").forEach(i -> {
             titleBlacklist.add(i.toString());
-            log.info(i.toString());
         });
 
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
@@ -80,22 +79,19 @@ public class Main extends JavaPlugin {
 
             if (!titleBlacklist.contains(rewardTitle)) {
                 ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
-                log.info(isBold.toString());
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
                     p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
                 });
             }
             rewards.forEach((k, v) -> {
-                log.info(rewardTitle + " --> " + k);
                 if (k.toString().equals(rewardTitle)) {
-                    log.info("MATCH!");
+                    log.info("Claimed Reward" + rewardTitle + "!");
                     if (v.toString().startsWith("SPAWN")) {
                         log.info("Spawning...");
                         List<String> action = Arrays.asList(v.toString().split(" "));
                         Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.fromName(action.get(1)), Integer.valueOf(action.get(2)));}});
                     } else if (v.toString().startsWith("RUN")) {
-                        log.info("Running...");
                         List<String> action = Arrays.asList(v.toString().split(" "));
                         String text = "";
                         for (int i = 0; i < action.size(); i++) {
@@ -111,7 +107,7 @@ public class Main extends JavaPlugin {
                         text = text.trim();
 
                         final String cmd = text.replace("/", "");
-                        log.info(cmd);
+                        log.info("Running command: \""+ cmd + "\"...");
 
                         if (action.get(1).equals("CONSOLE")) {
                             Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getServer().getConsoleSender(), cmd);}});
