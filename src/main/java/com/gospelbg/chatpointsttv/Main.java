@@ -55,8 +55,6 @@ public class Main extends JavaPlugin {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
         
-        //titleBlacklist = config.getList("TITLE_BLACK_LIST").toString();
-
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
             .withClientId(config.getString("CLIENT_ID"))
@@ -64,8 +62,6 @@ public class Main extends JavaPlugin {
             .withEnableHelix(true)
             .withEnableChat(true)
             .withEnablePubSub(true)
-            //.withDefaultAuthToken(credential)
-            //.withChatCommandsViaHelix(false)
             .build();
 
         // Join the twitch chats of this channel and enable stream/follow events
@@ -78,7 +74,6 @@ public class Main extends JavaPlugin {
         }
 
         // Register event listeners
-        //client.getEventManager().getEventHandler(Events.class).registerListener(new TwitchEventHandler(this));
         client.getPubSub().listenForChannelPointsRedemptionEvents(null, user_id);
         client.getEventManager().onEvent(RewardRedeemedEvent.class, event -> {
             String rewardTitle = event.getRedemption().getReward().getTitle();
@@ -91,8 +86,6 @@ public class Main extends JavaPlugin {
                     p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
                 });
             }
-            //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.CREEPER);}});
-
             rewards.forEach((k, v) -> {
                 log.info(rewardTitle + " --> " + k);
                 if (k.toString().equals(rewardTitle)) {

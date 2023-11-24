@@ -20,11 +20,5 @@ public class Events {
 
     public static void runCommand(CommandSender runAs, String cmd) {
         Bukkit.dispatchCommand(runAs, cmd);
-        
-        /* if (runAs.equals("CONSOLE")) {  
-            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);}});
-        } else {
-            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Bukkit.getPlayer(action.get(1)).performCommand(cmd);}});
-        } */
     }
 }
