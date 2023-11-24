@@ -68,8 +68,8 @@ public class Main extends JavaPlugin {
         String user_id = getUserId(channel);
         if (!user_id.isEmpty()) {
             client.getChat().joinChannel(user_id);
-            client.getClientHelper().enableStreamEventListener(user_id);
-            client.getClientHelper().enableFollowEventListener(user_id);
+            //client.getClientHelper().enableStreamEventListener(user_id);
+            //client.getClientHelper().enableFollowEventListener(user_id);
         }
 
         // Register event listeners
