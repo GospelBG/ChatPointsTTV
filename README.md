@@ -8,8 +8,14 @@ You will need to setup a Twitch Application in the Dev Console.
 1. Install the plugin into your Minecraft server.
 2. Create an app using [Twitch Developer Console](https://dev.twitch.tv/console). (Refer to ["Setting up a Twitch app"](#setting-up-a-twitch-app)).
 3. Copy your Client ID and your secret token to your [config.yml](/src/main/resources/config.yml).*
-4. Open your [Twitch Dashboard](https://dashboard.twitch.tv) and create your custom Channel Points Rewards. (Remember the names of your rewards, if it's necessary copy-paste them into a text document).
-5. Add to your [config.yml](/src/main/resources/config.yml) your newly created Twitch rewards, and setup the actions. *Note: copy the name EXACTLY as it is on Twitch.*
+4. Open your [Twitch Dashboard](https://dashboard.twitch.tv) and create your custom Channel Points Rewards.
+> [!TIP]
+>  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
+  
+5. Add to your [config.yml](/src/main/resources/config.yml) your newly created Twitch rewards, and setup the actions.
+> [!NOTE]
+> Copy the name **EXACTLY** as it is on Twitch.
+  
 6. Customize the text and it's formatting (optional).
 
 *: The config file for the plugin should be in 'plugins/ChatPointsTTV/config.yml'.
