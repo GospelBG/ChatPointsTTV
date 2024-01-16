@@ -3,7 +3,6 @@ package com.gospelbg.chatpointsttv;
 import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -12,23 +11,14 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.StringUtil;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.chat.TwitchChatBuilder;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
-import com.github.twitch4j.auth.TwitchAuth;
-import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.twitch4j.helix.domain.UserList;
 
-import com.gospelbg.chatpointsttv.Events;
 import com.github.twitch4j.helix.domain.UserList;
 
 public class Main extends JavaPlugin {
@@ -67,7 +57,6 @@ public class Main extends JavaPlugin {
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
-        
 
         this.getCommand("link").setExecutor(new CommandController());
     }

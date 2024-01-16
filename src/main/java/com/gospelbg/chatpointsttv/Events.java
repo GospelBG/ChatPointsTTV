@@ -3,11 +3,7 @@ package com.gospelbg.chatpointsttv;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.EntityType;
-import org.bukkit.World;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandSender;
-
-import com.gospelbg.chatpointsttv.Main;
 
 public class Events {
     public static void spawnMob(EntityType entity, int amount) {
