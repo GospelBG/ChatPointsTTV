@@ -27,3 +27,5 @@ You will need to setup a Twitch Application in the Dev Console.
 
 ### **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
+
+Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentification.

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Authorization Successful</title>
+    <style>
+        .container {
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function clearGetParams() {
+            // Clear the GET parameters so that the access_token is not stored in the browser history
+            if (typeof window.history.pushState == 'function') {
+                window.history.pushState({}, "Hide", location.origin + location.pathname);
+            }
+        }
+        window.onload = clearGetParams();
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2 id="heading" class="">Authorization Success</h2>
+</div>
+</body>
+</html>

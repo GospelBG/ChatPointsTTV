@@ -18,6 +18,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.chat.TwitchChatBuilder;
@@ -28,6 +29,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.helix.domain.UserList;
 
 import com.gospelbg.chatpointsttv.Events;
+import com.github.twitch4j.helix.domain.UserList;
 
 public class Main extends JavaPlugin {
     private ITwitchClient client;
@@ -37,6 +39,17 @@ public class Main extends JavaPlugin {
     private Map<String, Object> rewards;
     private List<String> titleBlacklist = new ArrayList<String>();
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
+
+    private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
+    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions";
+
+    public String getClientID() {
+        return ClientID;
+    }
+
+    public String getAuthURL() {
+        return AuthURL;
+    }
 
     @Override
     public void onEnable() {
@@ -55,14 +68,24 @@ public class Main extends JavaPlugin {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
         
+
+        this.getCommand("link").setExecutor(new CommandController());
+    }
+
+    public void linkToTwitch(String token) {
+        //Send Message with URL
+
+        //Wait until OAuth POST
+
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
-            .withClientId(config.getString("CLIENT_ID"))
-            .withClientSecret(config.getString("SECRET"))
+            .withDefaultAuthToken(new OAuth2Credential(ClientID, token))
             .withEnableHelix(true)
             .withEnableChat(true)
             .withEnablePubSub(true)
             .build();
+
+        log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
 
         // Join the twitch chats of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
