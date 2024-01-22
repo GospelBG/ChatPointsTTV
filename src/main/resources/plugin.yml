@@ -1,5 +1,7 @@
 name: 'ChatPointsTTV'
 version: 1.0.1
+author: GospelDev
+website: https://github.com/GospelBG/ChatPointsTTV
 main: 'com.gospelbg.chatpointsttv.ChatPointsTTV'
 api-version: '1.20'
 libraries:
