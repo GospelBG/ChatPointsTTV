@@ -1,5 +1,7 @@
 package com.gospelbg.chatpointsttv.TwitchAuth;
 
+import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -125,7 +127,7 @@ public class AuthenticationCallbackRequest implements Runnable {
 
         // Parse the request line.
         StringTokenizer tokens = new StringTokenizer(requestLine);
-        //String requestMethod = tokens.nextToken();  // Request method, which should be "GET"
+        String requestMethod = tokens.nextToken();  // Request method, which should be "GET"
         String requestFilename = tokens.nextToken();
         Map<String, String> queryParams = extractQueryParams(requestFilename);
 
