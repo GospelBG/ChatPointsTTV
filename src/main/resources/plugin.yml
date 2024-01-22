@@ -1,6 +1,6 @@
 name: 'ChatPointsTTV'
 version: 1.0.1
-main: 'com.gospelbg.chatpointsttv.Main'
+main: 'com.gospelbg.chatpointsttv.ChatPointsTTV'
 api-version: '1.20'
 libraries:
   - com.github.twitch4j:twitch4j:1.16.0

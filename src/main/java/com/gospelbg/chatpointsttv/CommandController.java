@@ -6,10 +6,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 
 import java.io.IOException;
 
@@ -25,35 +25,40 @@ public class CommandController implements CommandExecutor {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             
-            switch(cmd.getName()) {
-                case "link":
-                    sendLinkMessage(player);                    
-            }
+            String msg = ChatColor.BOLD + "Link your Twitch account to setup ChatPointsTTV\n[Click here to login with Twitch]";
+            ComponentBuilder formatted = new ComponentBuilder(msg);
+            
+            BaseComponent btn = formatted.create()[0];
+    
+            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
+            btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, ChatPointsTTV.getPlugin().getAuthURL()));
+    
+            player.spigot().sendMessage(btn);
+            Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), new Runnable() {
+                @Override
+                public void run() {
+                    
+                    try {
+                        server.start();
+                        
+                        if(server.getAccessToken() != null) ChatPointsTTV.getPlugin().linkToTwitch(server.getAccessToken());
+                    } catch(IOException e) {
+                        ChatPointsTTV.getPlugin().log.warning(e.toString());
+                    }
+                }
+            });
+            
+           Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), new Runnable() {
+ 
+                public void run() {
+                    ChatPointsTTV.getPlugin().log.info("Stopping Task");
+                    server.stop();
+                }
+              }, 6000L);// 60 L == 3 sec, 20 ticks == 1 sec
+            
         }
 
         // If the player (or console) uses our command correct, we can return true
         return true;
-    }
-
-    public void sendLinkMessage(Player player) {
-        String msg = ChatColor.BOLD + "Link your Twitch account to setup ChatPointsTTV";
-        TextComponent btn = new TextComponent(ChatColor.GOLD + msg + "\n" + ChatColor.RESET + "[Click here to login with Twitch]");
-        btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
-        btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, Main.plugin.getAuthURL()));
-
-        player.spigot().sendMessage(btn);
-
-        Bukkit.getScheduler().runTaskAsynchronously(Main.plugin, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    server.start();
-
-                    Main.plugin.linkToTwitch(server.getAccessToken());
-                } catch(IOException e) {
-                    Main.plugin.log.warning(e.toString());
-                }
-            }
-        });
     }
 }

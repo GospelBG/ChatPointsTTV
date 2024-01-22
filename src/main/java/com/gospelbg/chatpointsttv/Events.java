@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 
 public class Events {
     public static void spawnMob(EntityType entity, int amount) {
-        for (Player p : Main.getPlugin().getServer().getOnlinePlayers()) {
+        for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
             for (int i = 0; i < amount; i++) {
                 p.getWorld().spawnEntity(p.getLocation(), entity);
             }
