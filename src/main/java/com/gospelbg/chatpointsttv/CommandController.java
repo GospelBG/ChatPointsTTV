@@ -24,7 +24,12 @@ public class CommandController implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            
+
+            try {
+                ChatPointsTTV.getTwitchClient().close();
+            } catch (Exception e) {}
+
+
             String msg = ChatColor.BOLD + "Link your Twitch account to setup ChatPointsTTV\n[Click here to login with Twitch]";
             ComponentBuilder formatted = new ComponentBuilder(msg);
             

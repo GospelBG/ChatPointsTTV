@@ -22,7 +22,7 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.github.twitch4j.helix.domain.UserList;
 
 public class ChatPointsTTV extends JavaPlugin {
-    private ITwitchClient client;
+    private static ITwitchClient client;
     private static ChatPointsTTV plugin;
     public Logger log = getLogger();
     public FileConfiguration config;
@@ -32,6 +32,19 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions";
+
+    public static ChatPointsTTV getPlugin() {
+        return plugin;
+    }
+
+    public String getUserId(String username) {
+        UserList resultList = getTwitchClient().getHelix().getUsers(null, null, Arrays.asList(new String[]{username})).execute();
+        return resultList.getUsers().get(0).getId();
+    }
+
+    public static ITwitchClient getTwitchClient() {
+        return client;
+    }
 
     public String getClientID() {
         return ClientID;
@@ -132,18 +145,5 @@ public class ChatPointsTTV extends JavaPlugin {
             client.close();
             client = null;
         }
-    }
-
-    public static ChatPointsTTV getPlugin() {
-        return plugin;
-    }
-
-    public String getUserId(String username) {
-        UserList resultList = getTwitchClient().getHelix().getUsers(null, null, Arrays.asList(new String[]{username})).execute();
-        return resultList.getUsers().get(0).getId();
-    }
-
-    public ITwitchClient getTwitchClient() {
-        return this.client;
     }
 }
