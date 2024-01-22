@@ -21,9 +21,9 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import com.github.twitch4j.helix.domain.UserList;
 
-public class Main extends JavaPlugin {
+public class ChatPointsTTV extends JavaPlugin {
     private ITwitchClient client;
-    public static Main plugin;
+    private static ChatPointsTTV plugin;
     public Logger log = getLogger();
     public FileConfiguration config;
     private Map<String, Object> rewards;
@@ -134,7 +134,7 @@ public class Main extends JavaPlugin {
         }
     }
 
-    public static Main getPlugin() {
+    public static ChatPointsTTV getPlugin() {
         return plugin;
     }
 
