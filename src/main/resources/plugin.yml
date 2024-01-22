@@ -18,6 +18,9 @@ permissions:
   chatpointsttv.manage_oauth:
     default: op
 
+  chatpointsttv.target:
+    default: false
+
   chatpointsttv.broadcast:
     default: true
 
