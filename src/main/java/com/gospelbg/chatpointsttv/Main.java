@@ -62,31 +62,22 @@ public class Main extends JavaPlugin {
     }
 
     public void linkToTwitch(String token) {
-        //Send Message with URL
-
-        //Wait until OAuth POST
-
+        OAuth2Credential oauth = new OAuth2Credential(ClientID, token);
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
-            .withDefaultAuthToken(new OAuth2Credential(ClientID, token))
+            .withDefaultAuthToken(oauth)
             .withEnableHelix(true)
-            .withEnableChat(true)
             .withEnablePubSub(true)
             .build();
 
         log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
 
-        // Join the twitch chats of this channel and enable stream/follow events
+        // Join the twitch chat of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
         String user_id = getUserId(channel);
-        if (!user_id.isEmpty()) {
-            client.getChat().joinChannel(user_id);
-            //client.getClientHelper().enableStreamEventListener(user_id);
-            //client.getClientHelper().enableFollowEventListener(user_id);
-        }
 
         // Register event listeners
-        client.getPubSub().listenForChannelPointsRedemptionEvents(null, user_id);
+        client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, user_id);
         client.getEventManager().onEvent(RewardRedeemedEvent.class, event -> {
             String rewardTitle = event.getRedemption().getReward().getTitle();
 
