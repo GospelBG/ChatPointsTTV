@@ -24,6 +24,7 @@ public class CommandController implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
 
             try {
                 ChatPointsTTV.getTwitchClient().close();
@@ -36,27 +37,27 @@ public class CommandController implements CommandExecutor {
             BaseComponent btn = formatted.create()[0];
     
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
-            btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, ChatPointsTTV.getPlugin().getAuthURL()));
+            btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
     
             player.spigot().sendMessage(btn);
-            Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), new Runnable() {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
                 @Override
                 public void run() {
                     
                     try {
                         server.start();
                         
-                        if(server.getAccessToken() != null) ChatPointsTTV.getPlugin().linkToTwitch(server.getAccessToken());
+                        if(server.getAccessToken() != null) plugin.linkToTwitch(server.getAccessToken());
                     } catch(IOException e) {
-                        ChatPointsTTV.getPlugin().log.warning(e.toString());
+                        plugin.log.warning(e.toString());
                     }
                 }
             });
             
-           Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), new Runnable() {
+           Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
  
                 public void run() {
-                    ChatPointsTTV.getPlugin().log.info("Stopping Task");
+                    plugin.log.info("Stopping HTTP Server");
                     server.stop();
                 }
               }, 6000L);// 60 L == 3 sec, 20 ticks == 1 sec

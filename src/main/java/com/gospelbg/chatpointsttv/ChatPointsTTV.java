@@ -98,7 +98,9 @@ public class ChatPointsTTV extends JavaPlugin {
                 ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
-                    p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
+                    if (p.hasPermission("chatpointsttv.broadcast")) {
+                        p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
+                    }
                 });
             }
             rewards.forEach((k, v) -> {

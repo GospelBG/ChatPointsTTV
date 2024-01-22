@@ -12,4 +12,12 @@ commands:
   link:
     description: Link a Twitch account to ChatPointsTTV
     usage: /<command>
-    permission: chatpointsttv.linkaccount
+    permission: chatpointsttv.manage_oauth
+
+permissions:
+  chatpointsttv.manage_oauth:
+    default: op
+
+  chatpointsttv.broadcast:
+    default: true
+
