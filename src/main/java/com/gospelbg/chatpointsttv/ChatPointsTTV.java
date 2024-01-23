@@ -1,7 +1,6 @@
 package com.gospelbg.chatpointsttv;
 
 import java.lang.Integer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ public class ChatPointsTTV extends JavaPlugin {
     public Logger log = getLogger();
     public FileConfiguration config;
     private Map<String, Object> rewards;
-    private List<String> titleBlacklist = new ArrayList<String>();
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
