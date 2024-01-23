@@ -136,7 +136,6 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (client != null) {
-            client.getChat().leaveChannel(config.getString("CHANNEL_USERNAME"));
             client.getEventManager().close();
             client.close();
             client = null;
