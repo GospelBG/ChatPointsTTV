@@ -62,11 +62,6 @@ public class ChatPointsTTV extends JavaPlugin {
         config = getConfig();
         rewards = config.getConfigurationSection("REWARDS").getValues(false);
 
-        config.getList("TITLE_BLACKLIST").forEach(i -> {
-            if (i == null) return;
-            titleBlacklist.add(i.toString());
-        });
-
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
@@ -94,7 +89,6 @@ public class ChatPointsTTV extends JavaPlugin {
         client.getEventManager().onEvent(RewardRedeemedEvent.class, event -> {
             String rewardTitle = event.getRedemption().getReward().getTitle();
 
-            if (!titleBlacklist.contains(rewardTitle)) {
                 ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {

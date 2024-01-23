@@ -35,7 +35,3 @@ COLORS:
   REWARD_NAME_COLOR: YELLOW
 
 HAS_REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
-
-# Add here the reward names that you don't want to be prompted on an in-game title.
-TITLE_BLACKLIST:
-  - 
