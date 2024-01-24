@@ -6,7 +6,7 @@
 
     <groupId>com.gospelbg.chatpointsttv</groupId>
     <artifactId>chatpointsttv</artifactId>
-    <version>1.1</version>
+    <version>2.0</version>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

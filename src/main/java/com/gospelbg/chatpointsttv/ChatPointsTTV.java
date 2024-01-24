@@ -4,6 +4,7 @@ import java.lang.Integer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -16,6 +17,9 @@ import org.bukkit.entity.EntityType;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
+import com.github.twitch4j.pubsub.events.ChannelSubGiftEvent;
+import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import com.github.twitch4j.helix.domain.UserList;
@@ -29,7 +33,14 @@ public class ChatPointsTTV extends JavaPlugin {
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
-    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions";
+    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions";
+
+    public enum reward_type {
+        CHANNEL_POINTS,
+        CHEER,
+        SUB,
+        SUB_GIFT
+    };
 
     public static ChatPointsTTV getPlugin() {
         return plugin;
@@ -83,51 +94,138 @@ public class ChatPointsTTV extends JavaPlugin {
         String user_id = getUserId(channel);
 
         // Register event listeners
+        if (config.getBoolean("ENABLE_CHEER_REWARDS")) {
+            rewards.putAll(config.getConfigurationSection("CHEER_REWARDS").getValues(false));
+
+            client.getPubSub().listenForCheerEvents(oauth, user_id);
+            client.getEventManager().onEvent(ChannelBitsEvent.class, event -> {
+                log.info("CHEER");
+                reward_action(reward_type.CHEER, event.getData().getBitsUsed() + " bits", event.getData().getUserName(), event.getData().getChatMessage());
+            });
+        }
+        if (config.getBoolean("ENABLE_SUB_REWARDS")) {
+            rewards.putAll(config.getConfigurationSection("SUB_REWARDS").getValues(false));
+
+            client.getPubSub().listenForSubscriptionEvents(oauth, user_id);
+            client.getPubSub().listenForChannelSubGiftsEvents(oauth, user_id);
+
+            client.getEventManager().onEvent(ChannelSubscribeEvent.class, event -> {
+                log.info("SUB");
+                String msg;
+                try {
+                    msg = event.getData().getSubMessage().toString();
+                } catch(NoSuchElementException e) {
+                    msg = "";
+                }
+                log.info(event.getData().getSubPlan().toString());
+                reward_action(reward_type.SUB, event.getData().getSubPlan().toString(), event.getData().getUserName(), msg);
+            });
+
+            client.getEventManager().onEvent(ChannelSubGiftEvent.class, event -> {
+                log.info("SUB_GIFT");
+                reward_action(reward_type.SUB_GIFT, event.getData().getCount() + " subs", event.getData().getUserName());
+
+            });
+        }
+
         client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, user_id);
         client.getEventManager().onEvent(RewardRedeemedEvent.class, event -> {
-            String rewardTitle = event.getRedemption().getReward().getTitle();
+            log.info("REWARD");
+            reward_action(reward_type.CHANNEL_POINTS, event.getRedemption().getReward().getTitle(), event.getRedemption().getUser().getDisplayName(), event.getRedemption().getUserInput());
+        });
+    }
+
+    private void reward_action(reward_type type, String reward, String username, String... extra) {
+        rewards.forEach((k, v) -> {
+            int amount = 0;
+            if (type == reward_type.SUB_GIFT) {
+                amount = Integer.parseInt(reward);
+                k = "GIFT_"+k;
+            }
+            log.info(k + " " + v);
+            if (k.toString().equals(reward) | (type == reward_type.CHEER && Integer.parseInt(reward) >= Integer.parseInt(k)) | (type == reward_type.SUB_GIFT && amount >= Integer.parseInt(reward))) {
+                log.info("THIS ONE");
+                final String custom_string;
+                final String color_key;
+
+                switch (type) {
+                    case CHANNEL_POINTS:
+                        log.info("Claimed Reward " + reward + "!");
+                        custom_string = config.getString("HAS_REDEEMED_STRING");
+                        color_key = "REWARD_NAME_COLOR";
+                        break;
+
+                    case CHEER:
+                        log.info(reward + " bits cheered!");
+                        custom_string = config.getString("CHEERED_STRING");
+                        color_key = "CHEER_COLOR";
+                        break;
+
+                    case SUB:
+                        log.info(username + " subscribed with a tier " + reward + " sub!");
+                        custom_string = config.getString("SUB_STRING");
+                        color_key = "SUB_COLOR";
+                        break;
+
+                    case SUB_GIFT:
+                        log.info(username + " gifed " + reward + " subs!");
+                        custom_string = config.getString("GIFT_STRING");
+                        color_key = "GIFT_COLOR";
+                        break;
+
+                    default:
+                        log.warning("Failed to get reward type. Using generic string");
+                        custom_string = "redeemed";
+                        color_key = "USER_COLOR";
+                        break;
+                        
+                }
+
+                String rewardTitle = reward;
 
                 ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
                     if (p.hasPermission("chatpointsttv.broadcast")) {
-                        p.sendTitle(colors.get("USER_COLOR") + event.getRedemption().getUser().getDisplayName(), config.getString("HAS_REDEEMED_STRING") + " " + isBold + colors.get("REWARD_NAME_COLOR") + rewardTitle, 10, 70, 20);
+                        p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + colors.get(color_key) + rewardTitle + "\n" + extra, 10, 70, 20);
                     }
                 });
-            }
-            rewards.forEach((k, v) -> {
-                if (k.toString().equals(rewardTitle)) {
-                    log.info("Claimed Reward" + rewardTitle + "!");
-                    if (v.toString().startsWith("SPAWN")) {
+                
+                if (v.toString().startsWith("SPAWN")) {
+                    
+                    List<String> action = Arrays.asList(v.toString().split(" "));
+                    //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
+                    Bukkit.getScheduler().runTask(plugin, () -> {
                         log.info("Spawning...");
-                        List<String> action = Arrays.asList(v.toString().split(" "));
-                        Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.fromName(action.get(1)), Integer.valueOf(action.get(2)));}});
-                    } else if (v.toString().startsWith("RUN")) {
-                        List<String> action = Arrays.asList(v.toString().split(" "));
-                        String text = "";
-                        for (int i = 0; i < action.size(); i++) {
-                            if (i == 0 | i == 1) continue;
+                        Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));
+                    });
 
-                            if (action.get(i).equals("{TEXT}")) {
-                                text += " " + event.getRedemption().getUserInput();
-                                continue;
-                            }
+                } else if (v.toString().startsWith("RUN")) {
+                    List<String> action = Arrays.asList(v.toString().split(" "));
+                    String text = "";
+                    
+                    for (int i = 0; i < action.size(); i++) {
+                        if (i == 0 | i == 1) continue;
 
-                            text += " " + action.get(i);
+                        if (action.get(i).equals("{TEXT}")) {
+                            text += " " + extra[0];
+                            continue;
                         }
-                        text = text.trim();
 
-                        final String cmd = text.replace("/", "");
-                        log.info("Running command: \""+ cmd + "\"...");
+                        text += " " + action.get(i);
+                    }
+                    text = text.trim();
 
-                        if (action.get(1).equals("CONSOLE")) {
-                            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getServer().getConsoleSender(), cmd);}});
-                        } else {
-                            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getPlayer(action.get(1)), cmd);}});
-                        }
+                    final String cmd = text.replace("/", "");
+                    log.info("Running command: \""+ cmd + "\"...");
+
+                    if (action.get(1).equals("CONSOLE")) {
+                        Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getServer().getConsoleSender(), cmd);}});
+                    } else {
+                        Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getPlayer(action.get(1)), cmd);}});
                     }
                 }
-            });
+            }
         });
     }
 
