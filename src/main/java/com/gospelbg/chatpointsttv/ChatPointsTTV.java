@@ -208,7 +208,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
                     Bukkit.getScheduler().runTask(plugin, () -> {
                         log.info("Spawning...");
-                        Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));
+                        Events.spawnMob(EntityType.valueOf(action.get(1).toUpperCase()), Integer.valueOf(action.get(2)));
                     });
 
                 } else if (v.toString().startsWith("RUN")) {
@@ -229,12 +229,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
                     final String cmd = text.replace("/", "");
                     log.info("Running command: \""+ cmd + "\"...");
-
-                    if (action.get(1).equals("CONSOLE")) {
-                        Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getServer().getConsoleSender(), cmd);}});
-                    } else {
-                        Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(Bukkit.getPlayer(action.get(1)), cmd);}});
-                    }
+                    Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(action.get(1), cmd);}});
                 }
             }
         });
