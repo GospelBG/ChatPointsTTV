@@ -9,10 +9,11 @@ libraries:
   - io.github.cdimascio:dotenv-java:3.0.0
 
 commands:
-  link:
-    description: Link a Twitch account to ChatPointsTTV
-    usage: /<command>
-    permission: chatpointsttv.manage_oauth
+  twitch:
+    description: Manage ChatPointsTTV from this command. Use "/twitch help" to get a full list of commands.
+    usage: /twitch <function>
+    permission: chatpointsttv.manage
+
 
 permissions:
   chatpointsttv.manage:
