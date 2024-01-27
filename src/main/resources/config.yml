@@ -3,13 +3,14 @@
 
 CHANNEL_USERNAME: {YOUR CHANNEL}
 
-# Configure your channel rewards.
-# Add lines as many times as needed. Replace {REWARD_NAME} as your reward's name.
+# Set up here your channel point rewards.
+# Add as many lines as needed. Replace {REWARD_NAME} with your reward's name, EXACTLY as it is on Twitch.
+
 # {REWARD_NAME}: {ACTION}
 
 # For the action, follow this format:
-#     ACTION: "SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}"
-#     ACTION: "RUN {PLAYER_NAME / CONSOLE} {COMMAND}"
+#     SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}
+#     RUN {TARGET / CONSOLE} {COMMAND}
 
 # If your reward contains a text message, you can reference it as:
 #     {TEXT}
@@ -55,8 +56,11 @@ COLORS:
   SUB_COLOR: YELLOW
   GIFT_COLOR: RED
 
-# Customize the on-screen text that is broadcasted to players. Viewer's username and their reward will be autommatically added to the message.
-HAS_REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
-CHEERED_STRING: "cheered"
-SUB_STRING: "has subscribed with" #..."Tier 1"
-GIFT_STRING: "gifed"
+# Customize the on-screen text that is broadcasted to players.
+# Viewer's username and their reward will be autommatically added to the message.
+
+STRINGS:
+  REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
+  CHEERED_STRING: "cheered" #..."100 bits"
+  SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
+  GIFT_STRING: "gifed" #..."5 subs"
