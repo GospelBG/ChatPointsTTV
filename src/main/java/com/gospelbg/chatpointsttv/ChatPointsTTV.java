@@ -30,6 +30,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public FileConfiguration config;
     private Map<String, Object> rewards;
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
+    private Map<String, String> titleStrings = new HashMap<String, String>();
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions";
@@ -161,37 +162,37 @@ public class ChatPointsTTV extends JavaPlugin {
             if (k.toString().equals(reward) | (type == reward_type.CHEER && Integer.parseInt(reward) >= Integer.parseInt(k)) | (type == reward_type.SUB_GIFT && amount >= Integer.parseInt(reward))) {
                 log.info("THIS ONE");
                 final String custom_string;
-                final String color_key;
+                final ChatColor title_color;
 
                 switch (type) {
                     case CHANNEL_POINTS:
                         log.info("Claimed Reward " + reward + "!");
-                        custom_string = config.getString("HAS_REDEEMED_STRING");
-                        color_key = "REWARD_NAME_COLOR";
+                        custom_string = titleStrings.get("REDEEMED_STRING");
+                        title_color = colors.get("REWARD_NAME_COLOR");
                         break;
 
                     case CHEER:
                         log.info(reward + " bits cheered!");
-                        custom_string = config.getString("CHEERED_STRING");
-                        color_key = "CHEER_COLOR";
+                        custom_string = titleStrings.get("CHEERED_STRING");
+                        title_color = colors.get("CHEER_COLOR");
                         break;
 
                     case SUB:
                         log.info(username + " subscribed with a tier " + reward + " sub!");
-                        custom_string = config.getString("SUB_STRING");
-                        color_key = "SUB_COLOR";
+                        custom_string = titleStrings.get("SUB_STRING");
+                        title_color = colors.get("SUB_COLOR");
                         break;
 
                     case SUB_GIFT:
                         log.info(username + " gifed " + reward + " subs!");
-                        custom_string = config.getString("GIFT_STRING");
-                        color_key = "GIFT_COLOR";
+                        custom_string = titleStrings.get("GIFT_STRING");
+                        title_color = colors.get("GIFT_COLOR");
                         break;
 
                     default:
                         log.warning("Failed to get reward type. Using generic string");
                         custom_string = "redeemed";
-                        color_key = "USER_COLOR";
+                        title_color = colors.get("USER_COLOR");
                         break;
                         
                 }
@@ -202,6 +203,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
                     if (p.hasPermission(permissions.BROADCAST.permission_id)) {
+                        p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + title_color + rewardTitle + "\n" + extra, 10, 70, 20);
                     }
                 });
                 
