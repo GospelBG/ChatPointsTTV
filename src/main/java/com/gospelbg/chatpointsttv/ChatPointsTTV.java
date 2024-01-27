@@ -21,7 +21,6 @@ import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubGiftEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
-
 import com.github.twitch4j.helix.domain.UserList;
 
 public class ChatPointsTTV extends JavaPlugin {
@@ -87,7 +86,11 @@ public class ChatPointsTTV extends JavaPlugin {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
 
-        this.getCommand("link").setExecutor(new CommandController());
+        config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
+            titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
+        });
+
+        this.getCommand("twitch").setExecutor(new CommandController());
     }
 
     public void linkToTwitch(String token) {
