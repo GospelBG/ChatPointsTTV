@@ -15,7 +15,7 @@ commands:
     permission: chatpointsttv.manage_oauth
 
 permissions:
-  chatpointsttv.manage_oauth:
+  chatpointsttv.manage:
     default: op
 
   chatpointsttv.target:

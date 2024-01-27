@@ -42,6 +42,18 @@ public class ChatPointsTTV extends JavaPlugin {
         SUB_GIFT
     };
 
+    public enum permissions {
+        BROADCAST("chatpointsttv.broadcast"),
+        MANAGE("chatpointsttv.manage"),
+        TARGET("chatpointsttv.target");
+
+        public final String permission_id;
+
+        private permissions(String label) {
+            this.permission_id = label;
+        }
+    }
+
     public static ChatPointsTTV getPlugin() {
         return plugin;
     }
@@ -186,8 +198,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
                 plugin.getServer().getOnlinePlayers().forEach (p -> {
-                    if (p.hasPermission("chatpointsttv.broadcast")) {
-                        p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + colors.get(color_key) + rewardTitle + "\n" + extra, 10, 70, 20);
+                    if (p.hasPermission(permissions.BROADCAST.permission_id)) {
                     }
                 });
                 
