@@ -27,9 +27,11 @@ CHEER_REWARDS:
   {100/500/1000...}: {ACTION}
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
-# Alse you can enter an AMOUNT to toggle actions with sub gifting
+# Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions with sub gifting
 SUB_REWARDS:
   {TWITCH_PRIME/TIER1/TIER2/TIER3}: {ACTION}
+
+GIFT_REWARDS:
   {AMOUNT}: {ACTION}
 
 # Customize the in-game title.
