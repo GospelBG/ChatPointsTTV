@@ -10,9 +10,13 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.ITwitchClient;
@@ -21,6 +25,12 @@ import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubGiftEvent;
 import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+
 import com.github.twitch4j.helix.domain.UserList;
 
 public class ChatPointsTTV extends JavaPlugin {
@@ -31,6 +41,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private Map<String, Object> rewards;
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
     private Map<String, String> titleStrings = new HashMap<String, String>();
+    private Boolean accountConnected = false;
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions";
@@ -74,6 +85,9 @@ public class ChatPointsTTV extends JavaPlugin {
     public String getAuthURL() {
         return AuthURL;
     }
+    public Boolean isAccountConnected() {
+        return accountConnected;
+    }
 
     @Override
     public void onEnable() {
@@ -91,8 +105,25 @@ public class ChatPointsTTV extends JavaPlugin {
             titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
         });
 
-        this.getCommand("twitch").setExecutor(new CommandController());
-    }
+        pm.registerEvents(new Listener() {
+            @EventHandler
+            public void onPlayerJoin(PlayerJoinEvent player) {
+                if (!accountConnected) {
+                    String msg ="Welcome! Remember to login with your Twitch account for this plugin to work.";
+                    ComponentBuilder builder = new ComponentBuilder(ChatColor.DARK_PURPLE + "[Click here to login with your Twitch account]");
+                    BaseComponent btn = builder.create()[0];
+
+                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
+                    btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
+
+                    player.getPlayer().spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
+                    player.getPlayer().spigot().sendMessage(btn);
+                }
+            }
+                } , this);
+
+                this.getCommand("twitch").setExecutor(new CommandController());
+            }
 
     public void linkToTwitch(String token) {
         OAuth2Credential oauth = new OAuth2Credential(ClientID, token);
