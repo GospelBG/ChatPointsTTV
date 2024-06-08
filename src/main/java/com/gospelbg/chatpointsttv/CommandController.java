@@ -39,7 +39,7 @@ public class CommandController implements CommandExecutor {
                 case "help":
                     help(plugin, sender, cmd);
                     break;
-
+                    
                 default:
                     sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0] + "\n ");
                     help(plugin, sender, cmd);
@@ -58,17 +58,18 @@ public class CommandController implements CommandExecutor {
         }
 
         if (p == Bukkit.getServer().getConsoleSender()) {
-            String msg = ChatColor.BOLD + "Link your Twitch account to setup ChatPointsTTV. Open this link in your browser to login:\n" + plugin.getAuthURL();
+            String msg = "Link your Twitch account to setup ChatPointsTTV. Open this link in your browser to login:\n" + plugin.getAuthURL();
             p.sendMessage(msg);
         } else {
-            String msg = ChatColor.BOLD + "Link your Twitch account to setup ChatPointsTTV\n[Click here to login with Twitch]";
-            ComponentBuilder formatted = new ComponentBuilder(msg);
+            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.DARK_PURPLE + "Link your Twitch account to setup ChatPointsTTV";
+            ComponentBuilder formatted = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
             
             BaseComponent btn = formatted.create()[0];
 
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
 
+            p.spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
             p.spigot().sendMessage(btn);
         }
 
