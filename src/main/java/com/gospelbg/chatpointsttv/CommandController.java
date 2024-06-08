@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 import java.io.IOException;
 
@@ -66,7 +67,7 @@ public class CommandController implements CommandExecutor {
             
             BaseComponent btn = formatted.create()[0];
 
-            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
+            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open in browser")));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
 
             p.spigot().sendMessage(new ComponentBuilder(msg).create()[0]);

@@ -30,6 +30,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 
 import com.github.twitch4j.helix.domain.UserList;
 
@@ -113,7 +114,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     ComponentBuilder builder = new ComponentBuilder(ChatColor.DARK_PURPLE + "[Click here to login with your Twitch account]");
                     BaseComponent btn = builder.create()[0];
 
-                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
+                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to run command")));
                     btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
 
                     player.getPlayer().spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
