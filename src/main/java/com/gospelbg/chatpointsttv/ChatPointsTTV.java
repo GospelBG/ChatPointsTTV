@@ -133,6 +133,15 @@ public class ChatPointsTTV extends JavaPlugin {
                 this.getCommand("twitch").setExecutor(new CommandController());
             }
 
+    @Override
+    public void onDisable() {
+        if (client != null) {
+            client.getEventManager().close();
+            client.close();
+            client = null;
+        }
+    }
+
     public void linkToTwitch(String token) {
         OAuth2Credential oauth = new OAuth2Credential(ClientID, token);
         // Build TwitchClient
