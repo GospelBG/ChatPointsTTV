@@ -12,15 +12,12 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 #     SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}
 #     RUN {TARGET / CONSOLE} {COMMAND}
 
-# If your reward contains a text message, you can reference it as:
-#     {TEXT}
+# If your reward contains a text input, you can reference it as:
+#     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
 
+# Leave any reward class empty to disable it.
 REWARDS:
   {REWARD NAME}: {ACTION}
-
-# If you want to have actions for bits and subscriptions, uncomment the appropiate lines and add the wanted action:
-# ENABLE_CHEER_REWARDS: true
-# ENABLE_SUB_REWARDS: true
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
 CHEER_REWARDS:
