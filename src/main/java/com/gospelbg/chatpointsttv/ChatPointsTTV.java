@@ -1,10 +1,7 @@
 package com.gospelbg.chatpointsttv;
 
-import java.lang.Integer;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -13,18 +10,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
-import com.github.twitch4j.pubsub.events.ChannelSubGiftEvent;
-import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -36,22 +30,18 @@ import com.github.twitch4j.helix.domain.UserList;
 
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
+    private static TwitchEventHandler eventHandler;
     private static ChatPointsTTV plugin;
+
+    private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
+    private static Map<String, String> titleStrings = new HashMap<String, String>();
+
     public Logger log = getLogger();
     public FileConfiguration config;
-    private Map<String, Object> channel_rewards;
-    private Map<String, Object> sub_rewards;
-    private Map<String, Object> gift_rewards;
-    private Map<String, Object> cheer_rewards;
-    private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
-    private Map<String, String> titleStrings = new HashMap<String, String>();
     private Boolean accountConnected = false;
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
-    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions";
-
-    private int nearest_amount;
-    private String action_str;
+    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions+chat%3Aread+chat%3Aedit";
 
     public enum reward_type {
         CHANNEL_POINTS,
@@ -60,7 +50,7 @@ public class ChatPointsTTV extends JavaPlugin {
         SUB_GIFT
     };
 
-    public enum permissions {
+    public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
         MANAGE("chatpointsttv.manage"),
         TARGET("chatpointsttv.target");
@@ -96,6 +86,29 @@ public class ChatPointsTTV extends JavaPlugin {
         return accountConnected;
     }
 
+    public static Map<String, ChatColor> getChatColors() {
+        return colors;
+    }
+    public static Map<String, String> getRedemptionStrings() {
+        return titleStrings;
+    }
+    public static Map<String, Object> getRewards(reward_type type) {
+        switch(type) {
+            case CHANNEL_POINTS:
+                return plugin.getConfig().getConfigurationSection("REWARDS").getValues(false);
+            case CHEER:
+                return plugin.getConfig().getConfigurationSection("CHEER_REWARDS").getValues(false);
+            case SUB:
+                return plugin.getConfig().getConfigurationSection("SUB_REWARDS").getValues(false);
+            case SUB_GIFT:
+                return plugin.getConfig().getConfigurationSection("GIFT_REWARDS").getValues(false);
+                
+            default:
+                plugin.log.warning("Cannot find any reward of type " + type);
+                return null;
+        }
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -103,7 +116,6 @@ public class ChatPointsTTV extends JavaPlugin {
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         config = getConfig();
-        channel_rewards = config.getConfigurationSection("REWARDS").getValues(false);
 
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
@@ -147,8 +159,11 @@ public class ChatPointsTTV extends JavaPlugin {
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
             .withDefaultAuthToken(oauth)
+            .withEnableChat(true)
+            .withChatAccount(oauth)
             .withEnableHelix(true)
             .withEnablePubSub(true)
+            .withDefaultEventHandler(SimpleEventHandler.class)
             .build();
 
         log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
@@ -156,169 +171,42 @@ public class ChatPointsTTV extends JavaPlugin {
 
         // Join the twitch chat of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
-        String user_id = getUserId(channel);
+        String channel_id = client.getHelix().getUsers(null, null, Arrays.asList(channel)).execute().getUsers().get(0).getId();
+        log.info("Joining chat from channel: " + channel_id);
+        client.getChat().joinChannel(channel);
 
-        // Register event listeners
-        if (config.getBoolean("ENABLE_CHEER_REWARDS")) {
-            cheer_rewards = config.getConfigurationSection("CHEER_REWARDS").getValues(false);
+        BaseComponent msg = new ComponentBuilder("[ChatPointsTTV] Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName()).create()[0];
 
-            client.getPubSub().listenForCheerEvents(oauth, user_id);
-            client.getEventManager().onEvent(ChannelBitsEvent.class, event -> {
-                log.info("CHEER");
-                reward_action(reward_type.CHEER, event.getData().getBitsUsed() + " bits", event.getData().getUserName(), event.getData().getChatMessage());
-            });
-        }
-        if (config.getBoolean("ENABLE_SUB_REWARDS")) {
-            sub_rewards = config.getConfigurationSection("SUB_REWARDS").getValues(false);
-            gift_rewards = config.getConfigurationSection("GIFT_REWARDS").getValues(false);
-
-            client.getPubSub().listenForSubscriptionEvents(oauth, user_id);
-            client.getPubSub().listenForChannelSubGiftsEvents(oauth, user_id);
-
-            client.getEventManager().onEvent(ChannelSubscribeEvent.class, event -> {
-                log.info("SUB");
-                String msg;
-                try {
-                    msg = event.getData().getSubMessage().toString();
-                } catch(NoSuchElementException e) {
-                    msg = "";
-                }
-                log.info(event.getData().getSubPlan().toString());
-                reward_action(reward_type.SUB, event.getData().getSubPlan().toString(), event.getData().getUserName(), msg);
-            });
-
-            client.getEventManager().onEvent(ChannelSubGiftEvent.class, event -> {
-                log.info("SUB_GIFT");
-                reward_action(reward_type.SUB_GIFT, event.getData().getCount() + " subs", event.getData().getUserName());
-
-            });
-        }
-
-        client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, user_id);
-        client.getEventManager().onEvent(RewardRedeemedEvent.class, event -> {
-            log.info("REWARD");
-            reward_action(reward_type.CHANNEL_POINTS, event.getRedemption().getReward().getTitle(), event.getRedemption().getUser().getDisplayName(), event.getRedemption().getUserInput());
-        });
-    }
-
-    private void reward_action(reward_type type, String reward, String username, String... extra) {
-        Map<String, Object> rewards = channel_rewards; // Fallback to channel point rewards
-        final String custom_string;
-        final ChatColor title_color;
-
-        switch(type) {
-            case CHEER:
-                log.info(reward + " bits cheered!");
-                custom_string = titleStrings.get("CHEERED_STRING");
-                title_color = colors.get("CHEER_COLOR");
-                rewards = cheer_rewards;
-                nearest_amount = -1;
-                
-                rewards.forEach((k, v) -> {
-                    int rewardValue = Integer.valueOf(k);
-                    int cheered = Integer.valueOf(reward);
-
-                    if (rewardValue < cheered && (nearest_amount == -1 | nearest_amount - cheered > rewardValue - cheered)) {
-                        nearest_amount = rewardValue;
-                    }
-                });
-
-                if (nearest_amount == -1) return;
-                action_str = Integer.toString(nearest_amount);
-                break;
-            
-            case SUB_GIFT:
-                log.info(reward + " subs gifted!");
-                custom_string = titleStrings.get("GIFT_STRING");
-                title_color = colors.get("GIFT_COLOR");
-                rewards = gift_rewards;
-                nearest_amount = -1;
-                
-                rewards.forEach((k, v) -> {
-                    int rewardValue = Integer.valueOf(k);
-                    int cheered = Integer.valueOf(reward);
-
-                    if (rewardValue < cheered && (nearest_amount == -1 | nearest_amount - cheered > rewardValue - cheered)) {
-                        nearest_amount = rewardValue;
-                    }
-                });
-
-                if (nearest_amount == -1) return;
-                action_str = Integer.toString(nearest_amount);
-                break;
-            case SUB:
-                log.info(username + " subscribed with a tier " + reward + " sub!");
-                custom_string = titleStrings.get("SUB_STRING");
-                title_color = colors.get("SUB_COLOR");
-                rewards = sub_rewards;
-
-                rewards.forEach((k, v) -> {
-                    if (k.equals(reward)) {
-                        action_str = v.toString();
-                    }
-                });
-                break;
-
-            default: //Channel Points as fallback
-                log.info("Claimed Reward " + reward + "!");
-                custom_string = titleStrings.get("REDEEMED_STRING");
-                title_color = colors.get("REWARD_NAME_COLOR");
-                rewards = channel_rewards;
-
-                rewards.forEach((k, v) -> {
-                    if (k.equals(reward)) {
-                        action_str = v.toString();
-                    }
-                });
-                break;
-        }
-
-        ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
-        
-        plugin.getServer().getOnlinePlayers().forEach (p -> {
-            if (p.hasPermission(permissions.BROADCAST.permission_id)) {
-                p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + title_color + reward + "\n" + extra, 10, 70, 20);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
+                p.spigot().sendMessage(msg);
             }
-        });
-        
-        if (action_str.startsWith("SPAWN")) {
-            
-            List<String> action = Arrays.asList(action_str.split(" "));
-            //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                log.info("Spawning...");
-                Events.spawnMob(EntityType.valueOf(action.get(1).toUpperCase()), Integer.valueOf(action.get(2)));
-            });
+        }
 
-        } else if (action_str.startsWith("RUN")) {
-            List<String> action = Arrays.asList(action_str.split(" "));
-            String text = "";
-            
-            for (int i = 0; i < action.size(); i++) {
-                if (i == 0 | i == 1) continue;
-
-                if (action.get(i).equals("{TEXT}")) {
-                    text += " " + extra[0];
-                    continue;
-                }
-
-                text += " " + action.get(i);
+        if (!config.getConfigurationSection("REWARDS").getKeys(true).isEmpty()) {
+            client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
+            log.info("Listening for channel point rewards...");
+        } 
+        if (!config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty()) {
+             if (channel_id == client.getHelix().getUsers(oauth.getAccessToken(), null, null).execute().getUsers().get(0).getId()) {
+                client.getPubSub().listenForCheerEvents(oauth, channel_id);
+                log.info("Listening for Cheers...");
+            } else {
+                client.getPubSub().listenForPublicCheerEvents(oauth, channel_id); // Not working
+                log.info("Listenig for PUBLIC Cheers...");
             }
-            text = text.trim();
-
-            final String cmd = text.replace("/", "");
-            log.info("Running command: \""+ cmd + "\"...");
-            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(action.get(1), cmd);}});
+         }
+        if (!config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty()) {
+            client.getPubSub().listenForSubscriptionEvents(oauth, channel_id); // Throws error
+            log.info("Listening for subscriptions...");
+        }
+        if (!config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty()) {
+            client.getPubSub().listenForChannelSubGiftsEvents(oauth, channel_id);
+            log.info("Listening for subscription gifts...");
         }
 
-    }
-
-    @Override
-    public void onDisable() {
-        if (client != null) {
-            client.getEventManager().close();
-            client.close();
-            client = null;
-        }
+        eventHandler = new TwitchEventHandler();
+        client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
+        log.info("Done!");
     }
 }
