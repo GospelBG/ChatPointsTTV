@@ -59,10 +59,10 @@ public class CommandController implements CommandExecutor {
         }
 
         if (p == Bukkit.getServer().getConsoleSender()) {
-            String msg = "Link your Twitch account to setup ChatPointsTTV. Open this link in your browser to login:\n" + plugin.getAuthURL();
+            String msg = "Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + plugin.getAuthURL();
             p.sendMessage(msg);
         } else {
-            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.DARK_PURPLE + "Link your Twitch account to setup ChatPointsTTV";
+            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.DARK_PURPLE + "Link your Twitch account to set ChatPointsTTV up";
             ComponentBuilder formatted = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
             
             BaseComponent btn = formatted.create()[0];
