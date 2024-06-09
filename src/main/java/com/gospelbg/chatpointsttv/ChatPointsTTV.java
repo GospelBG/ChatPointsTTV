@@ -39,13 +39,19 @@ public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     public Logger log = getLogger();
     public FileConfiguration config;
-    private Map<String, Object> rewards;
+    private Map<String, Object> channel_rewards;
+    private Map<String, Object> sub_rewards;
+    private Map<String, Object> gift_rewards;
+    private Map<String, Object> cheer_rewards;
     private Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
     private Map<String, String> titleStrings = new HashMap<String, String>();
     private Boolean accountConnected = false;
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions";
+
+    private int nearest_amount;
+    private String action_str;
 
     public enum reward_type {
         CHANNEL_POINTS,
@@ -93,10 +99,11 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        PluginManager pm = Bukkit.getServer().getPluginManager();
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         config = getConfig();
-        rewards = config.getConfigurationSection("REWARDS").getValues(false);
+        channel_rewards = config.getConfigurationSection("REWARDS").getValues(false);
 
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
@@ -136,6 +143,7 @@ public class ChatPointsTTV extends JavaPlugin {
             .build();
 
         log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
+        accountConnected = true;
 
         // Join the twitch chat of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
@@ -143,7 +151,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
         // Register event listeners
         if (config.getBoolean("ENABLE_CHEER_REWARDS")) {
-            rewards.putAll(config.getConfigurationSection("CHEER_REWARDS").getValues(false));
+            cheer_rewards = config.getConfigurationSection("CHEER_REWARDS").getValues(false);
 
             client.getPubSub().listenForCheerEvents(oauth, user_id);
             client.getEventManager().onEvent(ChannelBitsEvent.class, event -> {
@@ -152,7 +160,8 @@ public class ChatPointsTTV extends JavaPlugin {
             });
         }
         if (config.getBoolean("ENABLE_SUB_REWARDS")) {
-            rewards.putAll(config.getConfigurationSection("SUB_REWARDS").getValues(false));
+            sub_rewards = config.getConfigurationSection("SUB_REWARDS").getValues(false);
+            gift_rewards = config.getConfigurationSection("GIFT_REWARDS").getValues(false);
 
             client.getPubSub().listenForSubscriptionEvents(oauth, user_id);
             client.getPubSub().listenForChannelSubGiftsEvents(oauth, user_id);
@@ -184,92 +193,115 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     private void reward_action(reward_type type, String reward, String username, String... extra) {
-        rewards.forEach((k, v) -> {
-            int amount = 0;
-            if (type == reward_type.SUB_GIFT) {
-                amount = Integer.parseInt(reward);
-                k = "GIFT_"+k;
-            }
-            log.info(k + " " + v);
-            if (k.toString().equals(reward) | (type == reward_type.CHEER && Integer.parseInt(reward) >= Integer.parseInt(k)) | (type == reward_type.SUB_GIFT && amount >= Integer.parseInt(reward))) {
-                log.info("THIS ONE");
-                final String custom_string;
-                final ChatColor title_color;
+        Map<String, Object> rewards = channel_rewards; // Fallback to channel point rewards
+        final String custom_string;
+        final ChatColor title_color;
 
-                switch (type) {
-                    case CHANNEL_POINTS:
-                        log.info("Claimed Reward " + reward + "!");
-                        custom_string = titleStrings.get("REDEEMED_STRING");
-                        title_color = colors.get("REWARD_NAME_COLOR");
-                        break;
+        switch(type) {
+            case CHEER:
+                log.info(reward + " bits cheered!");
+                custom_string = titleStrings.get("CHEERED_STRING");
+                title_color = colors.get("CHEER_COLOR");
+                rewards = cheer_rewards;
+                nearest_amount = -1;
+                
+                rewards.forEach((k, v) -> {
+                    int rewardValue = Integer.valueOf(k);
+                    int cheered = Integer.valueOf(reward);
 
-                    case CHEER:
-                        log.info(reward + " bits cheered!");
-                        custom_string = titleStrings.get("CHEERED_STRING");
-                        title_color = colors.get("CHEER_COLOR");
-                        break;
-
-                    case SUB:
-                        log.info(username + " subscribed with a tier " + reward + " sub!");
-                        custom_string = titleStrings.get("SUB_STRING");
-                        title_color = colors.get("SUB_COLOR");
-                        break;
-
-                    case SUB_GIFT:
-                        log.info(username + " gifed " + reward + " subs!");
-                        custom_string = titleStrings.get("GIFT_STRING");
-                        title_color = colors.get("GIFT_COLOR");
-                        break;
-
-                    default:
-                        log.warning("Failed to get reward type. Using generic string");
-                        custom_string = "redeemed";
-                        title_color = colors.get("USER_COLOR");
-                        break;
-                        
-                }
-
-                String rewardTitle = reward;
-
-                ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
-
-                plugin.getServer().getOnlinePlayers().forEach (p -> {
-                    if (p.hasPermission(permissions.BROADCAST.permission_id)) {
-                        p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + title_color + rewardTitle + "\n" + extra, 10, 70, 20);
+                    if (rewardValue < cheered && (nearest_amount == -1 | nearest_amount - cheered > rewardValue - cheered)) {
+                        nearest_amount = rewardValue;
                     }
                 });
+
+                if (nearest_amount == -1) return;
+                action_str = Integer.toString(nearest_amount);
+                break;
+            
+            case SUB_GIFT:
+                log.info(reward + " subs gifted!");
+                custom_string = titleStrings.get("GIFT_STRING");
+                title_color = colors.get("GIFT_COLOR");
+                rewards = gift_rewards;
+                nearest_amount = -1;
                 
-                if (v.toString().startsWith("SPAWN")) {
-                    
-                    List<String> action = Arrays.asList(v.toString().split(" "));
-                    //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
-                    Bukkit.getScheduler().runTask(plugin, () -> {
-                        log.info("Spawning...");
-                        Events.spawnMob(EntityType.valueOf(action.get(1).toUpperCase()), Integer.valueOf(action.get(2)));
-                    });
+                rewards.forEach((k, v) -> {
+                    int rewardValue = Integer.valueOf(k);
+                    int cheered = Integer.valueOf(reward);
 
-                } else if (v.toString().startsWith("RUN")) {
-                    List<String> action = Arrays.asList(v.toString().split(" "));
-                    String text = "";
-                    
-                    for (int i = 0; i < action.size(); i++) {
-                        if (i == 0 | i == 1) continue;
-
-                        if (action.get(i).equals("{TEXT}")) {
-                            text += " " + extra[0];
-                            continue;
-                        }
-
-                        text += " " + action.get(i);
+                    if (rewardValue < cheered && (nearest_amount == -1 | nearest_amount - cheered > rewardValue - cheered)) {
+                        nearest_amount = rewardValue;
                     }
-                    text = text.trim();
+                });
 
-                    final String cmd = text.replace("/", "");
-                    log.info("Running command: \""+ cmd + "\"...");
-                    Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(action.get(1), cmd);}});
-                }
+                if (nearest_amount == -1) return;
+                action_str = Integer.toString(nearest_amount);
+                break;
+            case SUB:
+                log.info(username + " subscribed with a tier " + reward + " sub!");
+                custom_string = titleStrings.get("SUB_STRING");
+                title_color = colors.get("SUB_COLOR");
+                rewards = sub_rewards;
+
+                rewards.forEach((k, v) -> {
+                    if (k.equals(reward)) {
+                        action_str = v.toString();
+                    }
+                });
+                break;
+
+            default: //Channel Points as fallback
+                log.info("Claimed Reward " + reward + "!");
+                custom_string = titleStrings.get("REDEEMED_STRING");
+                title_color = colors.get("REWARD_NAME_COLOR");
+                rewards = channel_rewards;
+
+                rewards.forEach((k, v) -> {
+                    if (k.equals(reward)) {
+                        action_str = v.toString();
+                    }
+                });
+                break;
+        }
+
+        ChatColor isBold = config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+        
+        plugin.getServer().getOnlinePlayers().forEach (p -> {
+            if (p.hasPermission(permissions.BROADCAST.permission_id)) {
+                p.sendTitle(colors.get("USER_COLOR") + username, custom_string + " " + isBold + title_color + reward + "\n" + extra, 10, 70, 20);
             }
         });
+        
+        if (action_str.startsWith("SPAWN")) {
+            
+            List<String> action = Arrays.asList(action_str.split(" "));
+            //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                log.info("Spawning...");
+                Events.spawnMob(EntityType.valueOf(action.get(1).toUpperCase()), Integer.valueOf(action.get(2)));
+            });
+
+        } else if (action_str.startsWith("RUN")) {
+            List<String> action = Arrays.asList(action_str.split(" "));
+            String text = "";
+            
+            for (int i = 0; i < action.size(); i++) {
+                if (i == 0 | i == 1) continue;
+
+                if (action.get(i).equals("{TEXT}")) {
+                    text += " " + extra[0];
+                    continue;
+                }
+
+                text += " " + action.get(i);
+            }
+            text = text.trim();
+
+            final String cmd = text.replace("/", "");
+            log.info("Running command: \""+ cmd + "\"...");
+            Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.runCommand(action.get(1), cmd);}});
+        }
+
     }
 
     @Override
