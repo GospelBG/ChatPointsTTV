@@ -2,6 +2,7 @@ package com.gospelbg.chatpointsttv;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -16,9 +17,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
+import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
+import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
+import com.github.twitch4j.eventsub.socket.IEventSubSocket;
+import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -27,10 +35,11 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 import com.github.twitch4j.helix.domain.UserList;
-
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
     private static TwitchEventHandler eventHandler;
+    private static IEventSubSocket eventSocket;
+    private static EventManager eventManager;
     private static ChatPointsTTV plugin;
 
     private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
@@ -41,7 +50,9 @@ public class ChatPointsTTV extends JavaPlugin {
     private Boolean accountConnected = false;
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
-    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions+chat%3Aread+chat%3Aedit";
+    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions+user%3Aread%3Achat+chat%3Aread+chat%3Aedit";
+
+    private OAuth2Credential oauth;
 
     public enum reward_type {
         CHANNEL_POINTS,
@@ -67,7 +78,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public String getUserId(String username) {
-        UserList resultList = getTwitchClient().getHelix().getUsers(null, null, Arrays.asList(new String[]{username})).execute();
+        UserList resultList = getTwitchClient().getHelix().getUsers(null, null, Arrays.asList(username)).execute();
         return resultList.getUsers().get(0).getId();
     }
 
@@ -149,13 +160,18 @@ public class ChatPointsTTV extends JavaPlugin {
     public void onDisable() {
         if (client != null) {
             client.getEventManager().close();
+            try {
+                eventSocket.close();
+            } catch (Exception e) {
+                log.warning(e.toString());
+            }
             client.close();
             client = null;
         }
     }
 
     public void linkToTwitch(String token) {
-        OAuth2Credential oauth = new OAuth2Credential(ClientID, token);
+        oauth = new OAuth2Credential(ClientID, token);
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
             .withDefaultAuthToken(oauth)
@@ -163,16 +179,20 @@ public class ChatPointsTTV extends JavaPlugin {
             .withChatAccount(oauth)
             .withEnableHelix(true)
             .withEnablePubSub(true)
+            .withEnableEventSocket(true)
             .withDefaultEventHandler(SimpleEventHandler.class)
             .build();
+
+        
 
         log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
         accountConnected = true;
 
         // Join the twitch chat of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
-        String channel_id = client.getHelix().getUsers(null, null, Arrays.asList(channel)).execute().getUsers().get(0).getId();
-        log.info("Joining chat from channel: " + channel_id);
+        String channel_id = getUserId(channel);
+        String user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
+        log.info("Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
 
         BaseComponent msg = new ComponentBuilder("[ChatPointsTTV] Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName()).create()[0];
@@ -183,30 +203,39 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
 
+        eventSocket = client.getEventSocket();
+        eventManager = client.getEventManager();
         if (!config.getConfigurationSection("REWARDS").getKeys(true).isEmpty()) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
             log.info("Listening for channel point rewards...");
-        } 
-        if (!config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty()) {
-             if (channel_id == client.getHelix().getUsers(oauth.getAccessToken(), null, null).execute().getUsers().get(0).getId()) {
-                client.getPubSub().listenForCheerEvents(oauth, channel_id);
-                log.info("Listening for Cheers...");
-            } else {
-                client.getPubSub().listenForPublicCheerEvents(oauth, channel_id); // Not working
-                log.info("Listenig for PUBLIC Cheers...");
-            }
-         }
-        if (!config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty()) {
-            client.getPubSub().listenForSubscriptionEvents(oauth, channel_id); // Throws error
-            log.info("Listening for subscriptions...");
         }
-        if (!config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty()) {
-            client.getPubSub().listenForChannelSubGiftsEvents(oauth, channel_id);
-            log.info("Listening for subscription gifts...");
+        if (!config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty()) {
+            eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
+            eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>(){
+                @Override
+                public void accept(ChannelChatMessageEvent e) {
+                    eventHandler.onCheer(e);
+                }
+            }); 
+            log.info("Listening for Cheers...");
         }
 
+        if (!config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty() || !config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty()) {
+            eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
+            eventManager.onEvent(ChannelChatNotificationEvent.class, new Consumer<ChannelChatNotificationEvent>(){
+                @Override
+                public void accept(ChannelChatNotificationEvent e) {
+                    eventHandler.onEvent(e);
+                }
+            });
+            log.info("Listening for subscriptions and gifts...");
+        }
         eventHandler = new TwitchEventHandler();
         client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
         log.info("Done!");
+    }
+
+    public void updateRedemption(String reward, String redemption, RedemptionStatus status) {
+        client.getHelix().updateRedemptionStatus(oauth.getAccessToken(), client.getChat().getChannels().iterator().next(), reward, Arrays.asList(reward), status);
     }
 }

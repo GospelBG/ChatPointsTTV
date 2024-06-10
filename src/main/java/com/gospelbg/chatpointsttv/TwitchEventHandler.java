@@ -1,14 +1,13 @@
 package com.gospelbg.chatpointsttv;
 
 import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
-import com.github.twitch4j.pubsub.domain.ChannelBitsData;
+import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
+import com.github.twitch4j.eventsub.domain.chat.NoticeType;
+import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
+import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.domain.SubGiftData;
-import com.github.twitch4j.pubsub.domain.SubscriptionData;
-import com.github.twitch4j.pubsub.events.ChannelBitsEvent;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
-import com.github.twitch4j.pubsub.events.ChannelSubGiftEvent;
-import com.github.twitch4j.pubsub.events.ChannelSubscribeEvent;
 import com.gospelbg.chatpointsttv.ChatPointsTTV.reward_type;
 
 import java.util.ArrayList;
@@ -21,6 +20,10 @@ import org.bukkit.ChatColor;
 
 public class TwitchEventHandler {
     Logger log = ChatPointsTTV.getPlugin().log;
+    Boolean listenForCheers = !ChatPointsTTV.getPlugin().config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForSubs = !ChatPointsTTV.getPlugin().config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForGifts = !ChatPointsTTV.getPlugin().config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
+
 
     @EventSubscriber
     public void onChannelPointsRedemption(ChannelPointsRedemptionEvent event) {
@@ -28,22 +31,31 @@ public class TwitchEventHandler {
         channelPointRewards(event.getRedemption());
     }
 
-    @EventSubscriber
-    public void onCheer(ChannelBitsEvent event) {
-        log.info(event.getData().getUserName() + " has cheered " +  event.getData().getBitsUsed() + "bits");
-        cheerRewards(event.getData());
+    public void onCheer(ChannelChatMessageEvent event) {
+        if (event.getCheer() == null) return;
+
+        cheerRewards(event.getChatterUserName(), event.getCheer().getBits());
     }
 
-    @EventSubscriber
-    public void onSub(ChannelSubscribeEvent event) {
-        log.info(event.getData().getDisplayName() + " has subscribed using a " + event.getData().getSubPlanName() + " sub");
-        subRewards(event.getData());
-    }
-
-    @EventSubscriber
-    public void onGift(ChannelSubGiftEvent event) {
-        log.info(event.getData().getDisplayName() + " has gifted " + Integer.toString(event.getData().getCount()) + " subs");
-        subGiftRewards(event.getData());
+    public void onEvent(ChannelChatNotificationEvent event) {
+        log.info(event.getNoticeType().toString());
+        if (listenForGifts) {
+            if (event.getNoticeType() == NoticeType.SUB_GIFT) {
+                subGiftRewards(event.getChatterUserName(), 1, event.getSubGift().getSubTier());
+            } else if (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) {
+                subGiftRewards(event.getChatterUserName(), event.getCommunitySubGift().getTotal(), event.getCommunitySubGift().getSubTier());
+            }
+        } else if (listenForSubs) {
+            String tier;
+            if (event.getNoticeType() == NoticeType.SUB) {
+                if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME.toString();
+                else tier = event.getSub().getSubTier().toString();
+            } else if (event.getNoticeType() == NoticeType.RESUB) {
+                if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME.toString();
+                else tier = event.getResub().getSubTier().toString();
+            } else return;
+            subRewards(event.getChatterUserName(), tier);
+        }
     }
 
     private void channelPointRewards(ChannelPointsRedemption redemption) {
@@ -61,15 +73,15 @@ public class TwitchEventHandler {
                 } else {
                     Events.runAction(ChatPointsTTV.getRewards(reward_type.CHANNEL_POINTS).get(redemption.getReward().getTitle()).toString());
                 }
-                redemption.setStatus("FULFILLED");
+                ChatPointsTTV.getPlugin().updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
             } catch (Exception e) {
                 log.warning(e.toString());
-                redemption.setStatus("CANCELLED"); // Probably unhandled by Twitch4J
+                ChatPointsTTV.getPlugin().updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
             }
         }
     }
 
-    private void cheerRewards (ChannelBitsData donation) {
+    private void cheerRewards (String chatter, Integer amount) {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("CHEERED_STRING");
         ChatColor title_color = ChatPointsTTV.getChatColors().get("CHEER_COLOR");
         ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
@@ -83,8 +95,8 @@ public class TwitchEventHandler {
 
         try {
             for (Integer i : rewards) {
-                if (donation.getBitsUsed() >= i) {
-                    Events.displayTitle(donation.getUserName(), custom_string, donation.getBitsUsed() + " bits", title_color, user_color, isBold, null);
+                if (amount >= i) {
+                    Events.displayTitle(chatter, custom_string, amount + " bits", title_color, user_color, isBold, null);
                     Events.runAction(ChatPointsTTV.getRewards(reward_type.CHEER).get(Integer.toString(i)).toString());
                     break;
                 }
@@ -94,23 +106,23 @@ public class TwitchEventHandler {
         }
     }
 
-    private void subRewards(SubscriptionData sub) {
-        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(sub.getSubPlanName())) {
+    private void subRewards(String chatter, String tier) {
+        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(tier)) {
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
             ChatColor title_color = ChatPointsTTV.getChatColors().get("SUB_COLOR");
             ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
             ChatColor isBold = ChatPointsTTV.getPlugin().config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
     
             try {
-                Events.displayTitle(sub.getDisplayName(), custom_string, sub.getSubPlanName(), title_color, user_color, isBold, null);
-                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(sub.getSubPlanName()).toString());
+                Events.displayTitle(chatter, custom_string, tier, title_color, user_color, isBold, null);
+                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(tier).toString());
             } catch (Exception e) {
                 log.warning(e.toString());
             }
         }
     }
 
-    private void subGiftRewards(SubGiftData gift) {
+    private void subGiftRewards(String chatter, Integer amount, SubscriptionPlan tier) {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
         ChatColor title_color = ChatPointsTTV.getChatColors().get("GIFT_COLOR");
         ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
@@ -124,8 +136,8 @@ public class TwitchEventHandler {
 
         try {
             for (Integer i : rewards) {
-                if (gift.getCount() >= i) {
-                    Events.displayTitle(gift.getDisplayName(), custom_string, gift.getCount() + " " + gift.getTier().toString() + " subs", title_color, user_color, isBold, null);
+                if (amount >= i) {
+                    Events.displayTitle(chatter, custom_string, amount + " " + tier.toString() + " subs", title_color, user_color, isBold, null);
                     Events.runAction(ChatPointsTTV.getRewards(reward_type.CHEER).get(Integer.toString(i)).toString());
                     break;
                 }
