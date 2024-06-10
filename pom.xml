@@ -13,6 +13,27 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
+    <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.6.0</version>
+            <configuration>
+              <!-- put your configurations here -->
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -27,15 +48,16 @@
             <version>1.20.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.twitch4j</groupId>
-            <artifactId>twitch4j</artifactId>
-            <version>1.20.0</version>
-        </dependency>
+        
         <dependency>
             <groupId>com.github.philippheuer.events4j</groupId>
             <artifactId>events4j-handler-simple</artifactId>
             <version>0.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.twitch4j</groupId>
+            <artifactId>twitch4j</artifactId>
+            <version>1.20.0</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
