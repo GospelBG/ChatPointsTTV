@@ -168,12 +168,6 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (client != null) {
-            try {
-                eventSocket.close();
-            } catch (Exception e) {
-                log.warning(e.toString());
-            }
-            client.getEventManager().close();
             client.close();
 
             // Erase variables
