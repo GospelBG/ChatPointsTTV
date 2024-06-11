@@ -106,6 +106,9 @@ public class ChatPointsTTV extends JavaPlugin {
     public Boolean isAccountConnected() {
         return accountConnected;
     }
+    public static ITwitchClient getClient() {
+        return client;
+    }
 
     public static Map<String, ChatColor> getChatColors() {
         return colors;
@@ -161,10 +164,8 @@ public class ChatPointsTTV extends JavaPlugin {
                     player.getPlayer().spigot().sendMessage(btn);
                 }
             }
-                } , this);
+        }, this);
 
-                this.getCommand("twitch").setExecutor(new CommandController());
-            }
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);

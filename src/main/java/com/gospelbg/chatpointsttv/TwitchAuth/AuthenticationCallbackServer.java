@@ -95,7 +95,7 @@ public class AuthenticationCallbackServer implements AuthenticationListener {
         if (serverSocket != null && !serverSocket.isClosed()) {
             try {
                 serverSocket.close();
-                thread.interrupt();
+                if (thread != null) thread.interrupt();
             } catch (IOException ignored) {
             } finally {
                 serverSocket = null;

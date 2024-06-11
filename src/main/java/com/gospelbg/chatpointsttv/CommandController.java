@@ -35,6 +35,7 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
+                    if (ChatPointsTTV.getClient() != null) ChatPointsTTV.getClient().close();
                     link(plugin, sender);
                     break;
 
