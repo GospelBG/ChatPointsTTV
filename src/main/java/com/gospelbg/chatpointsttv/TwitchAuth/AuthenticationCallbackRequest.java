@@ -100,8 +100,10 @@ public class AuthenticationCallbackRequest implements Runnable {
      *
      * @throws IOException
      */
+    @SuppressWarnings("null")
     private void processRequest() throws IOException {
         // Get a reference to the socket's input and output streams.
+        @SuppressWarnings("unused")
         InputStream is = socket.getInputStream();
         DataOutputStream os = new DataOutputStream(socket.getOutputStream());
 
@@ -115,6 +117,7 @@ public class AuthenticationCallbackRequest implements Runnable {
         //String rawRequest = "\n" + requestLine;
 
         // Read the header lines.
+        @SuppressWarnings("unused")
         String headerLine = null;
         while ((headerLine = br.readLine()).length() != 0) {
             //rawRequest += headerLine + "\n";
@@ -125,6 +128,7 @@ public class AuthenticationCallbackRequest implements Runnable {
 
         // Parse the request line.
         StringTokenizer tokens = new StringTokenizer(requestLine);
+        @SuppressWarnings("unused")
         String requestMethod = tokens.nextToken();  // Request method, which should be "GET"
         String requestFilename = tokens.nextToken();
         Map<String, String> queryParams = extractQueryParams(requestFilename);
