@@ -1,7 +1,5 @@
 package com.gospelbg.chatpointsttv.TwitchAuth;
 
-import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
-
 import java.io.*;
 import java.net.Socket;
 import java.net.URL;
@@ -194,6 +192,7 @@ public class AuthenticationCallbackRequest implements Runnable {
         os.close();
         br.close();
         socket.close();
+        
 
         // Send callbacks
         if (authenticationListener != null) {
