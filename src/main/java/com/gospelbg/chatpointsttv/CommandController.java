@@ -84,7 +84,10 @@ public class CommandController implements CommandExecutor {
                 try {
                     server.start();
                     
-                    if(server.getAccessToken() != null) plugin.linkToTwitch(server.getAccessToken());
+                    if(server.getAccessToken() != null) {
+                        plugin.linkToTwitch(server.getAccessToken());
+                        server.stop();
+                    }
                 } catch(IOException e) {
                     plugin.log.warning(e.toString());
                 }
@@ -105,7 +108,7 @@ public class CommandController implements CommandExecutor {
         plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
-        
+
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.sendMessage("ChatPointsTTV reloaded!");
