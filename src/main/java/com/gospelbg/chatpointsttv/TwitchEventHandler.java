@@ -14,15 +14,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 
 public class TwitchEventHandler {
-    Logger log = ChatPointsTTV.getPlugin().log;
-    Boolean listenForCheers = !ChatPointsTTV.getPlugin().config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForSubs = !ChatPointsTTV.getPlugin().config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForGifts = !ChatPointsTTV.getPlugin().config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
+    ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+
+    Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
 
     private Integer ignoreSubs = 0;
 
@@ -59,19 +59,19 @@ public class TwitchEventHandler {
 
     @EventSubscriber
     public void onChannelPointsRedemption(ChannelPointsRedemptionEvent event) {
-        log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+        plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         channelPointRewards(event.getRedemption());
     }
 
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
-        ChatPointsTTV.getPlugin().log.info(event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
+        plugin.log.info(event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
         cheerRewards(event.getChatterUserName(), event.getCheer().getBits());
     }
 
     public void onEvent(ChannelChatNotificationEvent event) {
         if (listenForGifts && (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT | event.getNoticeType() == NoticeType.SUB_GIFT)) {
-            ChatPointsTTV.getPlugin().log.info(event.getChatterUserName() + " gifted a sub!"); 
+            plugin.log.info(event.getChatterUserName() + " gifted a sub!"); 
             if (event.getNoticeType() == NoticeType.SUB_GIFT) {
                 subGiftRewards(event.getChatterUserName(), 1, event.getSubGift().getSubTier());
             } else if (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) {
@@ -91,7 +91,7 @@ public class TwitchEventHandler {
                 if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
                 else tier = event.getResub().getSubTier();
             } else {
-                ChatPointsTTV.getPlugin().log.warning("Couldn't fetch sub type!");
+                plugin.log.warning("Couldn't fetch sub type!");
                 return;
             }
             subRewards(event.getChatterUserName(), tier);
@@ -103,7 +103,7 @@ public class TwitchEventHandler {
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
             ChatColor title_color = ChatPointsTTV.getChatColors().get("REWARD_NAME_COLOR");
             ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
-            ChatColor isBold = ChatPointsTTV.getPlugin().config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+            ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
             Events.displayTitle(redemption.getUser().getDisplayName(), custom_string ,redemption.getReward().getTitle(), title_color, user_color, isBold, redemption.getUserInput());
 
@@ -113,10 +113,10 @@ public class TwitchEventHandler {
                 } else {
                     Events.runAction(ChatPointsTTV.getRewards(reward_type.CHANNEL_POINTS).get(redemption.getReward().getTitle()).toString());
                 }
-                ChatPointsTTV.getPlugin().updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
+                plugin.updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
             } catch (Exception e) {
-                log.warning(e.toString());
-                ChatPointsTTV.getPlugin().updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
+                plugin.log.warning(e.toString());
+                plugin.updateRedemption(redemption.getReward().getId(), redemption.getId(), RedemptionStatus.FULFILLED);
             }
         }
     }
@@ -125,7 +125,7 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("CHEERED_STRING");
         ChatColor title_color = ChatPointsTTV.getChatColors().get("CHEER_COLOR");
         ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
-        ChatColor isBold = ChatPointsTTV.getPlugin().config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+        ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
         List<Integer> rewards = new ArrayList<Integer>();
         ChatPointsTTV.getRewards(reward_type.CHEER).forEach((k, v) -> {
@@ -142,7 +142,7 @@ public class TwitchEventHandler {
                 }
             }
         } catch (Exception e) {
-            log.warning(e.toString());
+            plugin.log.warning(e.toString());
         }
     }
 
@@ -151,13 +151,13 @@ public class TwitchEventHandler {
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
             ChatColor title_color = ChatPointsTTV.getChatColors().get("SUB_COLOR");
             ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
-            ChatColor isBold = ChatPointsTTV.getPlugin().config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+            ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
         
             try {
                 Events.displayTitle(chatter, custom_string, PlanToString(tier), title_color, user_color, isBold, null);
                 Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(PlanToConfig(tier)).toString());
             } catch (Exception e) {
-                log.warning(e.toString());
+                plugin.log.warning(e.toString());
             }
         }
     }
@@ -166,7 +166,7 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
         ChatColor title_color = ChatPointsTTV.getChatColors().get("GIFT_COLOR");
         ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
-        ChatColor isBold = ChatPointsTTV.getPlugin().config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
+        ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
 
         List<Integer> rewards = new ArrayList<Integer>();
         ChatPointsTTV.getRewards(reward_type.SUB_GIFT).forEach((k, v) -> {
@@ -183,7 +183,7 @@ public class TwitchEventHandler {
                 }
             }
         } catch (Exception e) {
-            log.warning(e.toString());
+            plugin.log.warning(e.toString());
         }
     }
 }
