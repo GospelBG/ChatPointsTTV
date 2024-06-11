@@ -8,6 +8,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
+import com.gospelbg.Utils;
 import com.gospelbg.chatpointsttv.ChatPointsTTV.reward_type;
 
 import java.util.ArrayList;
@@ -26,37 +27,6 @@ public class TwitchEventHandler {
 
     private Integer ignoreSubs = 0;
 
-    public static String PlanToString(SubscriptionPlan plan) {
-        switch (plan.toString()) {
-            case "Prime":
-                return "Tier 1 (Prime)";
-            case "1000":
-                return "Tier 1";
-            case "2000":
-                return "Tier 2";
-            case "3000":
-                return "Tier 3";
-            default:
-                return null;
-        }
-    }
-
-    public static String PlanToConfig(SubscriptionPlan plan) {
-        switch (plan.toString()) {
-            case "Prime":
-                return "TWITCH_PRIME";
-            case "1000":
-                return "TIER1";
-            case "2000":
-                return "TIER2";
-            case "3000":
-                return "TIER3";
-            default:
-                return null;
-        }
-    }
-
-
     @EventSubscriber
     public void onChannelPointsRedemption(ChannelPointsRedemptionEvent event) {
         plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
@@ -74,22 +44,27 @@ public class TwitchEventHandler {
             plugin.log.info(event.getChatterUserName() + " gifted a sub!"); 
             if (event.getNoticeType() == NoticeType.SUB_GIFT) {
                 subGiftRewards(event.getChatterUserName(), 1, event.getSubGift().getSubTier());
+
             } else if (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) {
                 ignoreSubs += event.getCommunitySubGift().getTotal(); // Multiple sub gifting triggers both events
                 subGiftRewards(event.getChatterUserName(), event.getCommunitySubGift().getTotal(), event.getCommunitySubGift().getSubTier());
             }
+
         } else if (listenForSubs && (event.getNoticeType() == NoticeType.SUB | event.getNoticeType() == NoticeType.RESUB)) {
             SubscriptionPlan tier;
             if (ignoreSubs > 0) {
                 ignoreSubs -= 1;
                 return;
             }
+
             if (event.getNoticeType() == NoticeType.SUB) {
                 if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
                 else tier = event.getSub().getSubTier();
+
             } else if (event.getNoticeType() == NoticeType.RESUB) {
                 if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
                 else tier = event.getResub().getSubTier();
+
             } else {
                 plugin.log.warning("Couldn't fetch sub type!");
                 return;
@@ -147,15 +122,15 @@ public class TwitchEventHandler {
     }
 
     private void subRewards(String chatter, SubscriptionPlan tier) {
-        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(PlanToConfig(tier))) {
+        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(Utils.PlanToConfig(tier))) {
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
             ChatColor title_color = ChatPointsTTV.getChatColors().get("SUB_COLOR");
             ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
             ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
         
             try {
-                Events.displayTitle(chatter, custom_string, PlanToString(tier), title_color, user_color, isBold, null);
-                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(PlanToConfig(tier)).toString());
+                Events.displayTitle(chatter, custom_string, Utils.PlanToString(tier), title_color, user_color, isBold, null);
+                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(Utils.PlanToConfig(tier)).toString());
             } catch (Exception e) {
                 plugin.log.warning(e.toString());
             }
