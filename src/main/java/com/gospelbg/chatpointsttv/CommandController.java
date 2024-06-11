@@ -4,7 +4,6 @@ import com.gospelbg.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -82,7 +81,7 @@ public class CommandController implements TabExecutor {
             String msg = "Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + plugin.getAuthURL();
             p.sendMessage(msg);
         } else {
-            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.DARK_PURPLE + "Link your Twitch account to set ChatPointsTTV up";
+            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up";
             ComponentBuilder formatted = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
             
             BaseComponent btn = formatted.create()[0];
@@ -129,11 +128,11 @@ public class CommandController implements TabExecutor {
 
     private void help(ChatPointsTTV plugin, CommandSender p, Command cmd) {
         String msg = (
-        "---------- " + ChatColor.BOLD + "" + ChatColor.GOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
+        "---------- " + ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + cmd.getUsage() + ChatColor.RESET + "\n" + 
-        ChatColor.GOLD + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
-        ChatColor.GOLD + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
-        ChatColor.GOLD + "/twitch help: " + ChatColor.RESET + "Displays this help message."
+        ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
+        ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message."
         );
         ComponentBuilder formatted = new ComponentBuilder(msg);
         

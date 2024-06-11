@@ -36,6 +36,7 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 
 import com.github.twitch4j.helix.domain.UserList;
 import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
+import com.gospelbg.chatpointsttv.TwitchAuth.VersionCheck;
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
     private static TwitchEventHandler eventHandler;
@@ -153,8 +154,8 @@ public class ChatPointsTTV extends JavaPlugin {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!accountConnected) {
-                    String msg ="Welcome! Remember to login with your Twitch account for this plugin to work.";
-                    ComponentBuilder builder = new ComponentBuilder(ChatColor.DARK_PURPLE + "[Click here to login with your Twitch account]");
+                    String msg = "Welcome! Remember to log in with your Twitch account for ChatPointsTTV to be able to connect and listen.";
+                    ComponentBuilder builder = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login]");
                     BaseComponent btn = builder.create()[0];
 
                     btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to run command")));
