@@ -169,6 +169,15 @@ public class ChatPointsTTV extends JavaPlugin {
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
+
+        log.info("ChatPointsTTV enabled!");
+        for (Player p: plugin.getServer().getOnlinePlayers()) {
+            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
+                p.sendMessage("ChatPointsTTV reloaded!");
+            }
+        }
+
+        VersionCheck.check();
     }
 
     @Override

@@ -125,13 +125,6 @@ public class CommandController implements TabExecutor {
         plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
-
-        for (Player p: plugin.getServer().getOnlinePlayers()) {
-            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.sendMessage("ChatPointsTTV reloaded!");
-            }
-        }
-        plugin.log.info("ChatPointsTTV reloaded!");
     }
 
     private void help(ChatPointsTTV plugin, CommandSender p, Command cmd) {
