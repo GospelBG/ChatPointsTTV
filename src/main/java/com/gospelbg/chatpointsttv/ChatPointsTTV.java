@@ -35,6 +35,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 import com.github.twitch4j.helix.domain.UserList;
+import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
     private static TwitchEventHandler eventHandler;
@@ -50,10 +51,18 @@ public class ChatPointsTTV extends JavaPlugin {
     private Boolean accountConnected = false;
 
     private final String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
-    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope=channel%3Aread%3Aredemptions+channel%3Amanage%3Aredemptions+bits%3Aread+channel%3Aread%3Asubscriptions+user%3Aread%3Achat+chat%3Aread+chat%3Aedit";
+    private final String scopes = Scopes.join(
+        Scopes.CHANNEL_READ_REDEMPTIONS,
+        Scopes.CHANNEL_MANAGE_REDEMPTIONS,
+        Scopes.BITS_READ,
+        Scopes.CHANNEL_READ_SUBSCRIPTIONS,
+        Scopes.USER_READ_CHAT,
+        Scopes.CHAT_READ,
+        Scopes.CHAT_EDIT
+        ).replace(":", "%3A"); // Format colon character for browser
+    private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope="+scopes;
 
     private OAuth2Credential oauth;
-
     public enum reward_type {
         CHANNEL_POINTS,
         CHEER,
