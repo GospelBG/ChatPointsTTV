@@ -159,14 +159,23 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (client != null) {
-            client.getEventManager().close();
             try {
                 eventSocket.close();
             } catch (Exception e) {
                 log.warning(e.toString());
             }
+            client.getEventManager().close();
             client.close();
+
+            // Erase variables
             client = null;
+            eventHandler = null;
+            eventSocket = null;
+            eventManager = null;
+            config = null;
+            accountConnected = false;
+            oauth = null;
+            plugin = null;
         }
     }
 
