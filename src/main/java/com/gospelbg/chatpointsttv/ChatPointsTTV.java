@@ -138,6 +138,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         PluginManager pm = Bukkit.getServer().getPluginManager();
+
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         config = getConfig();
@@ -200,6 +201,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void linkToTwitch(String token) {
         oauth = new OAuth2Credential(ClientID, token);
+
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
             .withDefaultAuthToken(oauth)
@@ -210,8 +212,6 @@ public class ChatPointsTTV extends JavaPlugin {
             .withEnableEventSocket(true)
             .withDefaultEventHandler(SimpleEventHandler.class)
             .build();
-
-        
 
         log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
         accountConnected = true;

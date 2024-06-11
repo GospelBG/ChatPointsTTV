@@ -2,6 +2,7 @@ package com.gospelbg.chatpointsttv;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -11,8 +12,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.entity.EntityType;
 
 public class Events {
+    static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+    static Logger log = plugin.log;
+
     public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, ChatColor isBold, String extra) {
-        ChatPointsTTV.getPlugin().getServer().getOnlinePlayers().forEach (p -> {
+        plugin.getServer().getOnlinePlayers().forEach (p -> {
             if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                 p.sendTitle(userColor + user, action + " " + isBold + titleColor + rewardName + "\n" + extra, 10, 70, 20);
             }
@@ -23,10 +27,9 @@ public class Events {
         if (action_str.startsWith("SPAWN")) {
             
             List<String> action = Arrays.asList(action_str.split(" "));
-            //Bukkit.getScheduler().runTask(this, new Runnable() {public void run() {Events.spawnMob(EntityType.valueOf(action.get(1)), Integer.valueOf(action.get(2)));}});
-            Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> {
-                ChatPointsTTV.getPlugin().log.info("Spawning...");
-                for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                log.info("Spawning...");
+                for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                         for (int i = 0; i < Integer.valueOf(action.get(2)); i++) {
                             p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(action.get(1).toUpperCase()));
@@ -47,20 +50,20 @@ public class Events {
             }
             text = text.trim();
 
-            final String cmd =text.replace("/", "");
-            ChatPointsTTV.getPlugin().log.info("Running command: \""+ cmd + "\"...");
+            final String cmd = text.replace("/", "");
+            log.info("Running command: \""+ cmd + "\"...");
 
             if (runAs.equalsIgnoreCase("CONSOLE")) {
                 Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
             } else  {
-                for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
+                for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
                                 Bukkit.dispatchCommand(p, cmd);
                             }
-                        }.runTask(ChatPointsTTV.getPlugin());
+                        }.runTask(plugin);
                         return;    
                     }
                 }
