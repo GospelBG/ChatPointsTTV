@@ -19,6 +19,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 
 public class CommandController implements CommandExecutor {
+
+    AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -53,7 +56,7 @@ public class CommandController implements CommandExecutor {
     }
 
     private void link(ChatPointsTTV plugin, CommandSender p) {
-        AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
+        server = new AuthenticationCallbackServer(3000);
         if (ChatPointsTTV.getTwitchClient() != null) {
             ChatPointsTTV.getTwitchClient().close();
         }
@@ -97,9 +100,12 @@ public class CommandController implements CommandExecutor {
     }
 
     private void reload(ChatPointsTTV plugin) {
-        //TODO: Kill HTTP server
+        if (server != null) server.stop(); // Stop HTTP server if it is actve
+
+        plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
+        
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.sendMessage("ChatPointsTTV reloaded!");
