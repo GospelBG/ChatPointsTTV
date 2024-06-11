@@ -21,7 +21,7 @@ import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
 
-    AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
+    public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

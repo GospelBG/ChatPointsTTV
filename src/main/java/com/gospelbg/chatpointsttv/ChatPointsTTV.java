@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scheduler.BukkitWorker;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -186,17 +188,19 @@ public class ChatPointsTTV extends JavaPlugin {
     public void onDisable() {
         if (client != null) {
             client.close();
-
-            // Erase variables
-            client = null;
-            eventHandler = null;
-            eventSocket = null;
-            eventManager = null;
-            config = null;
-            accountConnected = false;
-            oauth = null;
-            plugin = null;
         }
+        
+        CommandController.server.stop();
+    
+        // Erase variables
+        client = null;
+        eventHandler = null;
+        eventSocket = null;
+        eventManager = null;
+        config = null;
+        accountConnected = false;
+        oauth = null;
+        plugin = null;
     }
 
     public void linkToTwitch(String token) {
