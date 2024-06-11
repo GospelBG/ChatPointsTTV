@@ -3,6 +3,7 @@ package com.gospelbg.chatpointsttv;
 import com.gospelbg.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
@@ -13,12 +14,13 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 
-public class CommandController implements CommandExecutor {
+public class CommandController implements TabExecutor {
 
     AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
 
@@ -53,6 +55,20 @@ public class CommandController implements CommandExecutor {
 
         // If the sender (or console) uses our command correct, we can return true
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+
+        if (args.length == 1) {
+            list.add("link");
+            list.add("reload");
+            list.add("help");
+
+            return list;
+        }
+        return null;        
     }
 
     private void link(ChatPointsTTV plugin, CommandSender p) {

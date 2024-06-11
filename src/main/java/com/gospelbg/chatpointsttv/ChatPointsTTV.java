@@ -42,6 +42,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
     private static ChatPointsTTV plugin;
+    private CommandController cmdController;
 
     private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
     private static Map<String, String> titleStrings = new HashMap<String, String>();
@@ -164,6 +165,10 @@ public class ChatPointsTTV extends JavaPlugin {
 
                 this.getCommand("twitch").setExecutor(new CommandController());
             }
+        cmdController = new CommandController();
+        this.getCommand("twitch").setExecutor(cmdController);
+        this.getCommand("twitch").setTabCompleter(cmdController);
+    }
 
     @Override
     public void onDisable() {
