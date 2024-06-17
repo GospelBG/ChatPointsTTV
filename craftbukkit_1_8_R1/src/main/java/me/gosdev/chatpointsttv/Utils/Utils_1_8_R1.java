@@ -1,4 +1,4 @@
-package com.gospelbg.chatpointsttv.Utils;
+package me.gosdev.chatpointsttv.Utils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

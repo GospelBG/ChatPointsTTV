@@ -1,6 +1,6 @@
 //TODO: MULTI-VERSIONS
 
-package com.gospelbg.chatpointsttv;
+package me.gosdev.chatpointsttv;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -36,9 +36,9 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.UserList;
-import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
-import com.gospelbg.chatpointsttv.TwitchAuth.VersionCheck;
-import com.gospelbg.chatpointsttv.Utils.Utils;
+import me.gosdev.chatpointsttv.TwitchAuth.Scopes;
+import me.gosdev.chatpointsttv.TwitchAuth.VersionCheck;
+import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;

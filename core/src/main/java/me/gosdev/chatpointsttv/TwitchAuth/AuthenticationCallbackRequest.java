@@ -1,4 +1,4 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.TwitchAuth;
 
 import java.io.*;
 import java.net.Socket;

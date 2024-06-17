@@ -1,4 +1,4 @@
-package com.gospelbg.chatpointsttv;
+package me.gosdev.chatpointsttv;
 
 import com.github.philippheuer.events4j.simple.domain.EventSubscriber;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
@@ -8,7 +8,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
-import com.gospelbg.chatpointsttv.ChatPointsTTV.reward_type;
+import me.gosdev.chatpointsttv.ChatPointsTTV.reward_type;
 
 import java.util.ArrayList;
 import java.util.Arrays;

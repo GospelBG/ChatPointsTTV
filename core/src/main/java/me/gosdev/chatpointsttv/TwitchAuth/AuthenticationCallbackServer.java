@@ -1,4 +1,4 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.TwitchAuth;
 
 import java.io.IOException;
 import java.net.*;

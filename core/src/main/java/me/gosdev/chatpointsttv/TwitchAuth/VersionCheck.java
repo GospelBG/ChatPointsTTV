@@ -1,4 +1,4 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.TwitchAuth;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
 
-import com.gospelbg.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;

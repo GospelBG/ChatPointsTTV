@@ -1,6 +1,6 @@
-package com.gospelbg.chatpointsttv;
+package me.gosdev.chatpointsttv;
 
-import com.gospelbg.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
+import me.gosdev.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
