@@ -8,7 +8,6 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.ChannelPointsRedemptionEvent;
-import com.gospelbg.Utils;
 import com.gospelbg.chatpointsttv.ChatPointsTTV.reward_type;
 
 import java.util.ArrayList;
@@ -122,15 +121,15 @@ public class TwitchEventHandler {
     }
 
     private void subRewards(String chatter, SubscriptionPlan tier) {
-        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(Utils.PlanToConfig(tier))) {
+        if (ChatPointsTTV.getRewards(reward_type.SUB).containsKey(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
             ChatColor title_color = ChatPointsTTV.getChatColors().get("SUB_COLOR");
             ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
             ChatColor isBold = plugin.config.getBoolean("REWARD_NAME_BOLD") ? ChatColor.BOLD : ChatColor.RESET;
         
             try {
-                Events.displayTitle(chatter, custom_string, Utils.PlanToString(tier), title_color, user_color, isBold, null);
-                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(Utils.PlanToConfig(tier)).toString());
+                Events.displayTitle(chatter, custom_string, ChatPointsTTV.getUtils().PlanToString(tier), title_color, user_color, isBold, null);
+                Events.runAction(ChatPointsTTV.getRewards(reward_type.SUB).get(ChatPointsTTV.getUtils().PlanToConfig(tier)).toString());
             } catch (Exception e) {
                 plugin.log.warning(e.toString());
             }

@@ -10,7 +10,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ public class CommandController implements TabExecutor {
                 case "help":
                     help(plugin, sender, cmd);
                     break;
-                    
                 default:
                     sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0] + "\n ");
                     help(plugin, sender, cmd);
@@ -86,11 +84,10 @@ public class CommandController implements TabExecutor {
             
             BaseComponent btn = formatted.create()[0];
 
-            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open in browser")));
+            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
 
-            p.spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
-            p.spigot().sendMessage(btn);
+            ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
@@ -136,6 +133,6 @@ public class CommandController implements TabExecutor {
         );
         ComponentBuilder formatted = new ComponentBuilder(msg);
         
-        p.spigot().sendMessage(formatted.create()[0]);
+        ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{formatted.create()[0]});
     }
 }

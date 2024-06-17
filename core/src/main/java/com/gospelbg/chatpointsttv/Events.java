@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+
 import org.bukkit.entity.EntityType;
 
 public class Events {
@@ -18,7 +19,7 @@ public class Events {
     public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, ChatColor isBold, String extra) {
         plugin.getServer().getOnlinePlayers().forEach (p -> {
             if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                p.sendTitle(userColor + user, action + " " + isBold + titleColor + rewardName + "\n" + extra, 10, 70, 20);
+                ChatPointsTTV.getUtils().displayTitle(p, userColor + user, action + " " + isBold + titleColor + rewardName + "\n" + extra);
             }
         });
     }

@@ -1,12 +1,11 @@
 package com.gospelbg.chatpointsttv.TwitchAuth;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.logging.Logger;
-
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
 
@@ -17,7 +16,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class VersionCheck {
     private final static String url = "https://api.modrinth.com/v2/project/nN0gRvoO/version";
@@ -28,11 +26,17 @@ public class VersionCheck {
         Logger log = plugin.log;
 
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
-    
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONArray json = new JSONArray(response.body());
+            StringBuilder result = new StringBuilder();
+            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+            conn.setRequestMethod("GET");
+            try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream()))) {
+                for (String line; (line = reader.readLine()) != null; ) {
+                    result.append(line);
+                }
+            }
+
+            JSONArray json = new JSONArray(result.toString());
             String latest = json.getJSONObject(0).getString("version_number");
 
             if (ChatPointsTTV.getPlugin().getDescription().getVersion() != latest) {
@@ -43,7 +47,7 @@ public class VersionCheck {
                         ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version");
             
                         BaseComponent btn = formatted.create()[0];
-                        btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to open in browser")));
+                        btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                         btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, download_url));
 
                         p.spigot().sendMessage(btn);
@@ -53,7 +57,7 @@ public class VersionCheck {
 
             }
 
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.warning("Couldn't fetch latest version." + e.toString());
         }
     }

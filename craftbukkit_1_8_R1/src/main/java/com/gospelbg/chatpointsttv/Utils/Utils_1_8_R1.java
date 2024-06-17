@@ -1,9 +1,15 @@
-package com.gospelbg;
+package com.gospelbg.chatpointsttv.Utils;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
-public class Utils {
-     public static String PlanToString(SubscriptionPlan plan) {
+import net.md_5.bungee.api.chat.BaseComponent;
+
+public class Utils_1_8_R1 implements Utils {
+    @Override
+     public String PlanToString(SubscriptionPlan plan) {
         switch (plan.toString()) {
             case "Prime":
                 return "Tier 1 (Prime)";
@@ -18,10 +24,11 @@ public class Utils {
         }
     }
 
-    public static String PlanToConfig(SubscriptionPlan plan) {
+    @Override
+    public String PlanToConfig(SubscriptionPlan plan) {
         switch (plan.toString()) {
             case "Prime":
-                return "TWITCH_PRIME";
+                return "TWITCH";
             case "1000":
                 return "TIER1";
             case "2000":
@@ -31,5 +38,16 @@ public class Utils {
             default:
                 return null;
         }
+    }
+
+    @Override
+    public void displayTitle(Player p, String title, String sub) {
+        p.sendTitle(title, sub);
+
+    }
+    
+    @Override
+    public void sendMessage(CommandSender p, BaseComponent[] message) {
+        p.getServer().spigot().broadcast(message);
     }
 }

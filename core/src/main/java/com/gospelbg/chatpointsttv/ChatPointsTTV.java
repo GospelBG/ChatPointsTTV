@@ -1,3 +1,5 @@
+//TODO: MULTI-VERSIONS
+
 package com.gospelbg.chatpointsttv;
 
 import java.util.Arrays;
@@ -32,11 +34,12 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 import com.github.twitch4j.helix.domain.UserList;
 import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
 import com.gospelbg.chatpointsttv.TwitchAuth.VersionCheck;
+import com.gospelbg.chatpointsttv.Utils.Utils;
+
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
     private static TwitchEventHandler eventHandler;
@@ -134,6 +137,25 @@ public class ChatPointsTTV extends JavaPlugin {
         }
     }
 
+    private static Utils utils;
+
+    public static Utils getUtils() {
+        if (utils != null) return utils;
+
+        int version = Integer.parseInt(Bukkit.getServer().getClass().getName().split("\\.")[3].split("_")[1]);
+        try {
+            if (version <= 8) { 
+                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_8_R1").getDeclaredConstructor().newInstance();
+            } else {
+                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_8_R1").getDeclaredConstructor().newInstance();
+            }
+            return utils;    
+        } catch (Exception e) {
+            plugin.log.warning(e.toString());
+            return null;
+        }
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -159,7 +181,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     ComponentBuilder builder = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login]");
                     BaseComponent btn = builder.create()[0];
 
-                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Click to run command")));
+                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
                     btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
 
                     player.getPlayer().spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
