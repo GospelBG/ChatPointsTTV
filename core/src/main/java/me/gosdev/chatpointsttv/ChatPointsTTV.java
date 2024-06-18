@@ -246,6 +246,7 @@ public class ChatPointsTTV extends JavaPlugin {
         String channel_id = getUserId(channel);
         String user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
         log.info("Listening to " + channel + "'s events...");
+        getUtils().sendLogToPlayers(new ComponentBuilder("[ChatPointsTTV] Listening to: " + channel).create()[0]);
         client.getChat().joinChannel(channel);
 
         BaseComponent msg = new ComponentBuilder("[ChatPointsTTV] Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName()).create()[0];
