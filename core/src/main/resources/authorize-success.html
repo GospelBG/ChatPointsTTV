@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Authorization Successful</title>
+    <style>
+        html {
+            background-color: #1d132f;
+        }
+        body {
+            color: #6441A5;
+            font-family: 'Lucida Sans';
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+        }
+        h2 {
+            font-size: 3rem;
+            margin: 0;
+        }
+        svg {
+            width: 30vh;
+        }
+        .container {
+            height: 100%;
+            vertical-align: middle;
+            text-align: center;
+            display: grid;
+            place-items: center;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function clearGetParams() {
+            // Clear the GET parameters so that the access_token is not stored in the browser history
+            if (typeof window.history.pushState == 'function') {
+                window.history.pushState({}, "Hide", location.origin + location.pathname);
+            }
+        }
+        window.onload = clearGetParams();
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 id="heading">Success!</h2>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="#6441A5" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 48c110.5 0 200 89.5 200 200 0 110.5-89.5 200-200 200-110.5 0-200-89.5-200-200 0-110.5 89.5-200 200-200m140.2 130.3l-22.5-22.7c-4.7-4.7-12.3-4.7-17-.1L215.3 303.7l-59.8-60.3c-4.7-4.7-12.3-4.7-17-.1l-22.7 22.5c-4.7 4.7-4.7 12.3-.1 17l90.8 91.5c4.7 4.7 12.3 4.7 17 .1l172.6-171.2c4.7-4.7 4.7-12.3 .1-17z"/></svg>
+    <h2>You can close this window now.</p>
+</div>
+</body>
+</html>
