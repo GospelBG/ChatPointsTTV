@@ -56,7 +56,7 @@ You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the 
 You can leave this section unmodified, as there are default colors set up in the original file
 * **Strings**: Allows you to customize all title texts displayed to people with the `chatpointsttv.broadcast` permission. You may want to translate these strings to your language for a better experience. Don't add spaces before or after the double quotes as the plugin already does this for you. English strings are set up in the file by default.
 
-### Reward Actions
+## Reward Actions
 Currently, there are 2 types of actions:
 - Spawning entities  
     **Format**: `SPAWN <ENTITY NAME> <AMOUNT>`  
@@ -68,7 +68,7 @@ Currently, there are 2 types of actions:
     **Example**: `RUN TARGET DAMAGE @S 2`  
     *This action will run the command as the console a single time, or as each player once. Command arguments are allowed. The example action will substract each player a heart from their health.*
 
-### Permissions
+## Permissions
 As of version 2.0 there are 3 permissions for the plugin:
 - TARGET  
     **ID**: `chatpointsttv.target`  
@@ -82,7 +82,7 @@ As of version 2.0 there are 3 permissions for the plugin:
     **ID**: `chatpointsttv.manage`  
     **Behaviour**: Players with this permission will be allowed to run the `/twitch` command and link a Twitch account.  
 
-### **Credits**
+## **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
 
 Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentification.
