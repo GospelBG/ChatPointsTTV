@@ -31,6 +31,9 @@ SUB_REWARDS:
 GIFT_REWARDS:
   {AMOUNT}: {ACTION}
 
+# Whether the plugin should log to the console when a user (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
+LOG_EVENTS: true
+
 # Customize the in-game title.
 # You can use the following options:
 

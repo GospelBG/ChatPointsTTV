@@ -23,24 +23,25 @@ public class TwitchEventHandler {
     Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
     Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
     Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
+    Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
 
     private Integer ignoreSubs = 0;
 
     @EventSubscriber
     public void onChannelPointsRedemption(ChannelPointsRedemptionEvent event) {
-        plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+        if (logEvents) plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         channelPointRewards(event.getRedemption());
     }
 
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
-        plugin.log.info(event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
+        if (logEvents) plugin.log.info(event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
         cheerRewards(event.getChatterUserName(), event.getCheer().getBits());
     }
 
     public void onEvent(ChannelChatNotificationEvent event) {
         if (listenForGifts && (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT | event.getNoticeType() == NoticeType.SUB_GIFT)) {
-            plugin.log.info(event.getChatterUserName() + " gifted a sub!"); 
+            if (logEvents) plugin.log.info(event.getChatterUserName() + " gifted a sub!"); 
             if (event.getNoticeType() == NoticeType.SUB_GIFT) {
                 subGiftRewards(event.getChatterUserName(), 1, event.getSubGift().getSubTier());
 
@@ -68,6 +69,8 @@ public class TwitchEventHandler {
                 plugin.log.warning("Couldn't fetch sub type!");
                 return;
             }
+
+            if (logEvents) plugin.log.info(event.getChatterUserName() + " subscribed with a " + tier.toString() + " sub!");
             subRewards(event.getChatterUserName(), tier);
         }
     }
