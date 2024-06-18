@@ -59,4 +59,4 @@ Currently, there are 2 types of actions:
 ### **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
 
-Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentification.
+Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentication.
