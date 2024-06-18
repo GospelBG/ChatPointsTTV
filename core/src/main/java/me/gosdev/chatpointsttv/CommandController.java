@@ -34,6 +34,7 @@ public class CommandController implements TabExecutor {
             switch (args[0]) {
                 case "link":
                     if (ChatPointsTTV.getClient() != null) ChatPointsTTV.getClient().close();
+                    if (!ChatPointsTTV.configOk) break;
                     link(plugin, sender);
                     break;
 
@@ -52,6 +53,7 @@ public class CommandController implements TabExecutor {
         }
 
         // If the sender (or console) uses our command correct, we can return true
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
         return true;
     }
 
@@ -129,8 +131,7 @@ public class CommandController implements TabExecutor {
         ChatColor.GRAY + "Usage: " + cmd.getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
-        ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message."
-        );
+        ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.");
         ComponentBuilder formatted = new ComponentBuilder(msg);
         
         ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{formatted.create()[0]});

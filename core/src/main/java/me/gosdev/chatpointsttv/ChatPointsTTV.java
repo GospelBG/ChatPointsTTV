@@ -51,6 +51,8 @@ public class ChatPointsTTV extends JavaPlugin {
     private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
     private static Map<String, String> titleStrings = new HashMap<String, String>();
 
+    public static boolean configOk = true;
+
     public Logger log = getLogger();
     public FileConfiguration config;
     private Boolean accountConnected = false;
@@ -202,6 +204,13 @@ public class ChatPointsTTV extends JavaPlugin {
         }
 
         VersionCheck.check();
+
+        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
+            log.warning("Cannot read channel. Config file may be not set up or invalid.");
+            configOk = false;
+        } else {
+            configOk = true;
+        }
     }
 
     @Override
