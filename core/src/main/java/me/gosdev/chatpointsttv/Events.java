@@ -55,7 +55,12 @@ public class Events {
             log.info("Running command: \""+ cmd + "\"...");
 
             if (runAs.equalsIgnoreCase("CONSOLE")) {
-                Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd);
+                    }
+                }.runTask(plugin);
             } else  {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
