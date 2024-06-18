@@ -13,6 +13,14 @@
     <module>craftbukkit_1_8_R1</module>
     <module>dist</module>
   </modules>
+  <build>
+    <resources>
+        <resource>
+            <directory>core/src/main/resources</directory>
+            <filtering>true</filtering>
+         </resource>
+      </resources>
+  </build>
 
   <properties>
       <maven.compiler.source>1.8</maven.compiler.source>

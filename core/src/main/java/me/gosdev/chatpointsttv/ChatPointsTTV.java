@@ -249,11 +249,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
         BaseComponent msg = new ComponentBuilder("[ChatPointsTTV] Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName()).create()[0];
 
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.spigot().sendMessage(msg);
-            }
-        }
+        getUtils().sendLogToPlayers(msg);
 
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
