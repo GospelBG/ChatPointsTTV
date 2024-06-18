@@ -233,7 +233,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public void linkToTwitch(String token) {
-        getUtils().sendLogToPlayers(new ComponentBuilder("[ChatPointsTTV] Logging in...").create()[0]);
+        getUtils().sendLogToPlayers("Logging in...");
         oauth = new OAuth2Credential(ClientID, token);
 
         // Build TwitchClient
@@ -255,12 +255,10 @@ public class ChatPointsTTV extends JavaPlugin {
         String channel_id = getUserId(channel);
         String user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
         log.info("Listening to " + channel + "'s events...");
-        getUtils().sendLogToPlayers(new ComponentBuilder("[ChatPointsTTV] Listening to: " + channel).create()[0]);
+        getUtils().sendLogToPlayers("Listening to: " + channel);
         client.getChat().joinChannel(channel);
 
-        BaseComponent msg = new ComponentBuilder("[ChatPointsTTV] Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName()).create()[0];
-
-        getUtils().sendLogToPlayers(msg);
+        getUtils().sendLogToPlayers("Logged in as: " + client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
 
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();

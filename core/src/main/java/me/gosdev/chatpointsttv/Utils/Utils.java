@@ -16,5 +16,5 @@ public interface Utils {
 
     public void sendMessage(CommandSender p, BaseComponent[] message);
 
-    public void sendLogToPlayers(BaseComponent msg);
+    public void sendLogToPlayers(String msg);
 }

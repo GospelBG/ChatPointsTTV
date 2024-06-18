@@ -8,6 +8,7 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class Utils_1_8_R1 implements Utils {
     @Override
@@ -54,10 +55,10 @@ public class Utils_1_8_R1 implements Utils {
     }
 
     @Override
-    public void sendLogToPlayers(BaseComponent msg) {
+    public void sendLogToPlayers(String msg) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.getServer().spigot().broadcast(msg);
+                p.sendRawMessage("[ChatPointsTTV] " + msg);
             }
         }
     }
