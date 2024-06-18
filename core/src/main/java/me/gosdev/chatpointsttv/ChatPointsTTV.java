@@ -176,7 +176,7 @@ public class ChatPointsTTV extends JavaPlugin {
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
-                if (!accountConnected) {
+                if (!accountConnected && player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) {
                     String msg = "Welcome! Remember to log in with your Twitch account for ChatPointsTTV to be able to connect and listen.";
                     ComponentBuilder builder = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login]");
                     BaseComponent btn = builder.create()[0];
