@@ -224,6 +224,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public void linkToTwitch(String token) {
+        getUtils().sendLogToPlayers(new ComponentBuilder("[ChatPointsTTV] Logging in...").create()[0]);
         oauth = new OAuth2Credential(ClientID, token);
 
         // Build TwitchClient
