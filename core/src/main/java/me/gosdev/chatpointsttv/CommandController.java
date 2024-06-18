@@ -5,7 +5,6 @@ import me.gosdev.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -16,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
@@ -29,7 +29,7 @@ public class CommandController implements TabExecutor {
         if (args.length == 0) {
             help(plugin, sender, cmd);
             return true;
-
+        
         } else {
             switch (args[0]) {
                 case "link":
@@ -44,9 +44,9 @@ public class CommandController implements TabExecutor {
 
                 case "help":
                     help(plugin, sender, cmd);
-                    break;
+                    return true;
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0] + "\n ");
+                    sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
                     help(plugin, sender, cmd);
                     return true;
             }
