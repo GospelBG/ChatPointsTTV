@@ -16,7 +16,7 @@
   <build>
     <resources>
         <resource>
-            <directory>core/src/main/resources</directory>
+            <directory>src/main/resources</directory>
             <filtering>true</filtering>
          </resource>
       </resources>
