@@ -1,5 +1,3 @@
-//TODO: MULTI-VERSIONS
-
 package me.gosdev.chatpointsttv;
 
 import java.util.Arrays;
@@ -37,7 +35,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.UserList;
 import me.gosdev.chatpointsttv.TwitchAuth.Scopes;
-import me.gosdev.chatpointsttv.TwitchAuth.VersionCheck;
 import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {

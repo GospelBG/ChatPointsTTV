@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +8,6 @@ import java.net.URL;
 import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
-
-import me.gosdev.chatpointsttv.ChatPointsTTV;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -39,7 +37,7 @@ public class VersionCheck {
             JSONArray json = new JSONArray(result.toString());
             String latest = json.getJSONObject(0).getString("version_number");
 
-            if (ChatPointsTTV.getPlugin().getDescription().getVersion() != latest) {
+            if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latest.replaceAll("[^\\d.]", ""))) {
                 for (Player p: plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                         p.sendMessage(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!");
