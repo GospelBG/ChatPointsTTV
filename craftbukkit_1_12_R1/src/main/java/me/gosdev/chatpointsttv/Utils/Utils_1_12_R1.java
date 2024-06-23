@@ -31,7 +31,7 @@ public class Utils_1_12_R1 implements Utils {
     public String PlanToConfig(SubscriptionPlan plan) {
         switch (plan.toString()) {
             case "Prime":
-                return "TWITCH";
+                return "TWITCH_PRIME";
             case "1000":
                 return "TIER1";
             case "2000":
