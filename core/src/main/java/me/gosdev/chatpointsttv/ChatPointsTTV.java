@@ -47,6 +47,8 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
     private static Map<String, String> titleStrings = new HashMap<String, String>();
+    public static Boolean shouldMobsGlow;
+    public static Boolean nameSpawnedMobs;
 
     public static boolean configOk = true;
 
@@ -171,6 +173,9 @@ public class ChatPointsTTV extends JavaPlugin {
         config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
             titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
         });
+
+        shouldMobsGlow = config.getBoolean("MOB_GLOW");
+        nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
 
         pm.registerEvents(new Listener() {
             @EventHandler

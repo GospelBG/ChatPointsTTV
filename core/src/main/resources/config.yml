@@ -31,6 +31,11 @@ SUB_REWARDS:
 GIFT_REWARDS:
   {AMOUNT}: {ACTION}
 
+# Add glow effect to spawned mobs
+MOB_GLOW: true
+# Set chatter's name to spawned mobs
+DISPLAY_NAME_ON_MOB: true
+
 # Whether the plugin should log to the console when a user (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
 LOG_EVENTS: true
 

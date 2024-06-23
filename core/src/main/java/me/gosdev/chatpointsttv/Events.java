@@ -33,7 +33,10 @@ public class Events {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                         for (int i = 0; i < Integer.valueOf(action.get(2)); i++) {
-                            p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(action.get(1).toUpperCase()));
+                            LivingEntity e = (LivingEntity) p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(action.get(1).toUpperCase()));
+
+                            e.setGlowing(ChatPointsTTV.shouldMobsGlow);
+                            if (ChatPointsTTV.nameSpawnedMobs) e.setCustomName(user);
                         }
                     }
                 }
