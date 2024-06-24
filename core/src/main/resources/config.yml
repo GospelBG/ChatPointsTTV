@@ -7,32 +7,46 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 SHOW_CHAT: true
 
 # Set up here your channel point rewards.
-# Add as many lines as needed. Replace {REWARD_NAME} with your reward's name, EXACTLY as it is on Twitch.
+# Add as many lines as needed. Replace [REWARD NAME] with your reward's name, EXACTLY as it is on Twitch.
 
-# {REWARD_NAME}: {ACTION}
+# REWARD_NAME:
+#    - ACTION
 
 # For the action, follow this format:
 #     SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}
 #     RUN {TARGET / CONSOLE} {COMMAND}
+#     GIVE {ITEM} {AMOUNT}
 
 # If your reward contains a text input, you can reference it as:
 #     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
 
 # Leave any reward class empty to disable it.
-REWARDS:
-  {REWARD NAME}: {ACTION}
+CHANNEL_POINTS_REWARDS:
+  [REWARD NAME]:
+    - {ACTION 1}
+    - {ACTION 2}
+
+# Put the desired action after the colon in the form of a list. You musn't add a "Reward Name".
+FOLLOW_REWARDS:
+  - {ACTION}
+  - {ACTION}
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
 CHEER_REWARDS:
-  {100/500/1000...}: {ACTION}
+  [BITS AMOUNT]:
+    - {ACTION}
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
 # Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions with sub gifting
 SUB_REWARDS:
-  {TWITCH_PRIME/TIER1/TIER2/TIER3}: {ACTION}
+  [TWITCH_PRIME]:
+    - {ACTION}
+  [TIER1/2/3]:
+    - {ACTION}
 
 GIFT_REWARDS:
-  {AMOUNT}: {ACTION}
+  [AMOUNT]:
+    - {ACTION}
 
 # Add glow effect to spawned mobs
 MOB_GLOW: true
@@ -60,17 +74,14 @@ LOG_EVENTS: true
 REWARD_NAME_BOLD: true
 COLORS:
   USER_COLOR: GOLD
-
-  REWARD_NAME_COLOR: YELLOW
-  CHEER_COLOR: DARK_PURPLE
-  SUB_COLOR: YELLOW
-  GIFT_COLOR: RED
+  ACTION_COLOR: YELLOW
 
 # Customize the on-screen text that is broadcasted to players.
 # Viewer's username and their reward will be autommatically added to the message.
 
 STRINGS:
   REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
+  FOLLOWED_STRING: "has started following"
   CHEERED_STRING: "cheered" #..."100 bits"
   SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifed" #..."5 subs"

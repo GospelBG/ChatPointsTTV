@@ -1,14 +1,10 @@
 package me.gosdev.chatpointsttv.Utils;
 
 import java.util.Map;
-import java.util.Set;
 import java.awt.Color;
-
-import org.bukkit.Bukkit;
 
 import com.google.common.collect.ImmutableMap;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV;
 import net.md_5.bungee.api.ChatColor;
 
 public class ColorUtils {
@@ -39,11 +35,6 @@ public class ColorUtils {
     public static int hexToRgb(String hex) {
         if (hex.startsWith("#")) hex = hex.substring(1); // Remove # from color code
         return Integer.valueOf(hex, 16);
-    }
-
-    public static void test2() {
-        Bukkit.getServer().getConsoleSender().sendMessage("AFTER");
-        ChatPointsTTV.getPlugin().log.info("Hi!");
     }
 
     public static int getRgb(int red, int green, int blue) {

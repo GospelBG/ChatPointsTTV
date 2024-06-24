@@ -1,6 +1,8 @@
 package me.gosdev.chatpointsttv;
 
+import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.HashMap;
@@ -22,6 +24,8 @@ import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
+import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
@@ -33,9 +37,13 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 
+import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
-import me.gosdev.chatpointsttv.TwitchAuth.Scopes;
+
+import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
+import me.gosdev.chatpointsttv.Utils.Scopes;
+import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {
@@ -46,7 +54,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private CommandController cmdController;
 
-    private static Map<String, ChatColor> colors = new HashMap<String, ChatColor>();
+    private static Map<String, ChatColor> colors = new HashMap<String, org.bukkit.ChatColor>();
     private static Map<String, String> titleStrings = new HashMap<String, String>();
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
@@ -61,6 +69,8 @@ public class ChatPointsTTV extends JavaPlugin {
     private final String scopes = Scopes.join(
         Scopes.CHANNEL_READ_REDEMPTIONS,
         Scopes.CHANNEL_MANAGE_REDEMPTIONS,
+        Scopes.USER_READ_MODERATED_CHANNELS,
+        Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_CHAT,
@@ -70,12 +80,6 @@ public class ChatPointsTTV extends JavaPlugin {
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope="+scopes;
 
     private OAuth2Credential oauth;
-    public enum reward_type {
-        CHANNEL_POINTS,
-        CHEER,
-        SUB,
-        SUB_GIFT
-    };
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -116,27 +120,11 @@ public class ChatPointsTTV extends JavaPlugin {
         return client;
     }
 
-    public static Map<String, ChatColor> getChatColors() {
+    public static Map<String, org.bukkit.ChatColor> getChatColors() {
         return colors;
     }
     public static Map<String, String> getRedemptionStrings() {
         return titleStrings;
-    }
-    public static Map<String, Object> getRewards(reward_type type) {
-        switch(type) {
-            case CHANNEL_POINTS:
-                return plugin.getConfig().getConfigurationSection("REWARDS").getValues(false);
-            case CHEER:
-                return plugin.getConfig().getConfigurationSection("CHEER_REWARDS").getValues(false);
-            case SUB:
-                return plugin.getConfig().getConfigurationSection("SUB_REWARDS").getValues(false);
-            case SUB_GIFT:
-                return plugin.getConfig().getConfigurationSection("GIFT_REWARDS").getValues(false);
-                
-            default:
-                plugin.log.warning("Cannot find any reward of type " + type);
-                return null;
-        }
     }
 
     public static Utils utils;
@@ -163,12 +151,14 @@ public class ChatPointsTTV extends JavaPlugin {
         plugin = this;
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
+        utils = getUtils();
+
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         config = getConfig();
 
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
-            colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
+            colors.put(i, org.bukkit.ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
 
         config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
@@ -182,15 +172,14 @@ public class ChatPointsTTV extends JavaPlugin {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!accountConnected && player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) {
-                    String msg = "Welcome! Remember to log in with your Twitch account for ChatPointsTTV to be able to connect and listen.";
+                    String msg = "Welcome! Remember to log in with your Twitch account for ChatPointsTTV to be able to connect and listen.\n";
                     ComponentBuilder builder = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login]");
                     BaseComponent btn = builder.create()[0];
 
                     btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
                     btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
 
-                    player.getPlayer().spigot().sendMessage(new ComponentBuilder(msg).create()[0]);
-                    player.getPlayer().spigot().sendMessage(btn);
+                    utils.sendMessage(player.getPlayer(), new BaseComponent[] {new ComponentBuilder(msg).create()[0], btn});
                 }
             }
         }, this);
@@ -205,7 +194,6 @@ public class ChatPointsTTV extends JavaPlugin {
                 p.sendMessage("ChatPointsTTV reloaded!");
             }
         }
-
         VersionCheck.check();
 
         if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
@@ -233,6 +221,8 @@ public class ChatPointsTTV extends JavaPlugin {
         accountConnected = false;
         oauth = null;
         plugin = null;
+
+        Rewards.rewards = Collections.emptyMap();
     }
 
     public void linkToTwitch(String token) {
@@ -250,7 +240,9 @@ public class ChatPointsTTV extends JavaPlugin {
             .withDefaultEventHandler(SimpleEventHandler.class)
             .build();
 
-        log.info("Logged in as: "+ client.getHelix().getUsers(token, null, null).execute().getUsers().get(0).getDisplayName());
+        User user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
+
+        log.info("Logged in as: "+ user.getDisplayName());
         accountConnected = true;
 
         // Join the twitch chat of this channel and enable stream/follow events
@@ -265,13 +257,27 @@ public class ChatPointsTTV extends JavaPlugin {
 
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
-        if (!config.getConfigurationSection("REWARDS").getKeys(true).isEmpty()) {
+        if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
             log.info("Listening for channel point rewards...");
         }
-        if (!config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty()) {
+        if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
+            if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
+                eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
+                eventManager.onEvent(FollowEvent.class, new Consumer<FollowEvent>() {
+                    @Override
+                    public void accept(FollowEvent e) {
+                        eventHandler.onFollow(e);
+                    }
+                });
+                log.info("Listening for follows...");            
+            } else {
+                log.warning("Follow events cannot be listened to on unauthorised channels.");
+            }
+        }
+        if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-            eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>(){
+            eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>() {
                 @Override
                 public void accept(ChannelChatMessageEvent e) {
                     eventHandler.onCheer(e);
@@ -280,7 +286,7 @@ public class ChatPointsTTV extends JavaPlugin {
             log.info("Listening for Cheers...");
         }
 
-        if (!config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty() || !config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty()) {
+        if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
             eventManager.onEvent(ChannelChatNotificationEvent.class, new Consumer<ChannelChatNotificationEvent>(){
                 @Override
@@ -309,6 +315,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     utils.sendMessage(p, components);
                 }
             });
+        }
         eventHandler = new TwitchEventHandler();
         client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
         log.info("Done!");
