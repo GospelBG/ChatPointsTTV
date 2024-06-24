@@ -304,14 +304,12 @@ public class ChatPointsTTV extends JavaPlugin {
                     try {
                         mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
                     } catch (Exception e) {
-                        log.warning(e.toString());
                         mcColor = net.md_5.bungee.api.ChatColor.RED; 
                     }
                     BaseComponent[] components = new BaseComponent[] {
                         new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
                         new ComponentBuilder(event.getMessage()).create()[0]
                     };
-                    log.info(components[1].toPlainText());
                     utils.sendMessage(p, components);
                 }
             });
