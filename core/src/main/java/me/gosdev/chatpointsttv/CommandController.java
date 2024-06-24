@@ -53,7 +53,7 @@ public class CommandController implements TabExecutor {
         }
 
         // If the sender (or console) uses our command correct, we can return true
-        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.utils.sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
         return true;
     }
 
@@ -89,7 +89,7 @@ public class CommandController implements TabExecutor {
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
 
-            ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
+            ChatPointsTTV.utils.sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
@@ -134,6 +134,6 @@ public class CommandController implements TabExecutor {
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.");
         ComponentBuilder formatted = new ComponentBuilder(msg);
         
-        ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{formatted.create()[0]});
+        ChatPointsTTV.utils.sendMessage(p, new BaseComponent[]{formatted.create()[0]});
     }
 }
