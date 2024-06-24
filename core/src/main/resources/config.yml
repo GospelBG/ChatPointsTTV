@@ -3,6 +3,9 @@
 
 CHANNEL_USERNAME: {YOUR CHANNEL}
 
+# Whether your stream chat should show up in the in-game chat
+SHOW_CHAT: true
+
 # Set up here your channel point rewards.
 # Add as many lines as needed. Replace {REWARD_NAME} with your reward's name, EXACTLY as it is on Twitch.
 

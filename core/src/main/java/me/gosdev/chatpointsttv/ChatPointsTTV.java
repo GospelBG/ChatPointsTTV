@@ -35,6 +35,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.UserList;
 import me.gosdev.chatpointsttv.TwitchAuth.Scopes;
+import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {
@@ -289,6 +290,25 @@ public class ChatPointsTTV extends JavaPlugin {
             });
             log.info("Listening for subscriptions and gifts...");
         }
+
+        if (config.getBoolean("SHOW_CHAT")) {
+            eventManager.onEvent(ChannelMessageEvent.class, event -> {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    net.md_5.bungee.api.ChatColor mcColor;
+                    try {
+                        mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
+                    } catch (Exception e) {
+                        log.warning(e.toString());
+                        mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                    }
+                    BaseComponent[] components = new BaseComponent[] {
+                        new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
+                        new ComponentBuilder(event.getMessage()).create()[0]
+                    };
+                    log.info(components[1].toPlainText());
+                    utils.sendMessage(p, components);
+                }
+            });
         eventHandler = new TwitchEventHandler();
         client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
         log.info("Done!");
