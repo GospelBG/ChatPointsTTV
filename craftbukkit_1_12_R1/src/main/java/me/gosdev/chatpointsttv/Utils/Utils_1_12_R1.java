@@ -46,8 +46,9 @@ public class Utils_1_12_R1 implements Utils {
     }
 
     @Override
-    public void displayTitle(Player p, String title, String sub, ChatColor titleColor, ChatColor subColor) {
-        p.sendTitle(titleColor + title, subColor + sub, 10, 70, 20);
+    public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor) {
+        ChatColor format = bold ? ChatColor.BOLD : ChatColor.RESET;
+        p.sendTitle(titleColor + title, action + subColor + " " + format + sub, 10, 70, 20);
     }
     
     @Override

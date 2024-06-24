@@ -44,9 +44,9 @@ public class Utils_1_8_R1 implements Utils {
     }
 
     @Override
-    public void displayTitle(Player p, String title, String sub, ChatColor titleColor, ChatColor subColor) {
-        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" subtitle [[{\"text\":\""+sub+"\"}]]");
-        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" title [[{\"text\":\""+title+"\",\"color\":\"\"}]]");
+    public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" subtitle [{\"text\":\""+action+" \",\"color\":\"white\"},{\"text\":\"" + sub + "\",\"color\":\"" + subColor.toString().toLowerCase() + "\",\"bold\":\"" + bold.toString() + "\"}]");
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" title [{\"text\":\""+title+"\",\"color\":\"" + titleColor.toString().toLowerCase() + "\"}]");
     }
     
     @Override

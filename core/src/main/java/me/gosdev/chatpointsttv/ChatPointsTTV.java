@@ -165,6 +165,8 @@ public class ChatPointsTTV extends JavaPlugin {
             titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
         });
 
+        TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
+
         shouldMobsGlow = config.getBoolean("MOB_GLOW");
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
 
@@ -223,6 +225,7 @@ public class ChatPointsTTV extends JavaPlugin {
         plugin = null;
 
         Rewards.rewards = Collections.emptyMap();
+        TwitchEventHandler.rewardBold = null;
     }
 
     public void linkToTwitch(String token) {

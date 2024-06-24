@@ -19,10 +19,10 @@ public class Events {
     static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     static Logger log = plugin.log;
 
-    public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, ChatColor isBold, String extra) {
+    public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
         plugin.getServer().getOnlinePlayers().forEach (p -> {
             if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                ChatPointsTTV.utils.displayTitle(p.getPlayer(),  user, action + " " + isBold +  rewardName + "\n" + extra, userColor, titleColor);
+                ChatPointsTTV.utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
             }
         });
     }
@@ -90,7 +90,7 @@ public class Events {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                         try {
-                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(0).toUpperCase()), Integer.parseInt(cmd.get(1)));
+                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(1).toUpperCase()), Integer.parseInt(cmd.get(2)));
                             p.getInventory().addItem(item);
                         } catch (IllegalArgumentException e) {
                             log.warning("Couldn't fetch item " + cmd.get(1));

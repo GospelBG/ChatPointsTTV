@@ -13,7 +13,7 @@ public interface Utils {
 
     public String PlanToConfig(SubscriptionPlan plan);
 
-    public void displayTitle(Player p, String title, String sub, ChatColor titleColor, ChatColor subColor);
+    public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor);
 
     public void sendMessage(CommandSender p, BaseComponent[] message);
     public void sendMessage(CommandSender p, BaseComponent message);
