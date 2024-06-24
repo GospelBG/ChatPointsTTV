@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import me.gosdev.chatpointsttv.Utils.Scopes;
+
 public class AuthenticationCallbackRequest implements Runnable {
 
     private static final String EOL = "\r\n"; // as specified by HTTP/1.1 spec

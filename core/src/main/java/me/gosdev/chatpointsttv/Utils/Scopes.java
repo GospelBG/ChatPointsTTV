@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Utils;
 
 /**
  * When requesting authorization from users, the scope parameter allows you to specify
