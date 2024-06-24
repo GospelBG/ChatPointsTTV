@@ -1,12 +1,14 @@
 package me.gosdev.chatpointsttv.Utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
@@ -44,14 +46,18 @@ public class Utils_1_12_R1 implements Utils {
     }
 
     @Override
-    public void displayTitle(Player p, String title, String sub) {
-        p.sendTitle(title, sub);
-
+    public void displayTitle(Player p, String title, String sub, ChatColor titleColor, ChatColor subColor) {
+        p.sendTitle(titleColor + title, subColor + sub, 10, 70, 20);
     }
     
     @Override
     public void sendMessage(CommandSender p, BaseComponent[] message) {
-        p.getServer().spigot().broadcast(message);
+        p.spigot().sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(CommandSender p, BaseComponent message) {
+        p.spigot().sendMessage(message);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.gosdev.chatpointsttv.Utils;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -43,13 +44,18 @@ public class Utils_1_8_R1 implements Utils {
     }
 
     @Override
-    public void displayTitle(Player p, String title, String sub) {
-        p.sendTitle(title, sub);
-
+    public void displayTitle(Player p, String title, String sub, ChatColor titleColor, ChatColor subColor) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" subtitle [[{\"text\":\""+sub+"\"}]]");
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" title [[{\"text\":\""+title+"\",\"color\":\"\"}]]");
     }
     
     @Override
     public void sendMessage(CommandSender p, BaseComponent[] message) {
+        p.getServer().spigot().broadcast(message);
+    }
+
+    @Override
+    public void sendMessage(CommandSender p, BaseComponent message) {
         p.getServer().spigot().broadcast(message);
     }
 
