@@ -148,7 +148,7 @@ public class ChatPointsTTV extends JavaPlugin {
             if (version <= 8) { 
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_8_R1").getDeclaredConstructor().newInstance();
             } else {
-                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_8_R1").getDeclaredConstructor().newInstance();
+                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
             }
             return utils;    
         } catch (Exception e) {
