@@ -79,8 +79,7 @@ public class ChatPointsTTV extends JavaPlugin {
         Scopes.BITS_READ,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_CHAT,
-        Scopes.CHAT_READ,
-        Scopes.CHAT_EDIT
+        Scopes.CHAT_READ
         ).replace(":", "%3A"); // Format colon character for browser
     private final String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ClientID + "&redirect_uri=http://localhost:3000&scope="+scopes;
 
