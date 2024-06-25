@@ -1,8 +1,8 @@
 package me.gosdev.chatpointsttv;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.HashMap;
@@ -26,7 +26,6 @@ import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.chat.events.channel.FollowEvent;
-import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
@@ -40,10 +39,10 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
-import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
+import me.gosdev.chatpointsttv.Rewards.Reward;
+import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
@@ -274,7 +273,10 @@ public class ChatPointsTTV extends JavaPlugin {
             eventManager.onEvent(CustomRewardRedemptionAddEvent.class, new Consumer<CustomRewardRedemptionAddEvent>() {
                 @Override
                 public void accept(CustomRewardRedemptionAddEvent e) {
-                    eventHandler.onChannelPointsRedemption(e);
+                    try { // May get NullPointerException if event is triggered while still subscribing
+                        eventHandler.onChannelPointsRedemption(e);
+                    } catch (NullPointerException ex) {}
+                    
                 }
             });
             log.info("Listening for channel point rewards...");
@@ -285,7 +287,9 @@ public class ChatPointsTTV extends JavaPlugin {
                 eventManager.onEvent(FollowEvent.class, new Consumer<FollowEvent>() {
                     @Override
                     public void accept(FollowEvent e) {
-                        eventHandler.onFollow(e);
+                        try { // May get NullPointerException if event is triggered while still subscribing
+                            eventHandler.onFollow(e);
+                        } catch (NullPointerException ex) {}
                     }
                 });
                 log.info("Listening for follows...");            
@@ -298,7 +302,9 @@ public class ChatPointsTTV extends JavaPlugin {
             eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>() {
                 @Override
                 public void accept(ChannelChatMessageEvent e) {
-                    eventHandler.onCheer(e);
+                    try { // May get NullPointerException if event is triggered while still subscribing
+                        eventHandler.onCheer(e);
+                    } catch (NullPointerException ex) {}
                 }
             }); 
             log.info("Listening for Cheers...");
@@ -309,7 +315,9 @@ public class ChatPointsTTV extends JavaPlugin {
             eventManager.onEvent(ChannelChatNotificationEvent.class, new Consumer<ChannelChatNotificationEvent>(){
                 @Override
                 public void accept(ChannelChatNotificationEvent e) {
-                    eventHandler.onEvent(e);
+                    try { // May get NullPointerException if event is triggered while still subscribing
+                        eventHandler.onEvent(e);
+                    } catch (NullPointerException ex) {}
                 }
             });
             log.info("Listening for subscriptions and gifts...");
