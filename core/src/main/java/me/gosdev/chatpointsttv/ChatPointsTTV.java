@@ -213,7 +213,12 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (client != null) {
-            client.close();
+            try {
+                client.getEventSocket().close();
+                client.close();
+            } catch (Exception e) {
+                log.warning("Error while disabling ChatPointsTTV: " + e.toString());
+            }
         }
         
         CommandController.server.stop();
