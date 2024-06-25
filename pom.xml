@@ -10,7 +10,7 @@
   <modules>
     <module>core</module>
     <module>craftbukkit_1_12_R1</module>
-    <module>craftbukkit_1_8_R1</module>
+    <module>craftbukkit_1_9_R1</module>
     <module>dist</module>
   </modules>
   <build>

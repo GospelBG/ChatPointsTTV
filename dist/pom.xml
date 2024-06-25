@@ -61,7 +61,7 @@
     </dependency>
     <dependency>
       <groupId>me.gosdev</groupId>
-      <artifactId>chatpointsttv-craftbukkit_1_8_R1</artifactId>
+      <artifactId>chatpointsttv-craftbukkit_1_9_R1</artifactId>
       <version>${project.parent.version}</version>
       </dependency>
       <dependency>

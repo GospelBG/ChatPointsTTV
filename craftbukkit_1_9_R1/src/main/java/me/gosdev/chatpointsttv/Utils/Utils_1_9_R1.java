@@ -10,7 +10,7 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import net.md_5.bungee.api.chat.BaseComponent;
 
-public class Utils_1_8_R1 implements Utils {
+public class Utils_1_9_R1 implements Utils {
     @Override
      public String PlanToString(SubscriptionPlan plan) {
         switch (plan.toString()) {

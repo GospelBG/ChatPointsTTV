@@ -138,10 +138,10 @@ public class ChatPointsTTV extends JavaPlugin {
 
         int version = Integer.parseInt(Bukkit.getServer().getClass().getName().split("\\.")[3].split("_")[1]);
         try {
-            if (version <= 8) { 
-                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_8_R1").getDeclaredConstructor().newInstance();
-            } else {
+            if (version >= 12) { 
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
+            } else {
+                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_9_R1").getDeclaredConstructor().newInstance();
             }
             return utils;    
         } catch (Exception e) {
