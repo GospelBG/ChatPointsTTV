@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
@@ -46,13 +45,11 @@ public class Utils_1_8_R1 implements Utils {
 
     @Override
     public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" subtitle [{\"text\":\""+action+" \",\"color\":\"white\"},{\"text\":\"" + sub + "\",\"color\":\"" + subColor.toString().toLowerCase() + "\",\"bold\":\"" + bold.toString() + "\"}]");
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "title "+p.getDisplayName()+" title [{\"text\":\""+title+"\",\"color\":\"" + titleColor.toString().toLowerCase() + "\"}]");
-            }
-        }.runTask(ChatPointsTTV.getPlugin());
+        if (bold) {
+            p.sendTitle(titleColor + p.getDisplayName(), action + " " + subColor + ChatColor.BOLD + sub);
+        } else {
+            p.sendTitle(titleColor + p.getDisplayName(), action + " " + subColor + sub);
+        }
     }
     
     @Override
