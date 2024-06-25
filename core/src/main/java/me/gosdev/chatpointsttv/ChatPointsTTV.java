@@ -137,7 +137,6 @@ public class ChatPointsTTV extends JavaPlugin {
         if (utils != null) return  utils;
 
         int version = Integer.parseInt(Bukkit.getServer().getClass().getName().split("\\.")[3].split("_")[1]);
-        getPlugin().log.info(String.valueOf(version));
         try {
             if (version >= 12) { 
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
