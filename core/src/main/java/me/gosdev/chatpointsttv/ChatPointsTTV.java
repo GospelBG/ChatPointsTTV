@@ -32,6 +32,9 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
+import com.github.twitch4j.eventsub.socket.events.EventSocketClosedByTwitchEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -41,6 +44,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
+import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
@@ -345,6 +349,21 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
             });
         }
+
+        // DEBUG:
+        eventManager.onEvent(PubSubListenResponseEvent.class, event -> {
+            log.info(event.getError());
+        });
+        eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, event -> {
+            log.info(event.getSubscription().getRawType());
+        });
+        eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, event -> {
+            log.info(event.getError().toString());
+        });
+        eventManager.onEvent(EventSocketClosedByTwitchEvent.class, event -> {
+            log.info(event.getReason().toString());
+        });
+
         eventHandler = new TwitchEventHandler();
         client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
         log.info("Done!");
