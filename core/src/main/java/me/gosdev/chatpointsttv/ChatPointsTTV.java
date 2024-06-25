@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.HashMap;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -134,8 +136,11 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private static Utils getUtils() {
         if (utils != null) return  utils;
-
-        int version = Integer.parseInt(Bukkit.getServer().getClass().getName().split("\\.")[3].split("_")[1]);
+        getPlugin().log.info(Bukkit.getVersion());
+        final Pattern pattern = Pattern.compile("1\\.\\d\\d?");
+        final Matcher matcher = pattern.matcher(Bukkit.getVersion());
+        matcher.find();
+        int version = Integer.parseInt(matcher.group().split("\\.")[1]);
         try {
             if (version >= 12) { 
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
