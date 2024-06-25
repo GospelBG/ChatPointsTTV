@@ -233,7 +233,7 @@ public class ChatPointsTTV extends JavaPlugin {
         oauth = null;
         plugin = null;
 
-        Rewards.rewards = Collections.emptyMap();
+        Rewards.rewards = new HashMap<rewardType,ArrayList<Reward>>();
         TwitchEventHandler.rewardBold = null;
     }
 
