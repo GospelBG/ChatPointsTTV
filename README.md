@@ -1,8 +1,8 @@
 <img src="icon.png" style="width: 7vw; float: left; padding-right: 10px; vertical-align: center;"/> <h1>ChatPointsTTV</h1>
 
-ChatPointsTTV is a Bukkit plugin that helps you to create interactions between your Twitch stream and your Minecraft world. Set up your own rewards in exchange of channel points, Bits or subs! Spawn mobs or run any command of your choice when an event is triggered, giving you a whole range of use cases and possibilities to connect with your audience!
+ChatPointsTTV is a Bukkit plugin that helps you to create interactions between your Twitch stream and your Minecraft world. Set up your own rewards in exchange of channel points, follows, Bits, subs and more! Spawn mobs, give items or run any command when an event is triggered.  
+There's a whole range of use cases and possibilities to connect with your audience!
 
-~~You will need to setup a Twitch Application in the Dev Console.~~ **As of v2.0, you no longer need a Twitch app, as that is replaced with an OAuth login.**
 
 ## Download
 This GitHub repository contains all the source code of the plugin. You can download a compiled .jar file through any of this links.
@@ -15,18 +15,13 @@ These are the only official download mirrors. Any downloads besides of these lin
 
 ## **Setup**
 1. Install the plugin into your Minecraft server.  
-~~2. Create an app using [Twitch Developer Console](https://dev.twitch.tv/console). (Refer to ["Setting up a Twitch app"](#setting-up-a-twitch-app)).~~  
-~~3. Copy your Client ID and your secret token to your [config.yml](/src/main/resources/config.yml).*~~
-2. Open your [Twitch Dashboard](https://dashboard.twitch.tv) and create your custom Channel Points Rewards.
+
+2. Open your channel's [Twitch Dashboard](https://dashboard.twitch.tv) and create your custom Channel Points Rewards. (optional)
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Add to your [config.yml](/src/main/resources/config.yml) your newly created Twitch rewards, and setup the actions.
-> [!NOTE]
-> Copy the name **EXACTLY** as it is on Twitch.
-  
-4. Customize the text and it's formatting (optional).
-5. Set up permissions for:
+3. Set your [config.yml](/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations...
+4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
     - the target player(s) (`chatpointsttv.target`).
     - people you want the reward messages broadcasted to (`chatpointsttv.broadcast`).  
@@ -38,12 +33,13 @@ These are the only official download mirrors. Any downloads besides of these lin
 
 ## **config.yml docs**
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
-Sections with a (*) are required to be changed in order to the plugin to be used.
-* **Channel Username***: The channel that will be listened for rewards, bits and subs
-* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server. 
-* **Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
-You need to follow this format: `{REWARD_NAME}: {ACTION}`, replacing `{REWARD_NAME}` with the **exact** reward name that is on Twitch and `{ACTION}` with the desired action to run.  
+*Sections with a (\*) are required to be changed in order to the plugin to be used.*
+* **Channel Username***: The channel that will be listened for rewards, bits and subs.  
 
+* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server. 
+* **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
+You need to follow this format: `{REWARD_NAME}: {ACTION}`, replacing `{REWARD_NAME}` with the **exact** reward name that is on Twitch and `{ACTION}` with the desired action to run.  
+* **Follow Rewards***: A list with all the actions that will be executed when the channel gets a new follower.
 * **Cheer Rewards***: A list containing all **cheer rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the minimal ammount of bits that will be needed to trigger the event and `{ACTION}` with the desired action to run.
 * **Sub Rewards***: A list containing all **subscription rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
@@ -51,6 +47,8 @@ You need to follow this format: `TWITCH_PRIME/TIER1/TIER2/TIER3: {ACTION}`.  Rep
 * **Gift Rewards***
 A list containing all **subscription gifts rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the minimal ammount of subscriptions that will be needed to be gifted in order to trigger the event and `{ACTION}` with the desired action to run.
+* **Mob Glow**: Whether the spawned mobs should have a glowing effect (highlighted and visible through blocks).
+* **Display Name on Mob**: Whether the spawned mobs should have the name of the user who triggered the action.
 * **Log Event**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
 * **Reward Name Bold**: Determines whether the reward name is displayed in bold letters in the title banner to people with the `chatpointsttv.broadcast` permission.
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
@@ -69,8 +67,23 @@ Currently, there are 2 types of actions:
     **Example**: `RUN TARGET DAMAGE @S 2`  
     *This action will run the command as the console a single time, or as each player once. Command arguments are allowed. The example action will substract each player a heart from their health.*
 
+- Giving Items  
+    **Format**: `GIVE <ITEM> <AMOUNT>`
+    **Example**: `GIVE DIAMOND 1`
+    *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*
+
+## Twitch Scopes
+The latest version of the plugin needs the following scopes to function propertly:  
+* `channel:read:redemptions`: Needed to read channel point redemptions.
+* `channel:manage:redemptions`: Needed to mark as completed redemptions once the event is triggered.
+* `user:read:moderated_channels`: Needed to check if user has permission to listen for follow events. (API only allows to listen to own/moderated channels)
+* `moderator:read:followers`: Needed to be able to listen for follows.
+* `bits:read`: Needed to listen for cheers.
+* `channel:read:subscriptions`: Needed to listen for subscriptions and gifts.
+* `user:read:chat`: Needed to use Twitch EventSub API.
+* `chat:read`: Needed to show your stream chat in-game.
+
 ## Permissions
-As of version 2.0 there are 3 permissions for the plugin:
 - TARGET  
     **ID**: `chatpointsttv.target`  
     **Behaviour**: Configured actions will trigger on all players with this permission.  
