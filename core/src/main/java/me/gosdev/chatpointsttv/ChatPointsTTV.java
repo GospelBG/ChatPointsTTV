@@ -39,6 +39,8 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
+import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
@@ -58,8 +60,10 @@ public class ChatPointsTTV extends JavaPlugin {
     private static Map<String, String> titleStrings = new HashMap<String, String>();
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
-
     public static boolean configOk = true;
+
+    private String user_id;
+    private String channel_id;
 
     public Logger log = getLogger();
     public FileConfiguration config;
@@ -250,8 +254,8 @@ public class ChatPointsTTV extends JavaPlugin {
 
         // Join the twitch chat of this channel and enable stream/follow events
         String channel = config.getString("CHANNEL_USERNAME");
-        String channel_id = getUserId(channel);
-        String user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
+        channel_id = getUserId(channel);
+        user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
         log.info("Listening to " + channel + "'s events...");
         utils.sendLogToPlayers("Listening to: " + channel);
         client.getChat().joinChannel(channel);
@@ -261,7 +265,12 @@ public class ChatPointsTTV extends JavaPlugin {
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-            client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
+            eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
+                @Override
+                public void accept(RewardRedeemedEvent e) {
+                    eventHandler.onChannelPointsRedemption(e);
+                }
+            });
             log.info("Listening for channel point rewards...");
         }
         if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
@@ -322,7 +331,7 @@ public class ChatPointsTTV extends JavaPlugin {
         log.info("Done!");
     }
 
-    public void updateRedemption(String reward, String redemption, RedemptionStatus status) {
-        client.getHelix().updateRedemptionStatus(oauth.getAccessToken(), client.getChat().getChannels().iterator().next(), reward, Arrays.asList(reward), status);
+    public void updateRedemption(ChannelPointsRedemption redemption, RedemptionStatus status) {
+        client.getHelix().updateRedemptionStatus(oauth.getAccessToken(), channel_id, redemption.getReward().getId(), Collections.singleton(redemption.getId()), status);
     }
 }
