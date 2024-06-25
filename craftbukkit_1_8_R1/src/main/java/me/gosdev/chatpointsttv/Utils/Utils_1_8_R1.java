@@ -46,9 +46,9 @@ public class Utils_1_8_R1 implements Utils {
     @Override
     public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor) {
         if (bold) {
-            p.sendTitle(titleColor + p.getDisplayName(), action + " " + subColor + ChatColor.BOLD + sub);
+            p.sendTitle(titleColor + title, action + " " + subColor + ChatColor.BOLD + sub);
         } else {
-            p.sendTitle(titleColor + p.getDisplayName(), action + " " + subColor + sub);
+            p.sendTitle(titleColor + title, action + " " + subColor + sub);
         }
     }
     
