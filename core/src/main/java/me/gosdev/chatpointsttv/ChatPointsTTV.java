@@ -29,6 +29,7 @@ import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
@@ -134,9 +135,10 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Utils utils;
 
     private static Utils getUtils() {
-        if (utils != null) return utils;
+        if (utils != null) return  utils;
 
         int version = Integer.parseInt(Bukkit.getServer().getClass().getName().split("\\.")[3].split("_")[1]);
+        getPlugin().log.info(String.valueOf(version));
         try {
             if (version >= 12) { 
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
@@ -265,9 +267,10 @@ public class ChatPointsTTV extends JavaPlugin {
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-            eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
+            eventSocket.register(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
+            eventManager.onEvent(CustomRewardRedemptionAddEvent.class, new Consumer<CustomRewardRedemptionAddEvent>() {
                 @Override
-                public void accept(RewardRedeemedEvent e) {
+                public void accept(CustomRewardRedemptionAddEvent e) {
                     eventHandler.onChannelPointsRedemption(e);
                 }
             });
@@ -329,9 +332,5 @@ public class ChatPointsTTV extends JavaPlugin {
         eventHandler = new TwitchEventHandler();
         client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
         log.info("Done!");
-    }
-
-    public void updateRedemption(ChannelPointsRedemption redemption, RedemptionStatus status) {
-        client.getHelix().updateRedemptionStatus(oauth.getAccessToken(), channel_id, redemption.getReward().getId(), Collections.singleton(redemption.getId()), status);
     }
 }
