@@ -346,21 +346,6 @@ public class ChatPointsTTV extends JavaPlugin {
                     }
                 });
             }
-    
-            // DEBUG:
-            /* eventManager.onEvent(PubSubListenResponseEvent.class, event -> {
-                log.info(event.getError());
-            }); */
-            eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, event -> {
-                log.info(event.getSubscription().getRawType());
-            });
-            eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, event -> {
-                log.info(event.getError().toString());
-            });
-            eventManager.onEvent(EventSocketClosedByTwitchEvent.class, event -> {
-                log.info(event.getReason().toString());
-            });
-    
             eventHandler = new TwitchEventHandler();
             client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
             log.info("Done!");    

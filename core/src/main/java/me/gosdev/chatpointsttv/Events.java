@@ -28,12 +28,10 @@ public class Events {
     }
 
     public static void runAction(String action, String args, String user) throws Exception {
-        log.info(args);
         List<String> cmd  = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
                 Bukkit.getScheduler().runTask(plugin, () -> {
-                    log.info("Spawning...");
                     for (Player p : plugin.getServer().getOnlinePlayers()) {
                         if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                             for (int i = 0; i < Integer.valueOf(cmd.get(1)); i++) {
@@ -62,7 +60,6 @@ public class Events {
                 text = text.trim();
 
                 final String command = text.replace("/", "");
-                log.info("Running command: \""+ command + "\"...");
 
                 if (runAs.equalsIgnoreCase("CONSOLE")) {
                     new BukkitRunnable() {
