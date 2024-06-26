@@ -30,3 +30,4 @@ target/
 .vscode/
 
 .hintrc
+.DS_Store
