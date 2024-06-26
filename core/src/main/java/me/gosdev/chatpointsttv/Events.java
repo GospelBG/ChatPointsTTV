@@ -28,6 +28,7 @@ public class Events {
     }
 
     public static void runAction(String action, String args, String user) throws Exception {
+        log.info(args);
         List<String> cmd  = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
@@ -90,7 +91,7 @@ public class Events {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                         try {
-                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(1).toUpperCase()), Integer.parseInt(cmd.get(2)));
+                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(0).toUpperCase()), Integer.parseInt(cmd.get(1)));
                             p.getInventory().addItem(item);
                         } catch (IllegalArgumentException e) {
                             log.warning("Couldn't fetch item " + cmd.get(1));
