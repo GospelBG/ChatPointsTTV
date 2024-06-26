@@ -256,7 +256,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 .withDefaultAuthToken(oauth)
                 .withEnableChat(true)
                 .withEnableHelix(true)
-                .withEnablePubSub(true)
+                //.withEnablePubSub(true)
                 .withEnableEventSocket(true)
                 .withDefaultEventHandler(SimpleEventHandler.class)
                 .build();
@@ -348,9 +348,9 @@ public class ChatPointsTTV extends JavaPlugin {
             }
     
             // DEBUG:
-            eventManager.onEvent(PubSubListenResponseEvent.class, event -> {
+            /* eventManager.onEvent(PubSubListenResponseEvent.class, event -> {
                 log.info(event.getError());
-            });
+            }); */
             eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, event -> {
                 log.info(event.getSubscription().getRawType());
             });
