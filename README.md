@@ -75,7 +75,6 @@ Currently, there are 2 types of actions:
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  
 * `channel:read:redemptions`: Needed to read channel point redemptions.
-* `channel:manage:redemptions`: Needed to mark as completed redemptions once the event is triggered.
 * `user:read:moderated_channels`: Needed to check if user has permission to listen for follow events. (API only allows to listen to own/moderated channels)
 * `moderator:read:followers`: Needed to be able to listen for follows.
 * `bits:read`: Needed to listen for cheers.
