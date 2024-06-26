@@ -1,27 +1,21 @@
 package me.gosdev.chatpointsttv;
 
-import me.gosdev.chatpointsttv.TwitchAuth.AuthenticationCallbackServer;
+import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
-
-    public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -72,53 +66,19 @@ public class CommandController implements TabExecutor {
     }
 
     private void link(ChatPointsTTV plugin, CommandSender p) {
-        server = new AuthenticationCallbackServer(3000);
-        if (ChatPointsTTV.getTwitchClient() != null) {
-            ChatPointsTTV.getTwitchClient().close();
-        }
-
-        if (p == Bukkit.getServer().getConsoleSender()) {
-            String msg = "Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + plugin.getAuthURL();
-            p.sendMessage(msg);
+        if (plugin.config.getString("CUSTOM_CLIENT_ID") != null && plugin.config.getString("CUSTOM_ACCESS_TOKEN") != null) {
+            // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
+            plugin.linkToTwitch(plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         } else {
-            String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up";
-            ComponentBuilder formatted = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
-            
-            BaseComponent btn = formatted.create()[0];
-
-            btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
-            btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, plugin.getAuthURL()));
-
-            ChatPointsTTV.utils.sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
+            CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p);
+            future.thenAccept(token -> {
+                plugin.linkToTwitch(token);
+            });
         }
-
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                
-                try {
-                    server.start();
-                    
-                    if(server.getAccessToken() != null) {
-                        plugin.linkToTwitch(server.getAccessToken());
-                        server.stop();
-                    }
-                } catch(IOException e) {
-                    plugin.log.warning(e.toString());
-                }
-            }
-        });
-        
-    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-            public void run() {
-                server.stop();
-            }
-        }, 6000L);// 60 L == 3 sec, 20 ticks == 1 sec
     }
 
     private void reload(ChatPointsTTV plugin) {
-        if (server != null) server.stop(); // Stop HTTP server if it is actve
+        if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop(); // Stop HTTP server if it is actve
 
         plugin.reloadConfig();
         plugin.onDisable();

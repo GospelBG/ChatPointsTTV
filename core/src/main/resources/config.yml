@@ -3,6 +3,11 @@
 
 CHANNEL_USERNAME: {YOUR CHANNEL}
 
+# Uncomment the following lines (remove the # symbol at the start of the line) to use a key-based authentication instead of the browser login.
+# It should be used in remote environments which do not have a web browser (i.e. a standalone hosted server)
+# CUSTOM_CLIENT_ID: your_client_id_here
+# CUSTOM_ACCESS_TOKEN: your_access_token_here
+
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
 
