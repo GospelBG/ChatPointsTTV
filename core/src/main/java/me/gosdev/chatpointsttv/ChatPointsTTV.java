@@ -45,6 +45,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
@@ -278,14 +279,10 @@ public class ChatPointsTTV extends JavaPlugin {
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-            eventSocket.register(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
-            eventManager.onEvent(CustomRewardRedemptionAddEvent.class, new Consumer<CustomRewardRedemptionAddEvent>() {
+            eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
                 @Override
-                public void accept(CustomRewardRedemptionAddEvent e) {
-                    try { // May get NullPointerException if event is triggered while still subscribing
-                        eventHandler.onChannelPointsRedemption(e);
-                    } catch (NullPointerException ex) {}
-                    
+                public void accept(RewardRedeemedEvent e) {
+                    eventHandler.onChannelPointsRedemption(e);
                 }
             });
             log.info("Listening for channel point rewards...");

@@ -2,10 +2,13 @@ package me.gosdev.chatpointsttv;
 
 import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
+import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.RewardComparator;
@@ -31,22 +34,22 @@ public class TwitchEventHandler {
 
     private Integer ignoreSubs = 0;
 
-    public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
-        //if (event.getStatus() != RedemptionStatus.UNFULFILLED) return;
-        if (logEvents) plugin.log.info(event.getUserName() + " has redeemed " + event.getReward().getTitle());
+    public void onChannelPointsRedemption(RewardRedeemedEvent event) {
+        if (logEvents) plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+        ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
-            if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
+            if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-            Events.displayTitle(event.getUserName(), custom_string, event.getReward().getTitle(), action_color, user_color, rewardBold);
+            Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", event.getUserInput()), event.getUserName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()), redemption.getUser().getDisplayName());
                 } catch (Exception e) {
                     plugin.log.warning(e.toString());
                 }
             }
-        }      
+        }
     }
 
     public void onFollow(FollowEvent event) {
