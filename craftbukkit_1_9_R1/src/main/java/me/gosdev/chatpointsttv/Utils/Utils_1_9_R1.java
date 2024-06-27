@@ -43,6 +43,7 @@ public class Utils_1_9_R1 implements Utils {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void displayTitle(Player p, String title, String action, String sub, Boolean bold, ChatColor titleColor, ChatColor subColor) {
         if (bold) {

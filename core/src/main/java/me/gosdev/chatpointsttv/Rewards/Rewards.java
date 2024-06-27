@@ -27,7 +27,7 @@ public class Rewards {
         ConfigurationSection config_value = ChatPointsTTV.getPlugin().config.getConfigurationSection(type.toString().toUpperCase() + "_REWARDS");
         ArrayList<Reward> reward_list = new ArrayList<>();
         if (type == rewardType.FOLLOW) {
-            List<String> follow_rewards = (List<String>) ChatPointsTTV.getPlugin().config.getList(type.toString().toUpperCase() + "_REWARDS");
+            List<String> follow_rewards = ChatPointsTTV.getPlugin().config.getStringList(type.toString().toUpperCase() + "_REWARDS");
             if (follow_rewards == null || follow_rewards.isEmpty()) return null;
             reward_list.add(new Reward(type, null, follow_rewards));
         } else {
@@ -39,7 +39,7 @@ public class Rewards {
 
                 //log.info(key);
                 //log.info(config_value.getList(key).toString());
-                reward_list.add(new Reward(type, key, (List<String>) config_value.getList(key)));
+                reward_list.add(new Reward(type, key, config_value.getStringList(key)));
             }
         }
 
