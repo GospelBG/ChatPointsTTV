@@ -72,6 +72,18 @@ Currently, there are 2 types of actions:
     **Example**: `GIVE DIAMOND 1`
     *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*
 
+You should set up your events in your config file with this format:
+```
+TYPE_REWARDS:
+    - KEY:
+        - Action 1
+        - Action 2
+        - ...
+```
+Whereas `TYPE_REWARDS` is replaces with the appropiate config key that is already on the file, `KEY` with the channel points reward name, subscription tier or minimal amount of bits/subs.  
+> [!IMPORTANT]  
+> **For follow events this line should be ommited.** See the placeholders on the default [config.yml](core/src/main/resources/config.yml).
+
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  
 * `channel:read:redemptions`: Needed to read channel point redemptions.
