@@ -165,6 +165,8 @@ public class ChatPointsTTV extends JavaPlugin {
         this.saveDefaultConfig();
         config = getConfig();
 
+        if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentials = true;
+
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, org.bukkit.ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
         });
