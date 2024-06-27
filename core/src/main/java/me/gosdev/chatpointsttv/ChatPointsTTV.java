@@ -31,9 +31,6 @@ import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
-import com.github.twitch4j.eventsub.socket.events.EventSocketClosedByTwitchEvent;
-import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
-import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -43,7 +40,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
-import com.github.twitch4j.pubsub.events.PubSubListenResponseEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
@@ -141,7 +137,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private static Utils getUtils() {
         if (utils != null) return  utils;
-        getPlugin().log.info(Bukkit.getVersion());
         final Pattern pattern = Pattern.compile("1\\.\\d\\d?");
         final Matcher matcher = pattern.matcher(Bukkit.getVersion());
         matcher.find();
