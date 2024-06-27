@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,6 +65,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Boolean customCredentials = false;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
+    private List<String> chatBlacklist;
     public static boolean configOk = true;
 
     private String user_id;
@@ -179,6 +181,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
         shouldMobsGlow = config.getBoolean("MOB_GLOW");
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
+        chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
         pm.registerEvents(new Listener() {
             @EventHandler
@@ -328,18 +331,20 @@ public class ChatPointsTTV extends JavaPlugin {
     
             if (config.getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        net.md_5.bungee.api.ChatColor mcColor;
-                        try {
-                            mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
-                        } catch (Exception e) {
-                            mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                    if (!chatBlacklist.contains(event.getUser().getName())) {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            net.md_5.bungee.api.ChatColor mcColor;
+                            try {
+                                mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
+                            } catch (Exception e) {
+                                mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                            }
+                            BaseComponent[] components = new BaseComponent[] {
+                                new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
+                                new ComponentBuilder(event.getMessage()).create()[0]
+                            };
+                            utils.sendMessage(p, components);
                         }
-                        BaseComponent[] components = new BaseComponent[] {
-                            new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
-                            new ComponentBuilder(event.getMessage()).create()[0]
-                        };
-                        utils.sendMessage(p, components);
                     }
                 });
             }
