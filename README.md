@@ -20,7 +20,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Set your [config.yml](/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations...
+3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations...
 4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
     - the target player(s) (`chatpointsttv.target`).
