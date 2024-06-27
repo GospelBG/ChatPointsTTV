@@ -11,6 +11,9 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
 
+# Uncomment the following line and add chat bot usernames to this list to prevent their messages to display on the in-game chat.
+# CHAT_BLACKLIST:
+
 # Set up here your channel point rewards.
 # Add as many lines as needed. Replace [REWARD NAME] with your reward's name, EXACTLY as it is on Twitch.
 
