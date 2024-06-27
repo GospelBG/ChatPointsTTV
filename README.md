@@ -28,7 +28,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 
     · See [Permissions](#permissions) for more information.
 
-> [!TIP]
+> [!NOTE]
 > The config file for the plugin should be in 'plugins/ChatPointsTTV/config.yml'.
 
 ## **config.yml docs**
