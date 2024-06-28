@@ -151,19 +151,16 @@ public class AuthenticationCallbackRequest implements Runnable {
         // Open the requested file.
         InputStream fis;
         String contentTypeLine;
-        if (requestFilename.startsWith("/auth.js") || requestFilename.startsWith("/auth-success.js")) {
-            fis = getClass().getResourceAsStream(requestFilename);
-            contentTypeLine = "Content-type: text/javascript" + EOL;
+
+        if (accessToken != null) {
+            fis = successPage.openStream();
+        } else if (error != null) {
+            fis = failurePage.openStream();
         } else {
-            if (accessToken != null) {
-                fis = successPage.openStream();
-            } else if (error != null) {
-                fis = failurePage.openStream();
-            } else {
-                fis = authPage.openStream();
-            }
-            contentTypeLine = "Content-type: text/html" + EOL;
+            fis = authPage.openStream();
         }
+        contentTypeLine = "Content-type: text/html" + EOL;
+
 
         boolean fileExists = fis != null;
 
