@@ -256,7 +256,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 .withDefaultAuthToken(oauth)
                 .withEnableChat(true)
                 .withEnableHelix(true)
-                //.withEnablePubSub(true)
+                .withEnablePubSub(true)
                 .withEnableEventSocket(true)
                 .withDefaultEventHandler(SimpleEventHandler.class)
                 .build();
@@ -279,6 +279,7 @@ public class ChatPointsTTV extends JavaPlugin {
             eventSocket = client.getEventSocket();
             eventManager = client.getEventManager();
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
+                client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
                 eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
                     @Override
                     public void accept(RewardRedeemedEvent e) {
