@@ -164,9 +164,21 @@ public class ChatPointsTTV extends JavaPlugin {
 
         utils = getUtils();
 
-        // Get the latest config after saving the default if missing
-        this.saveDefaultConfig();
-        config = getConfig();
+        try {
+            // Get the latest config after saving the default if missing
+            this.saveDefaultConfig();
+            config = getConfig();
+
+            if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
+                throw new Exception("Cannot read channel. Config file may be not set up or invalid.");
+            } else {
+                configOk = true;
+            }
+        } catch (Exception e) {
+            configOk = false;
+            log.warning(e.toString());
+        }
+
 
         if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentials = true;
 
@@ -184,6 +196,22 @@ public class ChatPointsTTV extends JavaPlugin {
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
+        cmdController = new CommandController();
+        this.getCommand("twitch").setExecutor(cmdController);
+        this.getCommand("twitch").setTabCompleter(cmdController);
+
+        log.info("ChatPointsTTV enabled!");
+        for (Player p: plugin.getServer().getOnlinePlayers()) {
+            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
+                p.sendMessage("ChatPointsTTV reloaded!");
+            }
+        }
+        VersionCheck.check();
+
+        if(customCredentials && config.getBoolean("AUTO_LINK_CUSTOM")) {
+            linkToTwitch(Bukkit.getConsoleSender(), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
+        }
+
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
@@ -199,25 +227,6 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
             }
         }, this);
-
-        cmdController = new CommandController();
-        this.getCommand("twitch").setExecutor(cmdController);
-        this.getCommand("twitch").setTabCompleter(cmdController);
-
-        log.info("ChatPointsTTV enabled!");
-        for (Player p: plugin.getServer().getOnlinePlayers()) {
-            if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.sendMessage("ChatPointsTTV reloaded!");
-            }
-        }
-        VersionCheck.check();
-
-        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
-            log.warning("Cannot read channel. Config file may be not set up or invalid.");
-            configOk = false;
-        } else {
-            configOk = true;
-        }
     }
 
     @Override
