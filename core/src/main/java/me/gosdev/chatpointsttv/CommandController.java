@@ -27,8 +27,14 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    if (ChatPointsTTV.getClient() != null) ChatPointsTTV.getClient().close();
-                    if (!ChatPointsTTV.configOk) break;
+                    if (plugin.isAccountConnected()) {
+                        sender.sendMessage("There is an account connected already!\nUnlink your account before linking another one.");
+                        break;
+                    }
+                    if (!ChatPointsTTV.configOk) {
+                        sender.sendMessage("Invalid configuration. Please check your config file.");
+                        break;
+                    }
                     link(plugin, sender);
                     break;
 
