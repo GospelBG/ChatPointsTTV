@@ -8,6 +8,9 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 # CUSTOM_CLIENT_ID: your_client_id_here
 # CUSTOM_ACCESS_TOKEN: your_access_token_here
 
+# Whether the plugin shoud automatically connect to Twitch when a key-based authentication is used.
+AUTO_LINK_CUSTOM: true
+
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
 
