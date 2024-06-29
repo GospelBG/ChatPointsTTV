@@ -366,4 +366,22 @@ public class ChatPointsTTV extends JavaPlugin {
         });
         thread.start();
     }
+
+    public void unlink(CommandSender p) {
+        if (accountConnected) {
+            try {
+                client.getEventSocket().close();
+                client.close();
+                accountConnected = false;
+            } catch (Exception e) {
+                log.warning("Error while disabling ChatPointsTTV: " + e.toString());
+                return;
+            }
+    
+            p.sendMessage("Account disconnected!");
+        } else {
+            p.sendMessage("There is no connected account.");
+        }
+
+    }
 }

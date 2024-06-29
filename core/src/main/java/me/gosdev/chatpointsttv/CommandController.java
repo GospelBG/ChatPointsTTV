@@ -39,6 +39,11 @@ public class CommandController implements TabExecutor {
                 case "help":
                     help(plugin, sender, cmd);
                     return true;
+
+                case "unlink":
+                    plugin.unlink(sender);
+                    return true;
+
                 default:
                     sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
                     help(plugin, sender, cmd);
@@ -57,6 +62,7 @@ public class CommandController implements TabExecutor {
 
         if (args.length == 1) {
             list.add("link");
+            list.add("unlink");
             list.add("reload");
             list.add("help");
 
@@ -90,6 +96,7 @@ public class CommandController implements TabExecutor {
         "---------- " + ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + cmd.getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.");
         ComponentBuilder formatted = new ComponentBuilder(msg);
