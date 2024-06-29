@@ -333,18 +333,18 @@ public class ChatPointsTTV extends JavaPlugin {
             if (config.getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
                     if (!chatBlacklist.contains(event.getUser().getName())) {
-                        for (Player p : Bukkit.getOnlinePlayers()) {
-                            net.md_5.bungee.api.ChatColor mcColor;
-                            try {
-                                mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
-                            } catch (Exception e) {
-                                mcColor = net.md_5.bungee.api.ChatColor.RED; 
-                            }
-                            BaseComponent[] components = new BaseComponent[] {
-                                new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
-                                new ComponentBuilder(event.getMessage()).create()[0]
-                            };
-                            utils.sendMessage(p, components);
+                        net.md_5.bungee.api.ChatColor mcColor;
+                        try {
+                            mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
+                        } catch (Exception e) {
+                            mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                        }
+                        BaseComponent[] components = new BaseComponent[] {
+                            new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
+                            new ComponentBuilder(event.getMessage()).create()[0]
+                        };
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            utils.sendMessage(player, components);
                         }
                     }
                 });
