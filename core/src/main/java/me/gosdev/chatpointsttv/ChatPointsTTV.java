@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -246,9 +247,10 @@ public class ChatPointsTTV extends JavaPlugin {
         TwitchEventHandler.rewardBold = null;
     }
 
-    public void linkToTwitch(String token) {
+    public void linkToTwitch(CommandSender p, String token) {
         Thread thread = new Thread(() -> {
-            utils.sendLogToPlayers("Logging in...");
+            
+            p.sendMessage("Logging in...");
             oauth = new OAuth2Credential(getClientID(), token);
     
             // Build TwitchClient
@@ -271,10 +273,10 @@ public class ChatPointsTTV extends JavaPlugin {
             channel_id = getUserId(channel);
             user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
             log.info("Listening to " + channel + "'s events...");
-            utils.sendLogToPlayers("Listening to: " + channel);
+            p.sendMessage("Listening to: " + channel);
             client.getChat().joinChannel(channel);
     
-            utils.sendLogToPlayers("Logged in as: " + user.getDisplayName());
+            p.sendMessage("Logged in as: " + user.getDisplayName());
     
             eventSocket = client.getEventSocket();
             eventManager = client.getEventManager();

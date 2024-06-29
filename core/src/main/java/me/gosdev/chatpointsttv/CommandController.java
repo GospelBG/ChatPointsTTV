@@ -68,11 +68,11 @@ public class CommandController implements TabExecutor {
     private void link(ChatPointsTTV plugin, CommandSender p) {
         if (ChatPointsTTV.customCredentials) {
             // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            plugin.linkToTwitch(plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
+            plugin.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         } else {
             CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p);
             future.thenAccept(token -> {
-                plugin.linkToTwitch(token);
+                plugin.linkToTwitch(p, token);
             });
         }
     }
