@@ -16,6 +16,13 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
+    private BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
+        ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
+        ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
+        ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -97,7 +104,11 @@ public class CommandController implements TabExecutor {
         plugin.onEnable();
     }
 
-    private void help(ChatPointsTTV plugin, CommandSender p, Command cmd) {
+    private void help(CommandSender p, Command cmd) {
+        ChatPointsTTV.utils.sendMessage(p, helpMsg);
+    }
+
+    private void status(CommandSender p, ChatPointsTTV plugin) {
         String msg = (
         "---------- " + ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + cmd.getUsage() + ChatColor.RESET + "\n" + 
