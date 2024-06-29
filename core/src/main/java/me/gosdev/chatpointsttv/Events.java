@@ -10,10 +10,8 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-
-
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 
 public class Events {
     static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -35,7 +33,7 @@ public class Events {
                     for (Player p : plugin.getServer().getOnlinePlayers()) {
                         if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                             for (int i = 0; i < Integer.valueOf(cmd.get(1)); i++) {
-                                LivingEntity e = (LivingEntity) p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(cmd.get(0).toUpperCase()));
+                                Entity e = p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(cmd.get(0).toUpperCase()));
 
                                 e.setGlowing(ChatPointsTTV.shouldMobsGlow);
                                 if (ChatPointsTTV.nameSpawnedMobs) {
