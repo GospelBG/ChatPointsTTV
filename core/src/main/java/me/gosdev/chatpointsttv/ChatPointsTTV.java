@@ -370,6 +370,7 @@ public class ChatPointsTTV extends JavaPlugin {
         if (accountConnected) {
             try {
                 client.getEventSocket().close();
+                client.getPubSub().close();
                 client.close();
                 accountConnected = false;
             } catch (Exception e) {
