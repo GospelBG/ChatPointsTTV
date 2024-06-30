@@ -76,13 +76,20 @@ public class CommandController implements TabExecutor {
         ArrayList<String> list = new ArrayList<>();
 
         if (args.length == 1) {
-            list.add("link");
-            list.add("unlink");
+            if (!ChatPointsTTV.getPlugin().isAccountConnected()) list.add("link");
+            else list.add("unlink");
             list.add("reload");
+            list.add("status");
             list.add("help");
 
             return list;
+        } else if (args.length == 2 && args[0] == "link") {
+            list.add("key");
+            list.add("browser");
+
+            return list;
         }
+
         return null;        
     }
 
