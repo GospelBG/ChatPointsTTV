@@ -67,7 +67,8 @@ public class Utils_1_9_R1 implements Utils {
     public void sendLogToPlayers(String msg) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.sendRawMessage("[ChatPointsTTV] " + msg);
+                p.sendRawMessage(ChatColor.LIGHT_PURPLE + "" +ChatColor.BOLD + "[ChatPointsTTV] " + ChatColor.RESET + msg);
+                
             }
         }
     }

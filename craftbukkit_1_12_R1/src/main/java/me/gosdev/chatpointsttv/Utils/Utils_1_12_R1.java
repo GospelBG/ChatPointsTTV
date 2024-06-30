@@ -63,7 +63,7 @@ public class Utils_1_12_R1 implements Utils {
 
     @Override
     public void sendLogToPlayers(String msg) {
-        BaseComponent component = new ComponentBuilder("[ChatPointsTTV] " + msg).create()[0];
+        BaseComponent component = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD +"[ChatPointsTTV] " + ChatColor.RESET + msg).create()[0];
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.spigot().sendMessage(component);
