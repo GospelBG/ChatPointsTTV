@@ -257,33 +257,44 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void linkToTwitch(CommandSender p, String token) {
         Thread thread = new Thread(() -> {
-            
-            p.sendMessage("Logging in...");
-            oauth = new OAuth2Credential(getClientID(), token);
-    
-            // Build TwitchClient
-            client = TwitchClientBuilder.builder()
-                .withDefaultAuthToken(oauth)
-                .withEnableChat(true)
-                .withEnableHelix(true)
-                .withEnablePubSub(true)
-                .withEnableEventSocket(true)
-                .withDefaultEventHandler(SimpleEventHandler.class)
-                .build();
-    
-            User user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
-    
-            log.info("Logged in as: "+ user.getDisplayName());
             accountConnected = true;
+            p.sendMessage("Logging in...");
+
+            if(getClientID() == null || getClientID().isEmpty()) {
+                throw new NullPointerException("Invalid Client ID");
+            }
+            if (token == null || token.isEmpty()) {
+                throw new NullPointerException("Invalid Access Token");
+            }
+
+            try {
+                oauth = new OAuth2Credential(getClientID(), token);
+    
+                // Build TwitchClient
+                client = TwitchClientBuilder.builder()
+                    .withDefaultAuthToken(oauth)
+                    .withEnableChat(true)
+                    .withEnableHelix(true)
+                    .withEnablePubSub(true)
+                    .withEnableEventSocket(true)
+                    .withDefaultEventHandler(SimpleEventHandler.class)
+                    .build();
+        
+                
+                user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
+            } catch (Exception e) {
+                throw new RuntimeException("Twitch API Login failed. Provided credentials may be invalid.");
+            }
+            
+            log.info("Logged in as: "+ user.getDisplayName());
     
             // Join the twitch chat of this channel and enable stream/follow events
             String channel = config.getString("CHANNEL_USERNAME");
             channel_id = getUserId(channel);
             user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
             log.info("Listening to " + channel + "'s events...");
-            p.sendMessage("Listening to: " + channel);
             client.getChat().joinChannel(channel);
-    
+
             p.sendMessage("Logged in as: " + user.getDisplayName());
     
             eventSocket = client.getEventSocket();
@@ -364,6 +375,17 @@ public class ChatPointsTTV extends JavaPlugin {
             log.info("Done!");    
         });
         thread.start();
+        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                log.warning(e.toString());
+                p.sendMessage(ChatColor.RED + "Account linking failed!");
+                unlink(Bukkit.getConsoleSender());
+                accountConnected = false;
+            }
+            
+        });
     }
 
     public void unlink(CommandSender p) {
@@ -378,9 +400,9 @@ public class ChatPointsTTV extends JavaPlugin {
                 return;
             }
     
-            p.sendMessage("Account disconnected!");
+            p.sendMessage(ChatColor.GREEN + "Account disconnected!");
         } else {
-            p.sendMessage("There is no connected account.");
+            p.sendMessage(ChatColor.RED + "There is no connected account.");
         }
 
     }
