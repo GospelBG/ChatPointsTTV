@@ -115,7 +115,7 @@ public class CommandController implements TabExecutor {
         plugin.onEnable();
     }
 
-    private void help(CommandSender p, Command cmd) {
+    private void help(CommandSender p) {
         ChatPointsTTV.utils.sendMessage(p, helpMsg);
     }
 
