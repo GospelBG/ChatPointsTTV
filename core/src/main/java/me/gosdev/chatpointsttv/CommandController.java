@@ -110,14 +110,15 @@ public class CommandController implements TabExecutor {
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
         String msg = (
-        "---------- " + ChatColor.BOLD + "" + ChatColor.DARK_PURPLE + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
-        ChatColor.GRAY + "Usage: " + cmd.getUsage() + ChatColor.RESET + "\n" + 
-        ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
-        ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.");
+            "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
+            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
+            ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + plugin.getConnectedUsername() + "\n" +
+            ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + plugin.getListenedChannel() + "\n" + 
+            "\n" +
+            ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+        );
+
         ComponentBuilder formatted = new ComponentBuilder(msg);
-        
-        ChatPointsTTV.utils.sendMessage(p, new BaseComponent[]{formatted.create()[0]});
+        ChatPointsTTV.utils.sendMessage(p, formatted.create()[0]);
     }
 }

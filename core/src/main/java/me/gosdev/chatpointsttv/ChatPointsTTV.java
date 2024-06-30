@@ -55,6 +55,7 @@ import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
+    private User user;
     private static TwitchEventHandler eventHandler;
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
@@ -134,6 +135,13 @@ public class ChatPointsTTV extends JavaPlugin {
     }
     public static Map<String, String> getRedemptionStrings() {
         return titleStrings;
+    }
+    public String getConnectedUsername() {
+        return accountConnected ? user.getLogin() : "Not Linked";
+    }
+    public String getListenedChannel() {
+        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")) return null;
+        return config.getString("CHANNEL_USERNAME");
     }
 
     public static Utils utils;
