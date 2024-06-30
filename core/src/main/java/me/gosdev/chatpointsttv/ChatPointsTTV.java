@@ -289,7 +289,7 @@ public class ChatPointsTTV extends JavaPlugin {
             eventSocket = client.getEventSocket();
             eventManager = client.getEventManager();
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-                client.getPubSub().listenForChannelPointsRedemptionEvents(oauth, channel_id);
+                client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
                 eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
                     @Override
                     public void accept(RewardRedeemedEvent e) {
