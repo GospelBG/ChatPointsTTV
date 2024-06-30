@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
@@ -28,7 +29,7 @@ public class CommandController implements TabExecutor {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
 
         if (args.length == 0) {
-            help(plugin, sender, cmd);
+            help(sender);
             return true;
         
         } else {
@@ -49,19 +50,22 @@ public class CommandController implements TabExecutor {
 
                 case "reload":
                     reload(plugin);
-                    break;
+                    return true;
 
                 case "help":
-                    help(plugin, sender, cmd);
+                    help(sender);
                     return true;
 
                 case "unlink":
                     plugin.unlink(sender);
                     return true;
+                case "status":
+                    status(sender, plugin);
+                    return true;
 
                 default:
                     sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
-                    help(plugin, sender, cmd);
+                    help(sender);
                     return true;
             }
         }
