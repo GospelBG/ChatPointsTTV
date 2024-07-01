@@ -20,7 +20,7 @@ public class Events {
     public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
         plugin.getServer().getOnlinePlayers().forEach (p -> {
             if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                ChatPointsTTV.utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
+                ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
             }
         });
     }
