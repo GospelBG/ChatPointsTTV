@@ -37,8 +37,6 @@ public class Rewards {
             for (int i = 0; i < keys.size(); i++) {
                 String key = iterator.next().toString();
 
-                //log.info(key);
-                //log.info(config_value.getList(key).toString());
                 reward_list.add(new Reward(type, key, config_value.getStringList(key)));
             }
         }
