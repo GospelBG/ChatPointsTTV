@@ -21,6 +21,7 @@ public class CommandController implements TabExecutor {
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch connection.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
     
@@ -71,7 +72,7 @@ public class CommandController implements TabExecutor {
         }
 
         // If the sender (or console) uses our command correct, we can return true
-        if (!ChatPointsTTV.configOk) ChatPointsTTV.utils.sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
         return true;
     }
 
@@ -87,7 +88,7 @@ public class CommandController implements TabExecutor {
             list.add("help");
 
             return list;
-        } else if (args.length == 2 && args[0] == "link") {
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             list.add("key");
             list.add("browser");
 
@@ -104,6 +105,7 @@ public class CommandController implements TabExecutor {
         else if (method.equals("default")) {
             ChatPointsTTV.customCredentials = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
         } else {
+            ChatPointsTTV.getUtils().sendMessage(p, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
             help(p);
             return;
         }
@@ -127,7 +129,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void help(CommandSender p) {
-        ChatPointsTTV.utils.sendMessage(p, helpMsg);
+        ChatPointsTTV.getUtils().sendMessage(p, helpMsg);
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
@@ -141,6 +143,6 @@ public class CommandController implements TabExecutor {
         );
 
         ComponentBuilder formatted = new ComponentBuilder(msg);
-        ChatPointsTTV.utils.sendMessage(p, formatted.create()[0]);
+        ChatPointsTTV.getUtils().sendMessage(p, formatted.create()[0]);
     }
 }

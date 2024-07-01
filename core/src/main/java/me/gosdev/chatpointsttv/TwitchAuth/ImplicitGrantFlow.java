@@ -38,7 +38,7 @@ public class ImplicitGrantFlow {
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, AuthURL));
 
-            ChatPointsTTV.utils.sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
+            ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
         }
         
         int serverCloseId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -59,7 +59,7 @@ public class ImplicitGrantFlow {
                         future.complete(server.getAccessToken());
                     }
                 } catch(IOException e) {
-                    plugin.log.warning(e.toString());
+                    e.printStackTrace();
                 }
             }
         });

@@ -105,7 +105,7 @@ public class TwitchEventHandler {
             ChatPointsTTV.getPlugin().log.info(event.getNoticeType().toString());
             //ignoreSubs += event.getSubGift().getCumulativeTotal(); // Multiple sub gifting triggers both events
             amount = event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? event.getCommunitySubGift().getCumulativeTotal() : event.getSubGift().getCumulativeTotal();
-            tier = event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? ChatPointsTTV.utils.PlanToString(event.getCommunitySubGift().getSubTier()) : ChatPointsTTV.utils.PlanToString(event.getSubGift().getSubTier());
+            tier = event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier()) : ChatPointsTTV.getUtils().PlanToString(event.getSubGift().getSubTier());
 
 
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
@@ -146,12 +146,12 @@ public class TwitchEventHandler {
                 return;
             }
 
-            if (logEvents) plugin.log.info(event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.utils.PlanToString(tier) + " sub!");
+            if (logEvents) plugin.log.info(event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub!");
             for (Reward i : Rewards.getRewards(rewardType.SUB)) {
-                if (i.getEvent().equals(ChatPointsTTV.utils.PlanToConfig(tier))) {
+                if (i.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                     String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                     
-                    Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.utils.PlanToString(tier), action_color, user_color, rewardBold);
+                    Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
                     for (String cmd : i.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {

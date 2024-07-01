@@ -144,9 +144,9 @@ public class ChatPointsTTV extends JavaPlugin {
         return config.getString("CHANNEL_USERNAME");
     }
 
-    public static Utils utils;
+    private static Utils utils;
 
-    private static Utils getUtils() {
+    public static Utils getUtils() {
         if (utils != null) return  utils;
         final Pattern pattern = Pattern.compile("1\\.\\d\\d?");
         final Matcher matcher = pattern.matcher(Bukkit.getVersion());
@@ -216,7 +216,7 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         VersionCheck.check();
 
-        if(customCredentials && config.getBoolean("AUTO_LINK_CUSTOM")) {
+        if(customCredentials && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
             linkToTwitch(Bukkit.getConsoleSender(), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         }
 
