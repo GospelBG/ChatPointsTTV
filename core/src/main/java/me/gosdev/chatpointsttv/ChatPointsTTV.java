@@ -29,9 +29,9 @@ import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
+import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
@@ -320,9 +320,9 @@ public class ChatPointsTTV extends JavaPlugin {
             if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
                 if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
                     eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
-                    eventManager.onEvent(FollowEvent.class, new Consumer<FollowEvent>() {
+                    eventManager.onEvent(ChannelFollowEvent.class, new Consumer<ChannelFollowEvent>() {
                         @Override
-                        public void accept(FollowEvent e) {
+                        public void accept(ChannelFollowEvent e) {
                             try { // May get NullPointerException if event is triggered while still subscribing
                                 eventHandler.onFollow(e);
                             } catch (NullPointerException ex) {}

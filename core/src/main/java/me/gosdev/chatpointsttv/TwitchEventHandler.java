@@ -50,14 +50,14 @@ public class TwitchEventHandler {
         }
     }
 
-    public void onFollow(FollowEvent event) {
-        if (logEvents) plugin.log.info(event.getUser() + " started following you");
-        String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOW_STRING");
-        Events.displayTitle(event.getUser().getName(), custom_string, "", action_color, user_color, rewardBold);
+    public void onFollow(ChannelFollowEvent event) {
+        if (logEvents) plugin.log.info(event.getUserName() + " started following you");
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
+        Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
         for (String cmd : Rewards.getRewards(rewardType.FOLLOW).get(0).getCommands()) {
             String[] parts = cmd.split(" ", 2);
             try {
-                Events.runAction(parts[0], parts[1], event.getUser().getName());
+                Events.runAction(parts[0], parts[1], event.getUserName());
             } catch (Exception e) {
                 plugin.log.warning(e.toString());
             }
