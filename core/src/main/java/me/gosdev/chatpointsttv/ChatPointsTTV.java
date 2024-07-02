@@ -265,7 +265,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void linkToTwitch(CommandSender p, String token) {
         Thread thread = new Thread(() -> {
-            accountConnected = true;
             p.sendMessage("Logging in...");
 
             if(getClientID() == null || getClientID().isEmpty()) {
@@ -380,7 +379,8 @@ public class ChatPointsTTV extends JavaPlugin {
             }
             eventHandler = new TwitchEventHandler();
             client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
-            log.info("Done!");    
+            log.info("Done!");
+            accountConnected = true;
         });
         thread.start();
         thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -397,21 +397,16 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public void unlink(CommandSender p) {
-        if (accountConnected) {
-            try {
-                client.getEventSocket().close();
-                client.getPubSub().close();
-                client.close();
-                accountConnected = false;
-            } catch (Exception e) {
-                log.warning("Error while disabling ChatPointsTTV: " + e.toString());
-                return;
-            }
-    
-            p.sendMessage(ChatColor.GREEN + "Account disconnected!");
-        } else {
-            p.sendMessage(ChatColor.RED + "There is no connected account.");
+        try {
+            client.getEventSocket().close();
+            client.getPubSub().close();
+            client.close();
+            accountConnected = false;
+        } catch (Exception e) {
+            log.warning("Error while disabling ChatPointsTTV: " + e.toString());
+            return;
         }
 
+        p.sendMessage(ChatColor.GREEN + "Account disconnected!");
     }
 }
