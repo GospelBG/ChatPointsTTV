@@ -1,10 +1,10 @@
 package me.gosdev.chatpointsttv;
 
-import com.github.twitch4j.chat.events.channel.FollowEvent;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
+import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
