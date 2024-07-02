@@ -69,6 +69,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Boolean nameSpawnedMobs;
     private List<String> chatBlacklist;
     public static boolean configOk = true;
+    private Thread linkThread;
 
     private String user_id;
     private String channel_id;
@@ -264,7 +265,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public void linkToTwitch(CommandSender p, String token) {
-        Thread thread = new Thread(() -> {
+        linkThread = new Thread(() -> {
             p.sendMessage("Logging in...");
 
             if(getClientID() == null || getClientID().isEmpty()) {
@@ -382,8 +383,8 @@ public class ChatPointsTTV extends JavaPlugin {
             log.info("Done!");
             accountConnected = true;
         });
-        thread.start();
-        thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+        linkThread.start();
+        linkThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -398,12 +399,14 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void unlink(CommandSender p) {
         try {
+            linkThread.join(); // Wait until linking is finished
             client.getEventSocket().close();
             client.getPubSub().close();
             client.close();
             accountConnected = false;
         } catch (Exception e) {
-            log.warning("Error while disabling ChatPointsTTV: " + e.toString());
+            log.warning("Error while disabling ChatPointsTTV.");
+            e.printStackTrace();
             return;
         }
 
