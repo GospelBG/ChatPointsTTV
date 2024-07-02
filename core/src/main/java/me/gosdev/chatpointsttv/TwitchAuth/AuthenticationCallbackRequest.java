@@ -102,7 +102,6 @@ public class AuthenticationCallbackRequest implements Runnable {
      *
      * @throws IOException
      */
-    @SuppressWarnings("null")
     private void processRequest() throws IOException {
         // Get a reference to the socket's input and output streams.
         @SuppressWarnings("unused")
