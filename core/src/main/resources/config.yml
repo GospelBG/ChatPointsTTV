@@ -24,7 +24,7 @@ SHOW_CHAT: true
 #    - ACTION
 
 # For the action, follow this format:
-#     SPAWN {ENTITY_NAME_IN_CAPS} {AMOUNT}
+#     SPAWN {ENTITY_NAME} {AMOUNT}
 #     RUN {TARGET / CONSOLE} {COMMAND}
 #     GIVE {ITEM} {AMOUNT}
 
