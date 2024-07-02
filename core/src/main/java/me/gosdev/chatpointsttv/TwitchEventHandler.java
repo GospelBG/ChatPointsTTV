@@ -78,7 +78,6 @@ public class TwitchEventHandler {
         Collections.sort(rewards, new RewardComparator());
 
         for (Reward i : rewards) {
-            ChatPointsTTV.getPlugin().log.info(i.getEvent());
             if (amount >= Integer.parseInt(i.getEvent())) {
                 Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
                 for (String cmd : i.getCommands()) {
@@ -102,8 +101,7 @@ public class TwitchEventHandler {
             String chatter = event.getChatterUserName();
             String tier;
             
-            ChatPointsTTV.getPlugin().log.info(event.getNoticeType().toString());
-            //ignoreSubs += event.getSubGift().getCumulativeTotal(); // Multiple sub gifting triggers both events
+            ignoreSubs += event.getSubGift().getCumulativeTotal(); // Multiple sub gifting triggers both events
             amount = event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? event.getCommunitySubGift().getCumulativeTotal() : event.getSubGift().getCumulativeTotal();
             tier = event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier()) : ChatPointsTTV.getUtils().PlanToString(event.getSubGift().getSubTier());
 
