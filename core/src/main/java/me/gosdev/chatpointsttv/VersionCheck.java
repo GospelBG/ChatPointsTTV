@@ -32,6 +32,7 @@ public class VersionCheck {
                     result.append(line);
                 }
             }
+            conn.disconnect();
 
             JSONArray json = new JSONArray(result.toString());
             String latest = json.getJSONObject(0).getString("version_number");
