@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
-  <artifactId>chatpointsttv-craftbukkit_1_8_R1</artifactId>
+  <artifactId>chatpointsttv-craftbukkit_1_9_R1</artifactId>
   <build>
     <plugins>
       <plugin>

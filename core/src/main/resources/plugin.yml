@@ -3,7 +3,7 @@ version: ${project.version}
 author: GospelDev
 website: ${project.url}
 main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
-#api-version: '1.20'
+api-version: '1.13'
 libraries:
   - com.github.twitch4j:twitch4j:1.16.0
   - io.github.cdimascio:dotenv-java:3.0.0
