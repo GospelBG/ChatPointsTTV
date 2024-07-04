@@ -29,8 +29,8 @@ These are the only official download mirrors. Any downloads besides of these lin
 
     - **Log in through a browser**:  
     You won't need any extra modification in your config.yml file. You will just need to run `/twitch link` in-game and open the provided link. You may need to log in your Twitch account and authorise the app. Once you finish the log in process you can close the browser and your account will be linked.
-    > [!WARNING]  
-    > Currently due to technical limitations **it's only possible to use this method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
+> [!WARNING]  
+> Currently due to technical limitations **it's only possible to use this method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
 
 4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
