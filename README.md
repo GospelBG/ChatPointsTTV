@@ -66,6 +66,21 @@ You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the 
 You can leave this section unmodified, as there are default colors set up in the original file
 * **Strings**: Allows you to customize all title texts displayed to people with the `chatpointsttv.broadcast` permission. You may want to translate these strings to your language for a better experience. Don't add spaces before or after the double quotes as the plugin already does this for you. English strings are set up in the file by default.
 
+## Commands
+This plugin is controlled by the `/twitch` command followed by one of the following arguments:
+* `/twitch link [method]`  
+    Links your Account. If a key-based credential is set it will use it. Otherwise will show the button for logging in through a browser (only works if the user logs in with the same machine as the server).  
+    You can specify the method to use through the optional `[method]` parameter.  
+    **Valid options**: `key`, `browser`
+* `/twitch unlink`  
+    Unlinks your account and disables the plugin. You may need to log in again if you used the browser method.
+
+* `/twitch status`  
+    Shows some plugin information such as: version, listened channel, linked account and connection status.
+
+* `/twitch reload`  
+    Unlinks your account, reloads the configuration file and restarts the plugin.
+
 ## Reward Actions
 Currently, there are 2 types of actions:
 - Spawning entities  
