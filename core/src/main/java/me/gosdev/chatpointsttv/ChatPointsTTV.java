@@ -266,7 +266,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void linkToTwitch(CommandSender p, String token) {
         linkThread = new Thread(() -> {
-            getUtils().sendMessage(p, "Logging in...");
+            utils.sendMessage(p, "Logging in...");
 
             if(getClientID() == null || getClientID().isEmpty()) {
                 throw new NullPointerException("Invalid Client ID");

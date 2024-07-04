@@ -1,6 +1,4 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
-
-import com.gospelbg.chatpointsttv.TwitchAuth.Scopes;
+package me.gosdev.chatpointsttv.TwitchAuth;
 
 import java.io.*;
 import java.net.Socket;
@@ -9,6 +7,8 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import me.gosdev.chatpointsttv.Utils.Scopes;
 
 public class AuthenticationCallbackRequest implements Runnable {
 
@@ -104,6 +104,7 @@ public class AuthenticationCallbackRequest implements Runnable {
      */
     private void processRequest() throws IOException {
         // Get a reference to the socket's input and output streams.
+        @SuppressWarnings("unused")
         InputStream is = socket.getInputStream();
         DataOutputStream os = new DataOutputStream(socket.getOutputStream());
 
@@ -117,6 +118,7 @@ public class AuthenticationCallbackRequest implements Runnable {
         //String rawRequest = "\n" + requestLine;
 
         // Read the header lines.
+        @SuppressWarnings("unused")
         String headerLine = null;
         while ((headerLine = br.readLine()).length() != 0) {
             //rawRequest += headerLine + "\n";
@@ -127,6 +129,7 @@ public class AuthenticationCallbackRequest implements Runnable {
 
         // Parse the request line.
         StringTokenizer tokens = new StringTokenizer(requestLine);
+        @SuppressWarnings("unused")
         String requestMethod = tokens.nextToken();  // Request method, which should be "GET"
         String requestFilename = tokens.nextToken();
         Map<String, String> queryParams = extractQueryParams(requestFilename);
@@ -147,19 +150,16 @@ public class AuthenticationCallbackRequest implements Runnable {
         // Open the requested file.
         InputStream fis;
         String contentTypeLine;
-        if (requestFilename.startsWith("/auth.js") || requestFilename.startsWith("/auth-success.js")) {
-            fis = getClass().getResourceAsStream(requestFilename);
-            contentTypeLine = "Content-type: text/javascript" + EOL;
+
+        if (accessToken != null) {
+            fis = successPage.openStream();
+        } else if (error != null) {
+            fis = failurePage.openStream();
         } else {
-            if (accessToken != null) {
-                fis = successPage.openStream();
-            } else if (error != null) {
-                fis = failurePage.openStream();
-            } else {
-                fis = authPage.openStream();
-            }
-            contentTypeLine = "Content-type: text/html" + EOL;
+            fis = authPage.openStream();
         }
+        contentTypeLine = "Content-type: text/html" + EOL;
+
 
         boolean fileExists = fis != null;
 
@@ -194,6 +194,7 @@ public class AuthenticationCallbackRequest implements Runnable {
         os.close();
         br.close();
         socket.close();
+        
 
         // Send callbacks
         if (authenticationListener != null) {

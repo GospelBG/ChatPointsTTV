@@ -28,3 +28,6 @@ target/
 
 # VSCode folder
 .vscode/
+
+.hintrc
+.DS_Store

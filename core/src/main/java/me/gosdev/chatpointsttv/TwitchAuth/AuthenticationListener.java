@@ -1,4 +1,6 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.TwitchAuth;
+
+import me.gosdev.chatpointsttv.Utils.Scopes;
 
 /**
  * Interface for listening to twitch.tv authentication

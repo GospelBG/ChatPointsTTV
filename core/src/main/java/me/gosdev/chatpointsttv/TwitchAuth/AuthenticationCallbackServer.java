@@ -1,7 +1,9 @@
-package com.gospelbg.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.TwitchAuth;
 
 import java.io.IOException;
 import java.net.*;
+
+import me.gosdev.chatpointsttv.Utils.Scopes;
 
 public class AuthenticationCallbackServer implements AuthenticationListener {
 
@@ -27,6 +29,7 @@ public class AuthenticationCallbackServer implements AuthenticationListener {
     private String accessToken; // twitch.tv auth access token
     private Scopes[] accessScopes; // scopes retrieves for access token
     private AuthenticationError authenticationError;
+    Thread thread;
 
     /**
      * Constructor that will use default HTML views for output.
@@ -70,7 +73,7 @@ public class AuthenticationCallbackServer implements AuthenticationListener {
 
     private void run() throws IOException {
         // Process HTTP service requests
-        while (true) {
+        while (!serverSocket.isClosed()) {
             try {
                 // Listen for a TCP connection request
                 Socket connectionSocket = serverSocket.accept();
@@ -78,7 +81,7 @@ public class AuthenticationCallbackServer implements AuthenticationListener {
                 AuthenticationCallbackRequest request = new AuthenticationCallbackRequest(connectionSocket, authPage, failurePage, successPage);
                 request.setAuthenticationListener(this);
                 // Start thread
-                Thread thread = new Thread(request);
+                thread = new Thread(request);
                 thread.start();
             } catch (SocketException e) {
                 // Socket was closed by another thread
@@ -94,6 +97,7 @@ public class AuthenticationCallbackServer implements AuthenticationListener {
         if (serverSocket != null && !serverSocket.isClosed()) {
             try {
                 serverSocket.close();
+                if (thread != null) thread.interrupt();
             } catch (IOException ignored) {
             } finally {
                 serverSocket = null;

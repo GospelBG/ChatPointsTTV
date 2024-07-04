@@ -1,9 +1,9 @@
-name: 'ChatPointsTTV'
-version: 2.0
+name: ChatPointsTTV
+version: ${project.version}
 author: GospelDev
-website: https://github.com/GospelBG/ChatPointsTTV
-main: 'com.gospelbg.chatpointsttv.ChatPointsTTV'
-api-version: '1.20'
+website: ${project.url}
+main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
+api-version: '1.13'
 libraries:
   - com.github.twitch4j:twitch4j:1.16.0
   - io.github.cdimascio:dotenv-java:3.0.0
