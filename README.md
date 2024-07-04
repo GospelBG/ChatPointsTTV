@@ -46,8 +46,9 @@ These are the only official download mirrors. Any downloads besides of these lin
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
 *Sections with a (\*) are required to be changed in order to the plugin to be used.*
 * **Channel Username***: The channel that will be listened for rewards, bits and subs.  
-
-* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server. 
+* **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
+* **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
+* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  
 * **Chat Blacklist**: List of usernames of chat bots and other users that will be ignored for the in-game stream chat.
 * **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `{REWARD_NAME}: {ACTION}`, replacing `{REWARD_NAME}` with the **exact** reward name that is on Twitch and `{ACTION}` with the desired action to run.  
