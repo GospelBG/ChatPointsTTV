@@ -1,4 +1,4 @@
-<img src="icon.png" style="width: 7vw; float: left; padding-right: 10px; vertical-align: center;"/> <h1>ChatPointsTTV</h1>
+<img src="icon.png" style="width: 3vw; float: left"/> <h1>ChatPointsTTV</h1>
 
 ChatPointsTTV is a Bukkit plugin that helps you to create interactions between your Twitch stream and your Minecraft world. Set up your own rewards in exchange of channel points, follows, Bits, subs and more! Spawn mobs, give items or run any command when an event is triggered.  
 There's a whole range of use cases and possibilities to connect with your audience!
