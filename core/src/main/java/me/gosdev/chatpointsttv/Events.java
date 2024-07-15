@@ -89,7 +89,7 @@ public class Events {
                             ItemStack item = new ItemStack(Material.valueOf(cmd.get(0).toUpperCase()), Integer.parseInt(cmd.get(1)));
                             p.getInventory().addItem(item);
                         } catch (IllegalArgumentException e) {
-                            log.warning("Couldn't fetch item " + cmd.get(1));
+                            log.warning("Couldn't fetch item " + cmd.get(0));
                         }
                         
                     }
