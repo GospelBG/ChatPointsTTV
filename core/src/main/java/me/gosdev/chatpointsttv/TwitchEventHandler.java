@@ -12,15 +12,17 @@ import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.RewardComparator;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 public class TwitchEventHandler {
     ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-
+    Utils utils = ChatPointsTTV.getUtils();
 
     public static Boolean rewardBold;
     Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
@@ -33,7 +35,8 @@ public class TwitchEventHandler {
     private Integer ignoreSubs = 0;
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        if (logEvents) plugin.log.info(event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+        
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
@@ -51,7 +54,7 @@ public class TwitchEventHandler {
     }
 
     public void onFollow(ChannelFollowEvent event) {
-        if (logEvents) plugin.log.info(event.getUserName() + " started following you");
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following you");
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
         Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
         for (String cmd : Rewards.getRewards(rewardType.FOLLOW).get(0).getCommands()) {
@@ -67,7 +70,7 @@ public class TwitchEventHandler {
 
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
-        if (logEvents) plugin.log.info(event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
 
         String chatter = event.getChatterUserName();
         int amount = event.getCheer().getBits();
@@ -95,7 +98,7 @@ public class TwitchEventHandler {
 
     public void onEvent(ChannelChatNotificationEvent event) {
         if (listenForGifts && (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT | event.getNoticeType() == NoticeType.SUB_GIFT)) {
-            if (logEvents) plugin.log.info(event.getChatterUserName() + " gifted a sub!"); 
+            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " gifted a sub!"); 
 
             int amount = 1;
             String chatter = event.getChatterUserName();
@@ -144,7 +147,7 @@ public class TwitchEventHandler {
                 return;
             }
 
-            if (logEvents) plugin.log.info(event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub!");
+            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub!");
             for (Reward i : Rewards.getRewards(rewardType.SUB)) {
                 if (i.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                     String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
