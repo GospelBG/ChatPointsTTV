@@ -28,13 +28,16 @@ public class TikTokEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFTED_STRING");
 
         for (Reward reward : Rewards.getRewards(rewardType.TIKTOK_GIFT)) {
-            Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
-            for (String cmd : reward.getCommands()) {
-                String[] parts = cmd.split(" ", 2);
-                try {
-                    Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
-                } catch (Exception e) {
-                    plugin.log.warning(e.toString());
+            plugin.log.info(event.getGift().getName());
+            if (event.getGift().getName().equalsIgnoreCase(reward.getEvent())) {
+                Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
+                for (String cmd : reward.getCommands()) {
+                    String[] parts = cmd.split(" ", 2);
+                    try {
+                        Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
+                    } catch (Exception e) {
+                        plugin.log.warning(e.toString());
+                    }
                 }
             }
         }
