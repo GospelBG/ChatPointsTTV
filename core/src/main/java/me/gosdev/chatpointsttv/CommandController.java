@@ -3,6 +3,8 @@ package me.gosdev.chatpointsttv;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV.platforms;
+import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
@@ -15,7 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
-    private BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
+    private BaseComponent twitchHelpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
@@ -23,6 +25,14 @@ public class CommandController implements TabExecutor {
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
     
+    private BaseComponent tiktokHelpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok help" + ChatColor.RESET + " ----------\n" + 
+    ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("tiktok").getUsage() + ChatColor.RESET + "\n" + 
+    ChatColor.LIGHT_PURPLE + "/tiktok start: " + ChatColor.RESET + "Use this command to enable the plugin.\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok stop: " + ChatColor.RESET + "Use this command to disable the plugin.\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok status: " + ChatColor.RESET + "Displays information about the plugin and the connection to TikTok.\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files.\n" + 
+    ChatColor.LIGHT_PURPLE + "/tiktok help: " + ChatColor.RESET + "Displays this help message.").create()[0];
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -66,6 +76,43 @@ public class CommandController implements TabExecutor {
                 }
             }
     
+        } else if (cmd.getName().equalsIgnoreCase("tiktok")) {
+            if (args.length == 0) {
+                help(platforms.TIKTOK, sender);
+                return true;
+            
+            } else {
+                switch (args[0]) {
+                    case "link":
+                        if (ChatPointsTTV.configOk) {
+                            link(plugin, sender, args.length == 2 ? args[1] : "default");
+                        } else {
+                            sender.sendMessage("Invalid configuration. Please check your config file.");
+                            break;
+                        }
+                        
+                        return true;
+    
+                    case "reload":
+                        reload(plugin);
+                        return true;
+    
+                    case "help":
+                        help(platforms.TIKTOK, sender);
+                        return true;
+    
+                    case "unlink":
+                        ChatPointsTTV.Twitch.unlink(sender);
+                        return true;
+                    case "status":
+                        status(sender, plugin);
+                        return true;
+    
+                    default:
+                        sender.sendMessage(ChatColor.RED + "Unknown command: /tiktok " + args[0]);
+                        help(platforms.TIKTOK, sender);
+                        return true;
+                }
             }
         }
 
@@ -128,6 +175,7 @@ public class CommandController implements TabExecutor {
 
     private void help(platforms platform, CommandSender p) {
         if (platform == platforms.TWITCH) ChatPointsTTV.getUtils().sendMessage(p, twitchHelpMsg);
+        else if (platform == platforms.TIKTOK) ChatPointsTTV.getUtils().sendMessage(p, tiktokHelpMsg);
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
