@@ -126,7 +126,7 @@ public class CommandController implements TabExecutor {
         ArrayList<String> list = new ArrayList<>();
 
         if (args.length == 1) {
-            if (!ChatPointsTTV.getPlugin().isAccountConnected()) list.add("link");
+            if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("link");
             else list.add("unlink");
             list.add("reload");
             list.add("status");
