@@ -28,6 +28,7 @@ public class Rewards {
         if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
 
         ConfigurationSection config_value = ChatPointsTTV.getPlugin().config.getConfigurationSection(type.toString().toUpperCase() + "_REWARDS");
+        if (config_value == null) return null;
         ArrayList<Reward> reward_list = new ArrayList<>();
         if (type == rewardType.TWITCH_FOLLOW) {
             List<String> follow_rewards = ChatPointsTTV.getPlugin().config.getStringList(type.toString().toUpperCase() + "_REWARDS");
