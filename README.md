@@ -1,4 +1,4 @@
-<img src="icon.png" style="width: 7vw; float: left; padding-right: 10px; vertical-align: center;"/> <h1>ChatPointsTTV</h1>
+<img src="icon.png" style="width: 3vw; float: left"/> <h1>ChatPointsTTV</h1>
 
 ChatPointsTTV is a Bukkit plugin that helps you to create interactions between your Twitch stream and your Minecraft world. Set up your own rewards in exchange of channel points, follows, Bits, subs and more! Spawn mobs, give items or run any command when an event is triggered.  
 There's a whole range of use cases and possibilities to connect with your audience!
@@ -138,7 +138,7 @@ The latest version of the plugin needs the following scopes to function propertl
 ## **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
 
-Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentification.
+Thanks to [urgrue](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for Twitch authentification.
 
 Thanks to [Mystiflow](https://github.com/Mystiflow) for their [color convertion code](https://gist.github.com/Mystiflow/c42f45bac9916c84e381155f72a96d84).
 
