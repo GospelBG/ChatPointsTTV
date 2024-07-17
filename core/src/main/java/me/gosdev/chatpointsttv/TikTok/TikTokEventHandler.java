@@ -25,7 +25,7 @@ public class TikTokEventHandler {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUser().getName() + " has gifted " + event.getCombo() + " " + event.getGift().getName());
 
         String user = event.getUser().getProfileName();
-        String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFTED_STRING");
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
 
         for (Reward reward : Rewards.getRewards(rewardType.TIKTOK_GIFT)) {
             plugin.log.info(event.getGift().getName());
