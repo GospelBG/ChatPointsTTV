@@ -20,8 +20,8 @@ import org.bukkit.command.Command;
 public class CommandController implements TabExecutor {
     private BaseComponent twitchHelpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
-        ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch start: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch stop: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch connection.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
@@ -45,7 +45,7 @@ public class CommandController implements TabExecutor {
             
             } else {
                 switch (args[0]) {
-                    case "link":
+                    case "start":
                         if (ChatPointsTTV.configOk) {
                             String method = args.length == 2 ? args[1] : "default";
 
@@ -54,7 +54,7 @@ public class CommandController implements TabExecutor {
                             else if (method.equals("default")) {
                                 ChatPointsTTV.twitchCustomCredentials = (plugin.config.getString("TWITCH_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
                             } else {
-                                ChatPointsTTV.getUtils().sendMessage(sender, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
+                                ChatPointsTTV.getUtils().sendMessage(sender, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch start " + method).create()[0]);
                                 help(platforms.TWITCH, sender);
                                 return true;
                             }
@@ -82,10 +82,10 @@ public class CommandController implements TabExecutor {
                         help(platforms.TWITCH, sender);
                         return true;
     
-                    case "unlink":
+                    case "stop":
                         ChatPointsTTV.Twitch.unlink(sender);
                         return true;
-                        
+
                     case "status":
                         status(platforms.TWITCH, sender, plugin);
                         return true;
@@ -143,14 +143,14 @@ public class CommandController implements TabExecutor {
 
         if (cmd.getName().equalsIgnoreCase("twitch")) {
             if (args.length == 1) {
-                if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("link");
-                else list.add("unlink");
+                if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("start");
+                else list.add("stop");
                 list.add("reload");
                 list.add("status");
                 list.add("help");
     
                 return list;
-            } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("start")) {
                 list.add("key");
                 list.add("browser");
     
