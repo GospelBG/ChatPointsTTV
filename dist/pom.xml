@@ -11,7 +11,7 @@
   </parent>
   <build>
     <directory>../target</directory>
-    <finalName>${project.parent.artifactId}-${project.version}</finalName>
+    <finalName>${project.parent.name}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
