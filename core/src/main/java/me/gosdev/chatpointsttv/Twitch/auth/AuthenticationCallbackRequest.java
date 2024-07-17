@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.auth;
 
 import java.io.*;
 import java.net.Socket;
@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import me.gosdev.chatpointsttv.Utils.Scopes;
+import me.gosdev.chatpointsttv.Twitch.Scopes;
 
 public class AuthenticationCallbackRequest implements Runnable {
 

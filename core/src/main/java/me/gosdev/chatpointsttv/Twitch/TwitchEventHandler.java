@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv;
+package me.gosdev.chatpointsttv.Twitch;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
@@ -8,6 +8,8 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.RewardComparator;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
@@ -24,10 +26,9 @@ public class TwitchEventHandler {
     ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     Utils utils = ChatPointsTTV.getUtils();
 
-    public static Boolean rewardBold;
-    Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForCheers = !plugin.config.getConfigurationSection("TWITCH_CHEER_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForSubs = !plugin.config.getConfigurationSection("TWITCH_SUB_REWARDS").getKeys(true).isEmpty();
+    Boolean listenForGifts = !plugin.config.getConfigurationSection("TWITCH_GIFT_REWARDS").getKeys(true).isEmpty();
     Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
@@ -38,10 +39,10 @@ public class TwitchEventHandler {
         
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         ChannelPointsRedemption redemption = event.getRedemption();
-        for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
+        for (Reward reward : Rewards.getRewards(rewardType.TWITCH_CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-            Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
+            Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, plugin.rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
@@ -56,8 +57,8 @@ public class TwitchEventHandler {
     public void onFollow(ChannelFollowEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following you");
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
-        Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
-        for (String cmd : Rewards.getRewards(rewardType.FOLLOW).get(0).getCommands()) {
+        Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, plugin.rewardBold);
+        for (String cmd : Rewards.getRewards(rewardType.TWITCH_FOLLOW).get(0).getCommands()) {
             String[] parts = cmd.split(" ", 2);
             try {
                 Events.runAction(parts[0], parts[1], event.getUserName());
@@ -77,12 +78,12 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("CHEERED_STRING");
 
         // Sort rewards by cheer.
-        ArrayList<Reward> rewards = Rewards.getRewards(rewardType.CHEER);
+        ArrayList<Reward> rewards = Rewards.getRewards(rewardType.TWITCH_CHEER);
         Collections.sort(rewards, new RewardComparator());
 
         for (Reward i : rewards) {
             if (amount >= Integer.parseInt(i.getEvent())) {
-                Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
+                Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, plugin.rewardBold);
                 for (String cmd : i.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
@@ -110,12 +111,12 @@ public class TwitchEventHandler {
 
 
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
-            ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
+            ArrayList<Reward> rewards = Rewards.getRewards(rewardType.TWITCH_GIFT);
             Collections.sort(rewards, Collections.reverseOrder());
             
             for (Reward i : rewards) {
                 if (amount >= Integer.parseInt(i.getEvent())) {
-                    Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
+                    Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, plugin.rewardBold);
                     for (String cmd : i.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {
@@ -148,11 +149,11 @@ public class TwitchEventHandler {
             }
 
             if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub!");
-            for (Reward i : Rewards.getRewards(rewardType.SUB)) {
+            for (Reward i : Rewards.getRewards(rewardType.TWITCH_SUB)) {
                 if (i.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                     String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                     
-                    Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
+                    Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, plugin.rewardBold);
                     for (String cmd : i.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {

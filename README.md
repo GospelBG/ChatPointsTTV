@@ -24,7 +24,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 
     - **Using a key-based authentication** *(recommended)*:  
     You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com). Make sure to add all the [needed scopes](#twitch-scopes).  
-    Uncomment `CUSTOM_CLIENT_ID` and `CUSTOM_ACCESS_TOKEN` on the config file and add your Client ID and Token onto the corresponding fields.  
+    Uncomment `TWITCH_CLIENT_ID` and `TWITCH_ACCESS_TOKEN` on the config file and add your Client ID and Token onto the corresponding fields.  
     Once the server has started you just need to run `/twitch link` and your account will be automatically logged in. You may need to refresh the token when it expires.
 
     - **Log in through a browser**:  

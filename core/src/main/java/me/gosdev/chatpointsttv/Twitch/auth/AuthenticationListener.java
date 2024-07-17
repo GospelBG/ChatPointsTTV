@@ -1,6 +1,6 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.auth;
 
-import me.gosdev.chatpointsttv.Utils.Scopes;
+import me.gosdev.chatpointsttv.Twitch.Scopes;
 
 /**
  * Interface for listening to twitch.tv authentication

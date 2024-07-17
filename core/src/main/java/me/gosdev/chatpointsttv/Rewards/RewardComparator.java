@@ -10,11 +10,11 @@ public class RewardComparator implements Comparator<Reward> {
     @Override
     public int compare(Reward o1, Reward o2) {
         if (o1.getType() != o2.getType()) throw new java.lang.UnsupportedOperationException("Cannot compare " + o1.getType().toString() + " rewards with " + o2.getType().toString());
-        if (o1.getType() == rewardType.CHANNEL_POINTS || o1.getType() == rewardType.FOLLOW || o1.getType() == rewardType.SUB) throw new UnsupportedOperationException("Cannot sort " + o1.getType().toString() + " rewards.");
-        if (o2.getType() == rewardType.CHANNEL_POINTS || o2.getType() == rewardType.FOLLOW || o2.getType() == rewardType.SUB) throw new UnsupportedOperationException("Cannot sort " + o1.getType().toString() + " rewards.");
+        if (o1.getType() == rewardType.TWITCH_CHANNEL_POINTS || o1.getType() == rewardType.TWITCH_FOLLOW || o1.getType() == rewardType.TWITCH_SUB) throw new UnsupportedOperationException("Cannot sort " + o1.getType().toString() + " rewards.");
+        if (o2.getType() == rewardType.TWITCH_CHANNEL_POINTS || o2.getType() == rewardType.TWITCH_FOLLOW || o2.getType() == rewardType.TWITCH_SUB) throw new UnsupportedOperationException("Cannot sort " + o1.getType().toString() + " rewards.");
 
         List<Integer> amounts = new ArrayList<Integer>();
-        Rewards.getRewards(rewardType.CHEER).forEach((reward) -> {
+        Rewards.getRewards(rewardType.TWITCH_CHEER).forEach((reward) -> {
             amounts.add(Integer.parseInt(reward.getEvent()));
         });
 

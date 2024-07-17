@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.auth;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -16,14 +17,14 @@ import net.md_5.bungee.api.chat.HoverEvent;
 public class ImplicitGrantFlow {
     private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
-    private final static String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ChatPointsTTV.getClientID() + "&redirect_uri=http://localhost:3000&scope="+plugin.scopes;
+    private final static String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + TwitchClient.getClientID() + "&redirect_uri=http://localhost:3000&scope="+ChatPointsTTV.Twitch.scopes;
 
 
     public static CompletableFuture<String> getAccessToken(CommandSender p) {
         CompletableFuture<String> future = new CompletableFuture<>();
         server = new AuthenticationCallbackServer(3000);
-        if (ChatPointsTTV.getTwitchClient() != null) {
-            ChatPointsTTV.getTwitchClient().close();
+        if (TwitchClient.getClient() != null) {
+            TwitchClient.getClient().close();
         }
 
         if (p == Bukkit.getServer().getConsoleSender()) {

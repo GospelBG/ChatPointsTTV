@@ -1,9 +1,9 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.auth;
 
 import java.io.IOException;
 import java.net.*;
 
-import me.gosdev.chatpointsttv.Utils.Scopes;
+import me.gosdev.chatpointsttv.Twitch.Scopes;
 
 public class AuthenticationCallbackServer implements AuthenticationListener {
 

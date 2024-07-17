@@ -1,15 +1,15 @@
 # This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
 # For more information about how to use this file, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
 
-CHANNEL_USERNAME: {YOUR CHANNEL}
+TWITCH_CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # Uncomment the following lines (remove the # symbol at the start of the line) to use a key-based authentication instead of the browser login.
 # It should be used in remote environments which do not have a web browser (i.e. a standalone hosted server)
-# CUSTOM_CLIENT_ID: your_client_id_here
-# CUSTOM_ACCESS_TOKEN: your_access_token_here
+# TWITCH_CLIENT_ID: your_client_id_here
+# TWITCH_ACCESS_TOKEN: your_access_token_here
 
 # Whether the plugin shoud automatically connect to Twitch when a key-based authentication is used.
-AUTO_LINK_CUSTOM: true
+TWITCH_AUTO_LINK: true
 
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
@@ -32,30 +32,30 @@ SHOW_CHAT: true
 #     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
 
 # Leave any reward class empty to disable it.
-CHANNEL_POINTS_REWARDS:
+TWITCH_CHANNEL_POINTS_REWARDS:
   [REWARD NAME]:
     - {ACTION 1}
     - {ACTION 2}
 
 # Put the desired action after the colon in the form of a list. You musn't add a "Reward Name".
-FOLLOW_REWARDS:
+TWITCH_FOLLOW_REWARDS:
   - {ACTION}
   - {ACTION}
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
-CHEER_REWARDS:
+TWITCH_CHEER_REWARDS:
   [BITS AMOUNT]:
     - {ACTION}
 
 # Follow the same format as the Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
-# Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions with sub gifting
-SUB_REWARDS:
+# Also you can enter an AMOUNT on TWITCH_GIFT_REWARDS to toggle actions with sub gifting
+TWITCH_SUB_REWARDS:
   [TWITCH_PRIME]:
     - {ACTION}
   [TIER1/2/3]:
     - {ACTION}
 
-GIFT_REWARDS:
+TWITCH_GIFT_REWARDS:
   [AMOUNT]:
     - {ACTION}
 
