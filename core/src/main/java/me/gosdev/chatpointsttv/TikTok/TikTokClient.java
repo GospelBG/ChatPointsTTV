@@ -1,0 +1,63 @@
+package me.gosdev.chatpointsttv.TikTok;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
+import io.github.jwdeveloper.tiktok.TikTokLive;
+import io.github.jwdeveloper.tiktok.live.LiveClient;
+import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Rewards.Rewards;
+import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+
+public class TikTokClient {
+    private static Boolean accountConnected = false;
+
+    private TikTokEventHandler eventHandler = new TikTokEventHandler();
+
+    private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+    private static Utils utils = ChatPointsTTV.getUtils();
+    private static LiveClient client;
+
+    public static LiveClient getClient() {
+        return client;
+    }
+    public static Boolean isAccountConected() {
+        return accountConnected;
+    }
+
+    public void link() {
+        LiveClientBuilder builder = TikTokLive.newClient(plugin.config.getString("TIKTOK_CHANNEL_USERNAME"));
+        if (Rewards.getRewards(rewardType.TIKTOK_GIFT) != null) {
+            builder.onGiftCombo((liveClient, event) -> {
+                eventHandler.onGift(event);
+            });
+        }
+        if (Rewards.getRewards(rewardType.TIKTOK_FOLLOW) != null) {
+            builder.onFollow((liveClient, event) -> {
+                eventHandler.onFollow(event);
+            });
+        }
+        if (plugin.config.getBoolean("SHOW_CHAT")) {
+            builder.onComment((liveClient, event) -> {
+                if (!plugin.chatBlacklist.contains(event.getUser().getName())) {
+                    BaseComponent[] components = new BaseComponent[] {
+                        new ComponentBuilder(ChatColor.DARK_PURPLE + event.getUser().getProfileName() + ": ").create()[0],
+                        new ComponentBuilder(event.getText()).create()[0]
+                    };
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        utils.sendMessage(player, components);
+                    }
+                }
+            });
+        }
+
+        client = builder.build();
+        client.connectAsync();
+    }
+    
+}
