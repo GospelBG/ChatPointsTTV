@@ -95,4 +95,4 @@ STRINGS:
   FOLLOWED_STRING: "has started following"
   CHEERED_STRING: "cheered" #..."100 bits"
   SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
-  GIFT_STRING: "gifed" #..."5 subs"
+  GIFT_STRING: "gifted" #..."5 subs"
