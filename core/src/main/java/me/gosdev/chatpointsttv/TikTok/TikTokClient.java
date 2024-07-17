@@ -16,7 +16,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TikTokClient {
-    private static Boolean accountConnected = false;
+    private Boolean accountConnected = false;
 
     private TikTokEventHandler eventHandler = new TikTokEventHandler();
 
@@ -27,7 +27,7 @@ public class TikTokClient {
     public static LiveClient getClient() {
         return client;
     }
-    public static Boolean isAccountConected() {
+    public Boolean isAccountConected() {
         return accountConnected;
     }
 

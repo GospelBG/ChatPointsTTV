@@ -158,7 +158,7 @@ public class CommandController implements TabExecutor {
             }
         } else if (cmd.getName().equalsIgnoreCase("tiktok")) {
             if (args.length == 1) {
-                if (!TikTokClient.isAccountConected()) list.add("start");
+                if (!ChatPointsTTV.Tiktok.isAccountConected()) list.add("start");
                 else list.add("stop");
                 list.add("reload");
                 list.add("status");
