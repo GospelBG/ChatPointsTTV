@@ -49,8 +49,8 @@ public class ChatPointsTTV extends JavaPlugin {
     public Logger log = getLogger();
     public FileConfiguration config;
 
-    public static TwitchClient Twitch = new TwitchClient();
-    public static TikTokClient Tiktok = new TikTokClient();  
+    public static TwitchClient Twitch;
+    public static TikTokClient Tiktok;
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -151,10 +151,16 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         VersionCheck.check();
 
+        Twitch = new TwitchClient();
+        Tiktok = new TikTokClient();
 
         if (config.getString("TWITCH_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) twitchCustomCredentials = true;
-        if(twitchCustomCredentials && config.getBoolean("TWITCH_AUTO_LINK", false) == true) {
+        if (config.getString("TWITCH_CHANNEL_USERNAME") != null && twitchCustomCredentials && config.getBoolean("AUTO_LINK", false) == true) {
             Twitch.link(Bukkit.getConsoleSender(), plugin.config.getString("TWITCH_ACCESS_TOKEN"));
+        }
+
+        if (config.getString("TIKTOK_CHANNEL_USERNAME") != null && config.getBoolean("AUTO_LINK", false) == true) {
+            Tiktok.link(Bukkit.getConsoleSender());
         }
 
         pm.registerEvents(new Listener() {
