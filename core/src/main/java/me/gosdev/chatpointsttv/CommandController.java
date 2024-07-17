@@ -4,7 +4,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV.platforms;
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -140,7 +139,6 @@ public class CommandController implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
-
         if (cmd.getName().equalsIgnoreCase("twitch")) {
             if (args.length == 1) {
                 if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("start");

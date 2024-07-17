@@ -141,7 +141,10 @@ public class ChatPointsTTV extends JavaPlugin {
 
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
+        this.getCommand("tiktok").setExecutor(cmdController);
+
         this.getCommand("twitch").setTabCompleter(cmdController);
+        this.getCommand("tiktok").setTabCompleter(cmdController);
 
         utils.sendMessage(Bukkit.getConsoleSender(), "ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
