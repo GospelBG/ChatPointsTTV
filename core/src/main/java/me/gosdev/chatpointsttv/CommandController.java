@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV.platforms;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -46,7 +47,26 @@ public class CommandController implements TabExecutor {
                 switch (args[0]) {
                     case "link":
                         if (ChatPointsTTV.configOk) {
-                            link(plugin, sender, args.length == 2 ? args[1] : "default");
+                            String method = args.length == 2 ? args[1] : "default";
+
+                            if (method.equalsIgnoreCase("browser"))  ChatPointsTTV.twitchCustomCredentials = false;
+                            else if (method.equalsIgnoreCase("key")) ChatPointsTTV.twitchCustomCredentials = true;
+                            else if (method.equals("default")) {
+                                ChatPointsTTV.twitchCustomCredentials = (plugin.config.getString("TWITCH_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
+                            } else {
+                                ChatPointsTTV.getUtils().sendMessage(sender, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
+                                help(platforms.TWITCH, sender);
+                                return true;
+                            }
+                            if (ChatPointsTTV.twitchCustomCredentials) {
+                                // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
+                                ChatPointsTTV.Twitch.link(sender, plugin.config.getString("TWITCH_ACCESS_TOKEN"));
+                            } else {
+                                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(sender);
+                                future.thenAccept(token -> {
+                                    ChatPointsTTV.Twitch.link(sender, token);
+                                });
+                            }
                         } else {
                             sender.sendMessage("Invalid configuration. Please check your config file.");
                             break;
@@ -65,8 +85,9 @@ public class CommandController implements TabExecutor {
                     case "unlink":
                         ChatPointsTTV.Twitch.unlink(sender);
                         return true;
+                        
                     case "status":
-                        status(sender, plugin);
+                        status(platforms.TWITCH, sender, plugin);
                         return true;
     
                     default:
@@ -83,14 +104,8 @@ public class CommandController implements TabExecutor {
             
             } else {
                 switch (args[0]) {
-                    case "link":
-                        if (ChatPointsTTV.configOk) {
-                            link(plugin, sender, args.length == 2 ? args[1] : "default");
-                        } else {
-                            sender.sendMessage("Invalid configuration. Please check your config file.");
-                            break;
-                        }
-                        
+                    case "start":
+                        ChatPointsTTV.Tiktok.link(sender);
                         return true;
     
                     case "reload":
@@ -101,11 +116,12 @@ public class CommandController implements TabExecutor {
                         help(platforms.TIKTOK, sender);
                         return true;
     
-                    case "unlink":
-                        ChatPointsTTV.Twitch.unlink(sender);
+                    case "stop":
+                        ChatPointsTTV.Tiktok.unlink(sender);
                         return true;
+
                     case "status":
-                        status(sender, plugin);
+                        status(platforms.TIKTOK, sender, plugin);
                         return true;
     
                     default:
@@ -125,44 +141,34 @@ public class CommandController implements TabExecutor {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
 
-        if (args.length == 1) {
-            if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("link");
-            else list.add("unlink");
-            list.add("reload");
-            list.add("status");
-            list.add("help");
+        if (cmd.getName().equalsIgnoreCase("twitch")) {
+            if (args.length == 1) {
+                if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("link");
+                else list.add("unlink");
+                list.add("reload");
+                list.add("status");
+                list.add("help");
+    
+                return list;
+            } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
+                list.add("key");
+                list.add("browser");
+    
+                return list;
+            }
+        } else if (cmd.getName().equalsIgnoreCase("tiktok")) {
+            if (args.length == 1) {
+                if (!TikTokClient.isAccountConected()) list.add("start");
+                else list.add("stop");
+                list.add("reload");
+                list.add("status");
+                list.add("help");
 
-            return list;
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
-            list.add("key");
-            list.add("browser");
-
-            return list;
+                return list;
+            }
         }
 
         return null;        
-    }
-
-    private void link(ChatPointsTTV plugin, CommandSender p, String method) {
-
-        if (method.equalsIgnoreCase("browser"))  ChatPointsTTV.twitchCustomCredentials = false;
-        else if (method.equalsIgnoreCase("key")) ChatPointsTTV.twitchCustomCredentials = true;
-        else if (method.equals("default")) {
-            ChatPointsTTV.twitchCustomCredentials = (plugin.config.getString("TWITCH_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
-        } else {
-            ChatPointsTTV.getUtils().sendMessage(p, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
-            help(platforms.TWITCH, p);
-            return;
-        }
-        if (ChatPointsTTV.twitchCustomCredentials) {
-            // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            ChatPointsTTV.Twitch.link(p, plugin.config.getString("TWITCH_ACCESS_TOKEN"));
-        } else {
-            CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p);
-            future.thenAccept(token -> {
-                ChatPointsTTV.Twitch.link(p, token);
-            });
-        }
     }
 
     private void reload(ChatPointsTTV plugin) {
@@ -178,7 +184,7 @@ public class CommandController implements TabExecutor {
         else if (platform == platforms.TIKTOK) ChatPointsTTV.getUtils().sendMessage(p, tiktokHelpMsg);
     }
 
-    private void status(CommandSender p, ChatPointsTTV plugin) {
+    private void status(platforms platform, CommandSender p, ChatPointsTTV plugin) {
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +

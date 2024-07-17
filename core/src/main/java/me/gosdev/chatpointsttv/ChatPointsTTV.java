@@ -27,6 +27,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -48,7 +49,8 @@ public class ChatPointsTTV extends JavaPlugin {
     public Logger log = getLogger();
     public FileConfiguration config;
 
-    public static TwitchClient Twitch = new TwitchClient();    
+    public static TwitchClient Twitch = new TwitchClient();
+    public static TikTokClient Tiktok = new TikTokClient();  
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),

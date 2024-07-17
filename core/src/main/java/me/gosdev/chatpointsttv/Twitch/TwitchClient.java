@@ -237,7 +237,7 @@ public class TwitchClient {
             }
             eventHandler = new TwitchEventHandler();
             client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
-            utils.sendMessage(p, "Done!");
+            utils.sendMessage(p, "Twitch connection done!");
             accountConnected = true;
         });
         linkThread.start();
@@ -274,6 +274,6 @@ public class TwitchClient {
         oauth = null;
         plugin = null;
 
-        p.sendMessage(ChatColor.GREEN + "Account disconnected!");
+        p.sendMessage(ChatColor.GREEN + "Twitch disconnected successfully!");
     }
 }

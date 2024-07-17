@@ -1,6 +1,7 @@
 package me.gosdev.chatpointsttv.TikTok;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import io.github.jwdeveloper.tiktok.TikTokLive;
@@ -30,7 +31,7 @@ public class TikTokClient {
         return accountConnected;
     }
 
-    public void link() {
+    public void link(CommandSender p) {
         LiveClientBuilder builder = TikTokLive.newClient(plugin.config.getString("TIKTOK_CHANNEL_USERNAME"));
         if (Rewards.getRewards(rewardType.TIKTOK_GIFT) != null) {
             builder.onGiftCombo((liveClient, event) -> {
@@ -57,7 +58,17 @@ public class TikTokClient {
         }
 
         client = builder.build();
-        client.connectAsync();
+        client.connectAsync().whenComplete((LiveClient client, Throwable ex) -> {
+            accountConnected = true;
+            utils.sendMessage(p, "TikTok connection done!");
+        });
+    }
+
+    public void unlink(CommandSender p) {
+        client.disconnect();
+        accountConnected = false;
+        p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
+
     }
     
 }
