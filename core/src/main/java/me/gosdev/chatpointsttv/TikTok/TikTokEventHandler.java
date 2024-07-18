@@ -28,7 +28,6 @@ public class TikTokEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
 
         for (Reward reward : Rewards.getRewards(rewardType.TIKTOK_GIFT)) {
-            plugin.log.info(event.getGift().getName());
             if (event.getGift().getName().equalsIgnoreCase(reward.getEvent())) {
                 Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
                 for (String cmd : reward.getCommands()) {
