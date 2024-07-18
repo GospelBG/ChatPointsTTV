@@ -21,8 +21,8 @@ public class TikTokEventHandler {
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
-    public void onGift(TikTokGiftComboEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUser().getName() + " has gifted " + event.getCombo() + " " + event.getGift().getName());
+    public void onGift(TikTokGiftComboEvent event) { //TODO: COMBOS DO NOT COUNT PROPERTLY
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), "@" + event.getUser().getName() + " has gifted " + event.getCombo() + " " + event.getGift().getName());
 
         String user = event.getUser().getProfileName();
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
