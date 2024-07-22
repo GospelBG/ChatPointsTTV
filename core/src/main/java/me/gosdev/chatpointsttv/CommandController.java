@@ -4,6 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV.platforms;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -183,14 +184,25 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(platforms platform, CommandSender p, ChatPointsTTV plugin) {
-        String msg = (
-            "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
-            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + ChatPointsTTV.Twitch.getConnectedUsername() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + ChatPointsTTV.Twitch.getListenedChannel() + "\n" + 
-            "\n" +
-            ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.Twitch.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
-        );
+        String msg;
+        if (platform == platforms.TWITCH) {
+            msg = (
+                "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
+                ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
+                ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + ChatPointsTTV.Twitch.getConnectedUsername() + "\n" +
+                ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + ChatPointsTTV.Twitch.getListenedChannel() + "\n" + 
+                "\n" +
+                ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.Twitch.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+            );
+        } else {
+            msg = (
+                "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
+                ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
+                ChatColor.LIGHT_PURPLE + "Listened account: " + ChatColor.RESET + TikTokClient.getClient().getRoomInfo().getHost().getName() + "\n" + 
+                "\n" +
+                ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.Tiktok.isAccountConected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+            );
+        }
 
         ComponentBuilder formatted = new ComponentBuilder(msg);
         ChatPointsTTV.getUtils().sendMessage(p, formatted.create()[0]);
