@@ -95,10 +95,11 @@ public class TwitchClient {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
     public String getListenedChannel() {
-        //if (config.getString("TWITCH_CHANNEL_USERNAME") == null | config.getString("TWITCH_CHANNEL_USERNAME").startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")) return null;
-        //return config.getString("TWITCH_CHANNEL_USERNAME");
-
-        return client.getChat().getChannels().iterator().next(); // UNTESTED 
+        String configValue = plugin.config.getString("TWITCH_CHANNEL_USERNAME");
+        if (configValue == null || configValue.isEmpty() || configValue.startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")
+        
+        if (client != null) return client.getChat().getChannels().iterator().next(); // UNTESTED 
+        else return plugin.config.getString("TWITCH_CHANNEL_USERNAME");
     }
 
     public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
