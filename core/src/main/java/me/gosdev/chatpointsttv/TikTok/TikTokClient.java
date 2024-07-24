@@ -43,6 +43,11 @@ public class TikTokClient {
                 eventHandler.onFollow(event);
             });
         }
+        if (Rewards.getRewards(rewardType.TIKTOK_SHARE) != null) {
+            builder.onShare((liveClient, event) -> {
+                eventHandler.onShare(event);
+            });
+        }
         if (plugin.config.getBoolean("SHOW_CHAT")) {
             builder.onComment((liveClient, event) -> {
                 if (!plugin.chatBlacklist.contains(event.getUser().getName())) {

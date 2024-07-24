@@ -70,6 +70,9 @@ TIKTOK_GIFT_REWARDS:
     - {ACTION 1}
     - {ACTION 2}
 
+TIKTOK_SHARE_REWARDS:
+  - {ACTION}
+
 # Add glow effect to spawned mobs
 MOB_GLOW: true
 # Set chatter's name to spawned mobs
@@ -107,3 +110,4 @@ STRINGS:
   CHEERED_STRING: "cheered" #..."100 bits"
   SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifed" #..."5 subs"
+  SHARED_STRING: "has shared this LIVE"
