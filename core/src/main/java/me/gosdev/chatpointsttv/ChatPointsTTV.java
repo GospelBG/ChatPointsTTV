@@ -44,6 +44,7 @@ import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
@@ -373,7 +374,9 @@ public class ChatPointsTTV extends JavaPlugin {
                             new ComponentBuilder(event.getMessage()).create()[0]
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            utils.sendMessage(player, components);
+                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                                utils.sendMessage(player, components);
+                            }
                         }
                     }
                 });
