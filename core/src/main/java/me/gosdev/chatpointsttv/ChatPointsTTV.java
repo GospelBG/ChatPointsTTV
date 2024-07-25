@@ -49,8 +49,8 @@ public class ChatPointsTTV extends JavaPlugin {
     public Logger log = getLogger();
     public FileConfiguration config;
 
-    public static TwitchClient Twitch;
-    public static TikTokClient Tiktok;
+    public TwitchClient Twitch;
+    public TikTokClient Tiktok;
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -184,11 +184,18 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {      
-        ImplicitGrantFlow.server.stop();
+        if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop();
     
         config = null;
 
         Rewards.rewards = new HashMap<rewardType,ArrayList<Reward>>();
         rewardBold = null;
+
+        if (Twitch.isAccountConnected()) {
+            Twitch.unlink(Bukkit.getConsoleSender());
+        }
+        if (Tiktok.isAccountConected()) {
+            Tiktok.unlink(Bukkit.getConsoleSender());
+        }
     }
 }

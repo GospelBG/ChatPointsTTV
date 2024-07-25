@@ -52,7 +52,7 @@ public class TwitchClient {
 
     private Boolean accountConnected = false;
 
-    private static ITwitchClient client;
+    private ITwitchClient client;
 
     private User user;
     private OAuth2Credential oauth;
@@ -85,7 +85,7 @@ public class TwitchClient {
             return ClientID;
         }
     }
-    public static ITwitchClient getClient() {
+    public ITwitchClient getClient() {
         return client;
     }
     public Boolean isAccountConnected() {
@@ -103,7 +103,7 @@ public class TwitchClient {
         else return plugin.config.getString("TWITCH_CHANNEL_USERNAME");
     }
 
-    public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
+    public List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
         String cursor = null;
         List<String> modsOutput = new ArrayList<>();
 
@@ -177,7 +177,7 @@ public class TwitchClient {
                 utils.sendMessage(p, "Listening for channel point rewards...");
             }
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_FOLLOW) != null) {
-                if (TwitchClient.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
+                if (getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
                     eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
                     eventManager.onEvent(ChannelFollowEvent.class, new Consumer<ChannelFollowEvent>() {
                         @Override

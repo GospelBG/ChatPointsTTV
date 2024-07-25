@@ -23,9 +23,9 @@ public class TikTokClient {
 
     private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private static Utils utils = ChatPointsTTV.getUtils();
-    private static LiveClient client;
+    private LiveClient client;
 
-    public static LiveClient getClient() {
+    public LiveClient getClient() {
         return client;
     }
     public Boolean isAccountConected() {
@@ -74,9 +74,9 @@ public class TikTokClient {
 
     public void unlink(CommandSender p) {
         client.disconnect();
+        client = null;
         accountConnected = false;
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
-
     }
     
 }
