@@ -373,7 +373,9 @@ public class ChatPointsTTV extends JavaPlugin {
                             new ComponentBuilder(event.getMessage()).create()[0]
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            utils.sendMessage(player, components);
+                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                                utils.sendMessage(player, components);.
+                            }
                         }
                     }
                 });
