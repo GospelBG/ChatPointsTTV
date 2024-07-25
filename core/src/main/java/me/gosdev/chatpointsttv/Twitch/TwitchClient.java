@@ -32,6 +32,7 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -231,7 +232,9 @@ public class TwitchClient {
                             new ComponentBuilder(event.getMessage()).create()[0]
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            utils.sendMessage(player, components);
+                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                                utils.sendMessage(player, components);
+                            }
                         }
                     }
                 });

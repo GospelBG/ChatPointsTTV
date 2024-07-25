@@ -8,6 +8,7 @@ import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -56,7 +57,9 @@ public class TikTokClient {
                         new ComponentBuilder(event.getText()).create()[0]
                     };
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        utils.sendMessage(player, components);
+                        if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                            utils.sendMessage(player, components);
+                        }
                     }
                 }
             });
