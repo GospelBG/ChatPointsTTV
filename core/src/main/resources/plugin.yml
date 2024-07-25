@@ -23,7 +23,7 @@ permissions:
     default: op
 
   chatpointsttv.target:
-    default: false
+    default: op
 
   chatpointsttv.broadcast:
     default: true
