@@ -100,6 +100,11 @@ Currently, there are 2 types of actions:
     **Example**: `GIVE DIAMOND 1`
     *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*
 
+- Explosions
+    **FORMAT**: `TNT <AMOUNT> <FUSE TIME IN TICKS>`
+    **Example**: `TNT 1 0`
+    *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*
+
 You should set up your events in your config file with this format:
 ```
 TYPE_REWARDS:
