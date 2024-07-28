@@ -142,8 +142,12 @@ public class ChatPointsTTV extends JavaPlugin {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
     public String getListenedChannel() {
-        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")) return null;
-        return config.getString("CHANNEL_USERNAME");
+        if (plugin != null) {
+            return client.getChat().getChannels().iterator().next(); // UNTESTED 
+        } else {
+            if (plugin.config.getString("TWITCH_CHANNEL_USERNAME") == null | plugin.config.getString("TWITCH_CHANNEL_USERNAME").startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")) return null;
+            return plugin.config.getString("TWITCH_CHANNEL_USERNAME");
+        }
     }
 
     private static Utils utils;
