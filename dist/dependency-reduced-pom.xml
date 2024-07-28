@@ -10,7 +10,7 @@
   <artifactId>chatpointsttv-dist</artifactId>
   <build>
     <directory>../target</directory>
-    <finalName>${project.parent.artifactId}-${project.version}</finalName>
+    <finalName>${project.parent.name}-${project.version}</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
