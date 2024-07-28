@@ -44,6 +44,7 @@ import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
@@ -213,7 +214,7 @@ public class ChatPointsTTV extends JavaPlugin {
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
-        log.info("ChatPointsTTV enabled!");
+        utils.sendMessage(Bukkit.getConsoleSender(), "ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.sendMessage("ChatPointsTTV reloaded!");
@@ -270,7 +271,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public void linkToTwitch(CommandSender p, String token) {
         linkThread = new Thread(() -> {
-            p.sendMessage("Logging in...");
+            utils.sendMessage(p, "Logging in...");
 
             if(getClientID() == null || getClientID().isEmpty()) {
                 throw new NullPointerException("Invalid Client ID");
@@ -298,13 +299,13 @@ public class ChatPointsTTV extends JavaPlugin {
                 throw new RuntimeException("Twitch API Login failed. Provided credentials may be invalid.");
             }
             
-            log.info("Logged in as: "+ user.getDisplayName());
+            utils.sendMessage(p, "Logged in as: "+ user.getDisplayName());
     
             // Join the twitch chat of this channel and enable stream/follow events
             String channel = config.getString("CHANNEL_USERNAME");
             channel_id = getUserId(channel);
             user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
-            log.info("Listening to " + channel + "'s events...");
+            utils.sendMessage(p, "Listening to " + channel + "'s events...");
             client.getChat().joinChannel(channel);
 
             p.sendMessage("Logged in as: " + user.getDisplayName());
@@ -319,7 +320,7 @@ public class ChatPointsTTV extends JavaPlugin {
                         eventHandler.onChannelPointsRedemption(e);
                     }
                 });
-                log.info("Listening for channel point rewards...");
+                utils.sendMessage(p, "Listening for channel point rewards...");
             }
             if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
                 if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
@@ -332,7 +333,7 @@ public class ChatPointsTTV extends JavaPlugin {
                             } catch (NullPointerException ex) {}
                         }
                     });
-                    log.info("Listening for follows...");            
+                    utils.sendMessage(p, "Listening for follows...");            
                 } else {
                     log.warning("Follow events cannot be listened to on unauthorised channels.");
                 }
@@ -347,7 +348,7 @@ public class ChatPointsTTV extends JavaPlugin {
                         } catch (NullPointerException ex) {}
                     }
                 }); 
-                log.info("Listening for Cheers...");
+                utils.sendMessage(p, "Listening for Cheers...");
             }
     
             if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
@@ -360,7 +361,7 @@ public class ChatPointsTTV extends JavaPlugin {
                         } catch (NullPointerException ex) {}
                     }
                 });
-                log.info("Listening for subscriptions and gifts...");
+                utils.sendMessage(p, "Listening for subscriptions and gifts...");
             }
     
             if (config.getBoolean("SHOW_CHAT")) {
@@ -377,14 +378,16 @@ public class ChatPointsTTV extends JavaPlugin {
                             new ComponentBuilder(event.getMessage()).create()[0]
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            utils.sendMessage(player, components);
+                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                                utils.sendMessage(player, components);
+                            }
                         }
                     }
                 });
             }
             eventHandler = new TwitchEventHandler();
             client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
-            log.info("Done!");
+            utils.sendMessage(p, "Done!");
             accountConnected = true;
         });
         linkThread.start();

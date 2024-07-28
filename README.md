@@ -1,4 +1,4 @@
-<img src="icon.png" style="width: 7vw; float: left; padding-right: 10px; vertical-align: center;"/> <h1>ChatPointsTTV</h1>
+<img src="icon.png" style="width: 3vw; float: left"/> <h1>ChatPointsTTV</h1>
 
 ChatPointsTTV is a Bukkit plugin that helps you to create interactions between your Twitch stream and your Minecraft world. Set up your own rewards in exchange of channel points, follows, Bits, subs and more! Spawn mobs, give items or run any command when an event is triggered.  
 There's a whole range of use cases and possibilities to connect with your audience!
@@ -28,8 +28,9 @@ These are the only official download mirrors. Any downloads besides of these lin
     Once the server has started you just need to run `/twitch link` and your account will be automatically logged in. You may need to refresh the token when it expires.
 
     - **Log in through a browser**:  
-    You won't need any extra modification in your config.yml file. You will just need to run `/twitch link` in-game and open the provided link. You may need to log in your Twitch account and authorise the app. Once you finish the log in process you can close the browser and your account will be linked.  
-    You have to repeat this process each time you start the server.
+    You won't need any extra modification in your config.yml file. You will just need to run `/twitch link` in-game and open the provided link. You may need to log in your Twitch account and authorise the app. Once you finish the log in process you can close the browser and your account will be linked.
+> [!WARNING]  
+> Currently due to technical limitations **it's only possible to use the browser method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
 
 4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
@@ -45,8 +46,9 @@ These are the only official download mirrors. Any downloads besides of these lin
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
 *Sections with a (\*) are required to be changed in order to the plugin to be used.*
 * **Channel Username***: The channel that will be listened for rewards, bits and subs.  
-
-* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server. 
+* **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
+* **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
+* **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  
 * **Chat Blacklist**: List of usernames of chat bots and other users that will be ignored for the in-game stream chat.
 * **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `{REWARD_NAME}: {ACTION}`, replacing `{REWARD_NAME}` with the **exact** reward name that is on Twitch and `{ACTION}` with the desired action to run.  
@@ -65,6 +67,21 @@ You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the 
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
 You can leave this section unmodified, as there are default colors set up in the original file
 * **Strings**: Allows you to customize all title texts displayed to people with the `chatpointsttv.broadcast` permission. You may want to translate these strings to your language for a better experience. Don't add spaces before or after the double quotes as the plugin already does this for you. English strings are set up in the file by default.
+
+## Commands
+This plugin is controlled by the `/twitch` command followed by one of the following arguments:
+* `/twitch link [method]`  
+    Links your Account. If a key-based credential is set it will use it. Otherwise will show the button for logging in through a browser (only works if the user logs in with the same machine as the server).  
+    You can specify the method to use through the optional `[method]` parameter.  
+    **Valid options**: `key`, `browser`
+* `/twitch unlink`  
+    Unlinks your account and disables the plugin. You may need to log in again if you used the browser method.
+
+* `/twitch status`  
+    Shows some plugin information such as: version, listened channel, linked account and connection status.
+
+* `/twitch reload`  
+    Unlinks your account, reloads the configuration file and restarts the plugin.
 
 ## Reward Actions
 Currently, there are 2 types of actions:
@@ -121,7 +138,7 @@ The latest version of the plugin needs the following scopes to function propertl
 ## **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
 
-Thanks to [Async Twitch API Wrapper](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for the Twitch authentification.
+Thanks to [urgrue](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for Twitch authentification.
 
 Thanks to [Mystiflow](https://github.com/Mystiflow) for their [color convertion code](https://gist.github.com/Mystiflow/c42f45bac9916c84e381155f72a96d84).
 

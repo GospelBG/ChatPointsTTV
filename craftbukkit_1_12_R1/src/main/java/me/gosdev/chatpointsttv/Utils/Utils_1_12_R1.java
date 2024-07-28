@@ -60,7 +60,11 @@ public class Utils_1_12_R1 implements Utils {
     public void sendMessage(CommandSender p, BaseComponent message) {
         p.spigot().sendMessage(message);
     }
-
+    @Override
+    public void sendMessage(CommandSender p, String message) {
+        BaseComponent component = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD +"[ChatPointsTTV] " + ChatColor.RESET + message).create()[0];
+        p.spigot().sendMessage(component);
+    }
     @Override
     public void sendLogToPlayers(String msg) {
         BaseComponent component = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD +"[ChatPointsTTV] " + ChatColor.RESET + msg).create()[0];

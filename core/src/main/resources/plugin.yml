@@ -6,14 +6,12 @@ main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
 api-version: '1.13'
 libraries:
   - com.github.twitch4j:twitch4j:1.16.0
-  - io.github.cdimascio:dotenv-java:3.0.0
 
 commands:
   twitch:
     description: Manage ChatPointsTTV from this command. Use "/twitch help" to get a full list of commands.
     usage: /twitch <function>
     permission: chatpointsttv.manage
-
 
 permissions:
   chatpointsttv.manage:
@@ -24,4 +22,3 @@ permissions:
 
   chatpointsttv.broadcast:
     default: true
-
