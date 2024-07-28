@@ -252,7 +252,9 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
         
-        ImplicitGrantFlow.server.stop();
+        if (ImplicitGrantFlow.server.isRunning()) {
+            ImplicitGrantFlow.server.stop();
+        }
     
         // Erase variables
         client = null;
