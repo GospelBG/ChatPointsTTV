@@ -44,7 +44,6 @@ import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
@@ -190,7 +189,7 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         } catch (Exception e) {
             configOk = false;
-            log.warning(e.toString());
+            log.warning(e.getMessage());
         }
 
 

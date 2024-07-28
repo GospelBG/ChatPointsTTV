@@ -59,7 +59,7 @@ public class ImplicitGrantFlow {
                         future.complete(server.getAccessToken());
                     }
                 } catch(IOException e) {
-                    e.printStackTrace();
+                    e.getMessage();
                 }
             }
         });
