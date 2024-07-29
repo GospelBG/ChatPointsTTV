@@ -209,9 +209,9 @@ public class ChatPointsTTV extends JavaPlugin {
 
         TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
-        shouldMobsGlow = config.getBoolean("MOB_GLOW");
-        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS");
-        nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
+        shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
+        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS", true);
+        nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
         cmdController = new CommandController();
