@@ -58,8 +58,15 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "unlink":
-                    plugin.unlink(sender);
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        try {
+                            plugin.linkThread.join();
+                        } catch (InterruptedException e) {}
+                        
+                        plugin.unlink(sender);
+                    });
                     return true;
+                    
                 case "status":
                     status(sender, plugin);
                     return true;
