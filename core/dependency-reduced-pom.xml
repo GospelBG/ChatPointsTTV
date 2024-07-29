@@ -3,7 +3,7 @@
   <parent>
     <artifactId>chatpointsttv</artifactId>
     <groupId>me.gosdev</groupId>
-    <version>2.0</version>
+    <version>${revision}</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
@@ -31,4 +31,12 @@
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
   </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.12-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>

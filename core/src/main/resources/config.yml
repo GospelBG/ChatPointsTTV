@@ -68,6 +68,10 @@ DISPLAY_NAME_ON_MOB: true
 LOG_EVENTS: true
 
 # Customize the in-game title.
+
+# Toggles in-game title messages.
+SHOW_INGAME_ALERTS: true
+
 # You can use the following options:
 
 #  Colors:
