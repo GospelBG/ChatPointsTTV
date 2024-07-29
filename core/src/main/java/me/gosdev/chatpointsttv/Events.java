@@ -18,6 +18,7 @@ public class Events {
     static Logger log = plugin.log;
 
     public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
+        if (!ChatPointsTTV.enableAlerts) return; // Do not show alerts if user has disabled them.
         plugin.getServer().getOnlinePlayers().forEach (p -> {
             if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                 ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);

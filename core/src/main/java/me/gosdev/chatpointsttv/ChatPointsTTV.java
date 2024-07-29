@@ -70,6 +70,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Boolean customCredentials = false;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
+    public static Boolean enableAlerts;
     private List<String> chatBlacklist;
     public static boolean configOk = true;
     public Thread linkThread;
@@ -209,6 +210,7 @@ public class ChatPointsTTV extends JavaPlugin {
         TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
         shouldMobsGlow = config.getBoolean("MOB_GLOW");
+        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS");
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
