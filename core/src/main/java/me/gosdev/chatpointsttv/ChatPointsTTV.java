@@ -300,7 +300,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 throw new RuntimeException("Twitch API Login failed. Provided credentials may be invalid.");
             }
             
-            utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
+            log.info("Logged in as: "+ user.getDisplayName());
     
             // Join the twitch chat of this channel and enable stream/follow events
             String channel = config.getString("CHANNEL_USERNAME");
