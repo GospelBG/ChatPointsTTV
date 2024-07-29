@@ -406,6 +406,10 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public void unlink(CommandSender p) {
+        if (!accountConnected) {
+            p.sendMessage(ChatColor.RED + "There is no connected account.");
+            return;
+        }
         try {
             linkThread.join(); // Wait until linking is finished
             client.getEventSocket().close();
