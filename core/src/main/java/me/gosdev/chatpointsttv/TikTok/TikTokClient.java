@@ -38,16 +38,19 @@ public class TikTokClient {
             builder.onGiftCombo((liveClient, event) -> {
                 eventHandler.onGift(event);
             });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for gifts...");     
         }
         if (Rewards.getRewards(rewardType.TIKTOK_FOLLOW) != null) {
             builder.onFollow((liveClient, event) -> {
                 eventHandler.onFollow(event);
             });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for follows...");
         }
         if (Rewards.getRewards(rewardType.TIKTOK_SHARE) != null) {
             builder.onShare((liveClient, event) -> {
                 eventHandler.onShare(event);
             });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for shares...");
         }
         if (plugin.config.getBoolean("SHOW_CHAT")) {
             builder.onComment((liveClient, event) -> {
@@ -68,7 +71,7 @@ public class TikTokClient {
         client = builder.build();
         client.connectAsync().whenComplete((LiveClient client, Throwable ex) -> {
             accountConnected = true;
-            utils.sendMessage(p, "TikTok connection done!");
+            utils.sendMessage(p, "TikTok client started successfully!");
         });
     }
 

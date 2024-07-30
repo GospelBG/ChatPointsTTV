@@ -162,7 +162,6 @@ public class TwitchClient {
             String channel = config.getString("TWITCH_CHANNEL_USERNAME");
             channel_id = getUserId(channel);
             user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
-            utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
             client.getChat().joinChannel(channel);
             
             // Subscribe to events
@@ -181,7 +180,7 @@ public class TwitchClient {
                         eventHandler.onChannelPointsRedemption(e);
                     }
                 });
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for channel point rewards...");
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for channel point rewards...");
             }
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_FOLLOW) != null) {
                 if (getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
@@ -194,7 +193,7 @@ public class TwitchClient {
                             } catch (NullPointerException ex) {}
                         }
                     });
-                    utils.sendMessage(Bukkit.getConsoleSender(), "Listening for follows...");            
+                    utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for follows...");            
                 } else {
                     plugin.log.warning("Follow events cannot be listened to on unauthorised channels.");
                 }
@@ -210,7 +209,7 @@ public class TwitchClient {
                         } catch (NullPointerException ex) {}
                     }
                 }); 
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for Cheers...");
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for Cheers...");
             } else latch.countDown();
     
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_SUB) != null || Rewards.getRewards(Rewards.rewardType.TWITCH_GIFT) != null) {
@@ -223,7 +222,7 @@ public class TwitchClient {
                         } catch (NullPointerException ex) {}
                     }
                 });
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for subscriptions and gifts...");
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for subscriptions and gifts...");
             } else latch.countDown();
     
             if (config.getBoolean("SHOW_CHAT")) {
