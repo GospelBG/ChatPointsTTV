@@ -36,7 +36,6 @@ public class TwitchEventHandler {
     private Integer ignoreSubs = 0;
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.TWITCH_CHANNEL_POINTS)) {
