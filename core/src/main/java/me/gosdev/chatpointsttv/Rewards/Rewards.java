@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,5 +48,21 @@ public class Rewards {
 
         rewards.put(type, reward_list);
         return reward_list;
+    }
+
+    public static Reward getReward(rewardType type, Optional<String> eventQuery, Optional<ArrayList<String>> cmdsQuery) {
+        ArrayList<String> cmds = cmdsQuery.isPresent() ? cmdsQuery.get() : null;
+        String event = eventQuery.isPresent() ? eventQuery.get() : null;
+        
+        ArrayList<Reward> rewards = getRewards(type);
+
+        for (Reward reward : rewards) {
+            if (cmds == null || cmds.equals(reward.getCommands())) {
+                if (event == null || event.equalsIgnoreCase(reward.getEvent())) {
+                    return reward;
+                }
+            }
+        }
+        return null;
     }
 }

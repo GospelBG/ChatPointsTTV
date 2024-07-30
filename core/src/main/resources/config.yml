@@ -66,6 +66,8 @@ TWITCH_GIFT_REWARDS:
 TIKTOK_FOLLOW_REWARDS:
   - {ACTION}
 
+# Add the desired gift name (original English name) in the [ITEM NAME] field.
+# You can use "ANY" as a wildcard which will handle all gift items, excluding the ones that were already added into the list.
 TIKTOK_GIFT_REWARDS:
   [ITEM NAME]:
     - {ACTION 1}

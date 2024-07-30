@@ -1,5 +1,7 @@
 package me.gosdev.chatpointsttv.TikTok;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
@@ -30,6 +32,19 @@ public class TikTokEventHandler {
 
         for (Reward reward : Rewards.getRewards(rewardType.TIKTOK_GIFT)) {
             if (event.getGift().getName().equalsIgnoreCase(reward.getEvent())) {
+                Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
+                for (String cmd : reward.getCommands()) {
+                    String[] parts = cmd.split(" ", 2);
+                    try {
+                        Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
+                    } catch (Exception e) {
+                        plugin.log.warning(e.toString());
+                    }
+                }
+                return;
+            } else if (reward.getEvent().equalsIgnoreCase("any")) {
+                reward = Rewards.getReward(rewardType.TIKTOK_GIFT, Optional.of("any"), Optional.empty());
+
                 Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);

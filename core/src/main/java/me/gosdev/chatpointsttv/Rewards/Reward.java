@@ -1,6 +1,7 @@
 package me.gosdev.chatpointsttv.Rewards;
 
 import java.util.List;
+import java.util.Optional;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 
@@ -23,5 +24,19 @@ public class Reward {
     }
     public rewardType getType() {
         return type;
+    }
+
+    public boolean equals(Reward reward, Optional<Boolean> exactMatchOpt) {
+        Boolean exactMatch = exactMatchOpt.isPresent() ? exactMatchOpt.get() : false;
+        
+        if (reward.type == this.type && reward.event.equalsIgnoreCase(this.event)) {
+            if (exactMatch) {
+                return reward.cmds.equals(this.cmds);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 }
