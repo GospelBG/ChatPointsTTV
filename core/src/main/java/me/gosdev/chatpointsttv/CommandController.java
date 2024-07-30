@@ -82,7 +82,13 @@ public class CommandController implements TabExecutor {
                         return true;
     
                     case "stop":
-                        plugin.Twitch.unlink(sender);
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                plugin.Twitch.linkThread.join();
+                            } catch (InterruptedException e) {}
+                            
+                            plugin.Twitch.unlink(sender);
+                        });
                         return true;
 
                     case "status":

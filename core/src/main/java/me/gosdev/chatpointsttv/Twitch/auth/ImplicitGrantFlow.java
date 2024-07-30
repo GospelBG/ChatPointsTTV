@@ -53,14 +53,16 @@ public class ImplicitGrantFlow {
             @Override
             public void run() {
                 try {
-                    server.start();
+                    if (!server.isRunning()) {
+                        server.start();
+                    }
                     if(server.getAccessToken() != null) {;
                         server.stop();
                         Bukkit.getScheduler().cancelTask(serverCloseId);
                         future.complete(server.getAccessToken());
                     }
                 } catch(IOException e) {
-                    e.printStackTrace();
+                    e.getMessage();
                 }
             }
         });

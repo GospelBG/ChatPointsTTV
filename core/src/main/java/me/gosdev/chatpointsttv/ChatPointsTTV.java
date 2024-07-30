@@ -41,6 +41,7 @@ public class ChatPointsTTV extends JavaPlugin {
     
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
+    public static Boolean enableAlerts;
     public List<String> chatBlacklist;
     public static boolean configOk = true;
     public static Boolean twitchCustomCredentials = false;
@@ -136,6 +137,7 @@ public class ChatPointsTTV extends JavaPlugin {
         rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
         shouldMobsGlow = config.getBoolean("MOB_GLOW");
+        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS", true);
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
@@ -184,7 +186,9 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {      
-        if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop();
+        if (ImplicitGrantFlow.server.isRunning()) {
+            ImplicitGrantFlow.server.stop();
+        }
     
         config = null;
 
