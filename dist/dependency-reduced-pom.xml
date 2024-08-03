@@ -41,6 +41,12 @@
   </repositories>
   <dependencies>
     <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit</artifactId>
+      <version>3.0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>com.github.philippheuer.events4j</groupId>
       <artifactId>events4j-handler-simple</artifactId>
       <version>0.12.2</version>

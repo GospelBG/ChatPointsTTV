@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -80,6 +82,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public Logger log = getLogger();
     public FileConfiguration config;
+    public Metrics metrics;
     private Boolean accountConnected = false;
 
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
@@ -178,6 +181,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         PluginManager pm = Bukkit.getServer().getPluginManager();
+        metrics = new Metrics(this, 22873);
 
         utils = getUtils();
 
@@ -227,6 +231,10 @@ public class ChatPointsTTV extends JavaPlugin {
         VersionCheck.check();
 
         if(customCredentials && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
+            metrics.addCustomChart(new SimplePie("authentication_method", () -> {
+                return "Twitch Auto-Link (Key)";
+            }));
+            
             linkToTwitch(Bukkit.getConsoleSender(), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         }
 

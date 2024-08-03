@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -125,6 +126,9 @@ public class CommandController implements TabExecutor {
                 plugin.linkToTwitch(p, token);
             });
         }
+        plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
+            return ChatPointsTTV.customCredentials ? "OAuth Keys" : "Browser Login";
+        }));
     }
 
     private void reload(ChatPointsTTV plugin) {

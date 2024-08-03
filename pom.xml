@@ -14,6 +14,29 @@
     <module>dist</module>
   </modules>
   <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <relocations>
+            <relocation>
+              <pattern>org.bstats</pattern>
+              <shadedPattern>me.name.util</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <resources>
         <resource>
             <directory>src/main/resources</directory>
@@ -25,7 +48,7 @@
   <properties>
       <maven.compiler.source>1.8</maven.compiler.source>
       <maven.compiler.target>1.8</maven.compiler.target>
-      <revision>2.1</revision>
+      <revision>2.1.1</revision>
   </properties>
 
   <repositories>
@@ -36,23 +59,29 @@
   </repositories>
 
   <dependencies>
-      <dependency>
-          <groupId>com.github.philippheuer.events4j</groupId>
-          <artifactId>events4j-handler-simple</artifactId>
-          <version>0.12.2</version>
-          <scope>provided</scope>
-      </dependency>
-      <dependency>
-          <groupId>com.github.twitch4j</groupId>
-          <artifactId>twitch4j</artifactId>
-          <version>1.21.0</version>
-          <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20240303</version>
-        <scope>provided</scope>
+    <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bukkit</artifactId>
+      <version>3.0.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.philippheuer.events4j</groupId>
+      <artifactId>events4j-handler-simple</artifactId>
+      <version>0.12.2</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.twitch4j</groupId>
+      <artifactId>twitch4j</artifactId>
+      <version>1.21.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20240303</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
