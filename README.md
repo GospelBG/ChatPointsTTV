@@ -87,19 +87,28 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 ## Reward Actions
 Currently, there are 2 types of actions:
 - Spawning entities  
-    **Format**: `SPAWN <ENTITY NAME> <AMOUNT>`  
+    **Format**: `SPAWN <ENTITY NAME> [AMOUNT]`  
     **Example**: `SPAWN CREEPER 2`  
-    *This action will spawn the menctioned entities for each player that is set up as a target (with the `chatpointsttv.target` permission). The example action will spawn 2 Creepers on each player's location.*
+    *This action will spawn the menctioned entities for each player that is set up as a target (with the `chatpointsttv.target` permission). The example action will spawn 2 Creepers on each player's location.*  
     
 - Running commands  
     **Format**: `RUN <TARGET / CONSOLE> <COMMAND>`  
     **Example**: `RUN TARGET DAMAGE @S 2`  
-    *This action will run the command as the console a single time, or as each player once. Command arguments are allowed. The example action will substract each player a heart from their health.*
+    *This action will run the command as the console a single time, or as each player once. Command arguments are allowed. The example action will substract each player a heart from their health.*  
 
 - Giving Items  
-    **Format**: `GIVE <ITEM> <AMOUNT>`
+    **Format**: `GIVE <ITEM> [AMOUNT]`
     **Example**: `GIVE DIAMOND 1`
-    *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*
+    *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
+
+- Explosions
+    **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`
+    **Example**: `TNT 1 0`
+    *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*  
+
+> [!TIP]
+> Argument names surrounded by <> means that it is a required argument.
+> Arguments surrounded by [] are optional.
 
 You should set up your events in your config file with this format:
 ```

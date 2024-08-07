@@ -10,7 +10,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.entity.Entity;
+
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
+import me.gosdev.chatpointsttv.Utils.SpawnRunnable;
+
 import org.bukkit.entity.EntityType;
 
 public class Events {
@@ -27,26 +30,26 @@ public class Events {
     }
 
     public static void runAction(String action, String args, String user) throws Exception {
-        List<String> cmd  = Arrays.asList(args.split(" "));
+        List<String> cmd = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    for (Player p : plugin.getServer().getOnlinePlayers()) {
-                        if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                            for (int i = 0; i < Integer.valueOf(cmd.get(1)); i++) {
-                                Entity e = p.getWorld().spawnEntity(p.getLocation(), EntityType.valueOf(cmd.get(0).toUpperCase()));
-
-                                e.setGlowing(ChatPointsTTV.shouldMobsGlow);
-                                if (ChatPointsTTV.nameSpawnedMobs) {
-                                    e.setCustomName(user);
-                                    e.setCustomNameVisible(true);
-                                } 
-                            }
-                        }
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
+                    
+                    SpawnRunnable entityRunnable = new SpawnRunnable();
+                    entityRunnable.entity = EntityType.valueOf(cmd.get(0));
+                    try {
+                        entityRunnable.amount = Integer.parseInt(cmd.get(1));
+                    } catch (NumberFormatException  | ArrayIndexOutOfBoundsException e) {
+                        entityRunnable.amount = 1;
                     }
-                });
+                    entityRunnable.entityName = user;
+                    entityRunnable.p = p;
+    
+                    entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, entityRunnable, 0, 0);
+                }
                 break;
-
+                
             case "RUN":
                 String text = "";
                 String runAs = cmd.get(0);
@@ -87,7 +90,13 @@ public class Events {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
                         try {
-                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(0).toUpperCase()), Integer.parseInt(cmd.get(1)));
+                            int amount;
+                            try {
+                                amount = Integer.parseInt(cmd.get(1));
+                            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                                amount = 1;
+                            }
+                            ItemStack item = new ItemStack(Material.valueOf(cmd.get(0).toUpperCase()), amount);
                             p.getInventory().addItem(item);
                         } catch (IllegalArgumentException e) {
                             log.warning("Couldn't fetch item " + cmd.get(0));
@@ -95,7 +104,27 @@ public class Events {
                         
                     }
                 }
-        }
+                break;
+            
+            case "TNT":
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
 
+                    SpawnRunnable tntRunnable = new SpawnRunnable();
+                    tntRunnable.entity = EntityType.PRIMED_TNT;
+                    tntRunnable.amount = Integer.valueOf(cmd.get(0));
+                    try {
+                        tntRunnable.explosionTime = Integer.valueOf(cmd.get(1));
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {}
+                    
+                    tntRunnable.p = p;
+                    tntRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, tntRunnable, 0, 2);
+                }
+                break;
+
+            default:
+                log.warning("No such action: " + action.toUpperCase());
+                return;
+        }
     }
 }
