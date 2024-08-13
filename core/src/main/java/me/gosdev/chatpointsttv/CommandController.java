@@ -4,7 +4,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV.platforms;
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.auth.ImplicitGrantFlow;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -60,11 +59,11 @@ public class CommandController implements TabExecutor {
                             }
                             if (ChatPointsTTV.twitchCustomCredentials) {
                                 // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-                                ChatPointsTTV.Twitch.link(sender, plugin.config.getString("TWITCH_ACCESS_TOKEN"));
+                                plugin.Twitch.link(sender, plugin.config.getString("TWITCH_ACCESS_TOKEN"));
                             } else {
                                 CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(sender);
                                 future.thenAccept(token -> {
-                                    ChatPointsTTV.Twitch.link(sender, token);
+                                    plugin.Twitch.link(sender, token);
                                 });
                             }
                         } else {
@@ -83,7 +82,13 @@ public class CommandController implements TabExecutor {
                         return true;
     
                     case "stop":
-                        ChatPointsTTV.Twitch.unlink(sender);
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                            try {
+                                plugin.Twitch.linkThread.join();
+                            } catch (InterruptedException e) {}
+                            
+                            plugin.Twitch.unlink(sender);
+                        });
                         return true;
 
                     case "status":
@@ -105,7 +110,7 @@ public class CommandController implements TabExecutor {
             } else {
                 switch (args[0]) {
                     case "start":
-                        ChatPointsTTV.Tiktok.link(sender);
+                        plugin.Tiktok.link(sender);
                         return true;
     
                     case "reload":
@@ -117,7 +122,7 @@ public class CommandController implements TabExecutor {
                         return true;
     
                     case "stop":
-                        ChatPointsTTV.Tiktok.unlink(sender);
+                        plugin.Tiktok.unlink(sender);
                         return true;
 
                     case "status":
@@ -142,7 +147,7 @@ public class CommandController implements TabExecutor {
         ArrayList<String> list = new ArrayList<>();
         if (cmd.getName().equalsIgnoreCase("twitch")) {
             if (args.length == 1) {
-                if (!ChatPointsTTV.Twitch.isAccountConnected()) list.add("start");
+                if (!ChatPointsTTV.getPlugin().Twitch.isAccountConnected()) list.add("start");
                 else list.add("stop");
                 list.add("reload");
                 list.add("status");
@@ -157,7 +162,7 @@ public class CommandController implements TabExecutor {
             }
         } else if (cmd.getName().equalsIgnoreCase("tiktok")) {
             if (args.length == 1) {
-                if (!ChatPointsTTV.Tiktok.isAccountConected()) list.add("start");
+                if (!ChatPointsTTV.getPlugin().Tiktok.isAccountConected()) list.add("start");
                 else list.add("stop");
                 list.add("reload");
                 list.add("status");
@@ -171,8 +176,6 @@ public class CommandController implements TabExecutor {
     }
 
     private void reload(ChatPointsTTV plugin) {
-        if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop(); // Stop HTTP server if it is actve
-
         plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
@@ -189,18 +192,18 @@ public class CommandController implements TabExecutor {
             msg = (
                 "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
                 ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
-                ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + ChatPointsTTV.Twitch.getConnectedUsername() + "\n" +
-                ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + ChatPointsTTV.Twitch.getListenedChannel() + "\n" + 
+                ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + plugin.Twitch.getConnectedUsername() + "\n" +
+                ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + plugin.Twitch.getListenedChannel() + "\n" + 
                 "\n" +
-                ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.Twitch.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+                ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.Twitch.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
             );
         } else {
             msg = (
                 "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
                 ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
-                ChatColor.LIGHT_PURPLE + "Listened account: " + ChatColor.RESET + TikTokClient.getClient().getRoomInfo().getHost().getName() + "\n" + 
+                ChatColor.LIGHT_PURPLE + "Listened account: " + ChatColor.RESET + plugin.Tiktok.getClient().getRoomInfo().getHost().getName() + "\n" + 
                 "\n" +
-                ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.Tiktok.isAccountConected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+                ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.Tiktok.isAccountConected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
             );
         }
 

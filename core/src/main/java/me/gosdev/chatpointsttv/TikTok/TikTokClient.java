@@ -8,6 +8,7 @@ import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -22,9 +23,9 @@ public class TikTokClient {
 
     private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private static Utils utils = ChatPointsTTV.getUtils();
-    private static LiveClient client;
+    private LiveClient client;
 
-    public static LiveClient getClient() {
+    public LiveClient getClient() {
         return client;
     }
     public Boolean isAccountConected() {
@@ -37,11 +38,19 @@ public class TikTokClient {
             builder.onGiftCombo((liveClient, event) -> {
                 eventHandler.onGift(event);
             });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for gifts...");     
         }
         if (Rewards.getRewards(rewardType.TIKTOK_FOLLOW) != null) {
             builder.onFollow((liveClient, event) -> {
                 eventHandler.onFollow(event);
             });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for follows...");
+        }
+        if (Rewards.getRewards(rewardType.TIKTOK_SHARE) != null) {
+            builder.onShare((liveClient, event) -> {
+                eventHandler.onShare(event);
+            });
+            utils.sendMessage(Bukkit.getConsoleSender(), "TikTok: Listening for shares...");
         }
         if (plugin.config.getBoolean("SHOW_CHAT")) {
             builder.onComment((liveClient, event) -> {
@@ -51,7 +60,9 @@ public class TikTokClient {
                         new ComponentBuilder(event.getText()).create()[0]
                     };
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        utils.sendMessage(player, components);
+                        if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                            utils.sendMessage(player, components);
+                        }
                     }
                 }
             });
@@ -60,15 +71,15 @@ public class TikTokClient {
         client = builder.build();
         client.connectAsync().whenComplete((LiveClient client, Throwable ex) -> {
             accountConnected = true;
-            utils.sendMessage(p, "TikTok connection done!");
+            utils.sendMessage(p, "TikTok client started successfully!");
         });
     }
 
     public void unlink(CommandSender p) {
         client.disconnect();
+        client = null;
         accountConnected = false;
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
-
     }
     
 }

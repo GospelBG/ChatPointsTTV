@@ -52,29 +52,34 @@ To reset the original configuration, delete `config.yml` and reload the plugin. 
 * **Chat Blacklist**: List of usernames of chat bots and other users that will be ignored for the in-game stream chat.
 * **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `{REWARD_NAME}: {ACTION}`, replacing `{REWARD_NAME}` with the **exact** reward name that is on Twitch and `{ACTION}` with the desired action to run.  
-* **Follow Rewards***: A list with all the actions that will be executed when the channel gets a new follower.
-* **Cheer Rewards***: A list containing all **cheer rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
+* **Twitch Follow Rewards***: A list with all the actions that will be executed when the channel gets a new follower.
+* **Twitch Cheer Rewards***: A list containing all **cheer rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the minimal ammount of bits that will be needed to trigger the event and `{ACTION}` with the desired action to run.
-* **Sub Rewards***: A list containing all **subscription rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
+* **Twitch Sub Rewards***: A list containing all **subscription rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `TWITCH_PRIME/TIER1/TIER2/TIER3: {ACTION}`.  Replace `{ACTION}` with the desired action to run.
-* **Gift Rewards***
+* **Twitch Gift Rewards***
 A list containing all **subscription gifts rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
 You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the minimal ammount of subscriptions that will be needed to be gifted in order to trigger the event and `{ACTION}` with the desired action to run.
+* **TikTok Follow Rewards***: A list with all the actions that will be executed when your profile gets a new follower.  
+* **TikTok Gift Rewards***: A section containing each desired *gift item*. Each gift item must be a list element which will contain all desired events. See [Reward Actions](#reward-actions) for more information.  
+* **TikTok Share Rewards***: A list with all the actions that will be executed when someone shares your LIVE.  
 * **Mob Glow**: Whether the spawned mobs should have a glowing effect (highlighted and visible through blocks).
 * **Display Name on Mob**: Whether the spawned mobs should have the name of the user who triggered the action.
 * **Log Event**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
+* **Show In-game Alerts**: Determines whether subscribed events should show an in-game title message.
 * **Reward Name Bold**: Determines whether the reward name is displayed in bold letters in the title banner to people with the `chatpointsttv.broadcast` permission.
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
 You can leave this section unmodified, as there are default colors set up in the original file
 * **Strings**: Allows you to customize all title texts displayed to people with the `chatpointsttv.broadcast` permission. You may want to translate these strings to your language for a better experience. Don't add spaces before or after the double quotes as the plugin already does this for you. English strings are set up in the file by default.
 
 ## Commands
+### Twitch
 This plugin is controlled by the `/twitch` command followed by one of the following arguments:
-* `/twitch link [method]`  
+* `/twitch start [method]`  
     Links your Account. If a key-based credential is set it will use it. Otherwise will show the button for logging in through a browser (only works if the user logs in with the same machine as the server).  
     You can specify the method to use through the optional `[method]` parameter.  
     **Valid options**: `key`, `browser`
-* `/twitch unlink`  
+* `/twitch stop`  
     Unlinks your account and disables the plugin. You may need to log in again if you used the browser method.
 
 * `/twitch status`  
@@ -83,8 +88,21 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 * `/twitch reload`  
     Unlinks your account, reloads the configuration file and restarts the plugin.
 
+### TikTok
+* `/tiktok start`  
+    Starts the TikTok client and listens to the configured LIVE.
+
+* `/tiktok stop`  
+    Stops listening to LIVEs and disables the plugin.
+
+* `/tiktok status`  
+    Shows some plugin information such as: version, listened LIVE, and connection status.
+
+* `/tiktok reload`  
+    Reloads the configuration file and restarts the plugin.
+
 ## Reward Actions
-Currently, there are 2 types of actions:
+Currently, there are 3 types of actions:
 - Spawning entities  
     **Format**: `SPAWN <ENTITY NAME> <AMOUNT>`  
     **Example**: `SPAWN CREEPER 2`  
@@ -100,6 +118,11 @@ Currently, there are 2 types of actions:
     **Example**: `GIVE DIAMOND 1`
     *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*
 
+- Explosions
+    **FORMAT**: `TNT <AMOUNT> <FUSE TIME IN TICKS>`
+    **Example**: `TNT 1 0`
+    *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*
+
 You should set up your events in your config file with this format:
 ```
 TYPE_REWARDS:
@@ -111,6 +134,9 @@ TYPE_REWARDS:
 Whereas `TYPE_REWARDS` is replaces with the appropiate config key that is already on the file, `KEY` with the channel points reward name, subscription tier or minimal amount of bits/subs.  
 > [!IMPORTANT]  
 > **For follow events this line should be ommited.** See the placeholders on the default [config.yml](core/src/main/resources/config.yml).
+
+> [!TIP]
+> In the case of TikTok Gifts, it is possible to use "ANY" as a wildcard in the `[ITEM NAME]` field, which will listen for all kinds of gifts (excluding the ones that may be already added).
 
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  
@@ -137,6 +163,8 @@ The latest version of the plugin needs the following scopes to function propertl
 
 ## **Credits**
 Thanks to [Twitch4J](https://twitch4j.github.io/) for the Java libraries used in this mod to communicate with the Twitch API.
+
+Thanks to [TikTokLiveJava](https://github.com/jwdeveloper/TikTokLiveJava) for the library used to communicate with the TikTok LIVE API.
 
 Thanks to [urgrue](https://github.com/urgrue/Java-Twitch-Api-Wrapper) for the code for Twitch authentification.
 

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
   <artifactId>chatpointsttv</artifactId>
-  <version>2.0</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
   <name>ChatPointsTTV</name>
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
@@ -25,35 +25,44 @@
   <properties>
       <maven.compiler.source>1.8</maven.compiler.source>
       <maven.compiler.target>1.8</maven.compiler.target>
+      <revision>2.1</revision>
   </properties>
 
-  <repositories>
-      <repository>
-          <id>spigot-repo</id>
-          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
-  </repositories>
+<repositories>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 
   <dependencies>
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.10-R0.1-SNAPSHOT</version>
+      <groupId>com.github.philippheuer.events4j</groupId>
+      <artifactId>events4j-handler-simple</artifactId>
+      <version>0.12.2</version>
+      <scope>provided</scope>
     </dependency>
-      <dependency>
-          <groupId>com.github.philippheuer.events4j</groupId>
-          <artifactId>events4j-handler-simple</artifactId>
-          <version>0.12.1</version>
-      </dependency>
-      <dependency>
-          <groupId>com.github.twitch4j</groupId>
-          <artifactId>twitch4j</artifactId>
-          <version>1.20.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20240303</version>
+    <dependency>
+      <groupId>com.github.twitch4j</groupId>
+      <artifactId>twitch4j</artifactId>
+      <version>1.21.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.jwdeveloper.TikTok-Live-Java</groupId>
+      <artifactId>Client</artifactId>
+      <version>1.8.0-Release</version>
+      <scope>compile</scope>
+  </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20240303</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

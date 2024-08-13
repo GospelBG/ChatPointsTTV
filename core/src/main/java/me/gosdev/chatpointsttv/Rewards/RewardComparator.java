@@ -21,5 +21,4 @@ public class RewardComparator implements Comparator<Reward> {
 
         return Integer.parseInt(o1.getEvent()) - Integer.parseInt(o2.getEvent());
     }
-
 }

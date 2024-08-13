@@ -41,6 +41,7 @@ public class ChatPointsTTV extends JavaPlugin {
     
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
+    public static Boolean enableAlerts;
     public List<String> chatBlacklist;
     public static boolean configOk = true;
     public static Boolean twitchCustomCredentials = false;
@@ -49,8 +50,8 @@ public class ChatPointsTTV extends JavaPlugin {
     public Logger log = getLogger();
     public FileConfiguration config;
 
-    public static TwitchClient Twitch;
-    public static TikTokClient Tiktok;
+    public TwitchClient Twitch;
+    public TikTokClient Tiktok;
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -136,6 +137,7 @@ public class ChatPointsTTV extends JavaPlugin {
         rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
         shouldMobsGlow = config.getBoolean("MOB_GLOW");
+        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS", true);
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB");
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
 
@@ -184,11 +186,20 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {      
-        ImplicitGrantFlow.server.stop();
+        if (ImplicitGrantFlow.server.isRunning()) {
+            ImplicitGrantFlow.server.stop();
+        }
     
         config = null;
 
         Rewards.rewards = new HashMap<rewardType,ArrayList<Reward>>();
         rewardBold = null;
+
+        if (Twitch.isAccountConnected()) {
+            Twitch.unlink(Bukkit.getConsoleSender());
+        }
+        if (Tiktok.isAccountConected()) {
+            Tiktok.unlink(Bukkit.getConsoleSender());
+        }
     }
 }

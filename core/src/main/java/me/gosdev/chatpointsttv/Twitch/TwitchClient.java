@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -23,6 +24,8 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
+import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 import com.github.twitch4j.helix.domain.ModeratedChannel;
 import com.github.twitch4j.helix.domain.ModeratedChannelList;
@@ -32,6 +35,7 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -51,12 +55,12 @@ public class TwitchClient {
 
     private Boolean accountConnected = false;
 
-    private static ITwitchClient client;
+    private ITwitchClient client;
 
     private User user;
     private OAuth2Credential oauth;
 
-    private Thread linkThread;
+    public Thread linkThread;
 
     private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private static Utils utils = ChatPointsTTV.getUtils();
@@ -84,7 +88,7 @@ public class TwitchClient {
             return ClientID;
         }
     }
-    public static ITwitchClient getClient() {
+    public ITwitchClient getClient() {
         return client;
     }
     public Boolean isAccountConnected() {
@@ -95,16 +99,14 @@ public class TwitchClient {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
     public String getListenedChannel() {
+        String configValue = plugin.config.getString("TWITCH_CHANNEL_USERNAME");
+        if (configValue == null || configValue.isEmpty() || configValue.startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")
         
-        if (plugin != null) {
-            return client.getChat().getChannels().iterator().next(); // UNTESTED 
-        } else {
-            if (plugin.config.getString("TWITCH_CHANNEL_USERNAME") == null | plugin.config.getString("TWITCH_CHANNEL_USERNAME").startsWith("MemorySection[path=")) return null; // Invalid string (probably left default "{YOUR CHANNEL}")) return null;
-            return plugin.config.getString("TWITCH_CHANNEL_USERNAME");
-        }
+        if (client != null) return client.getChat().getChannels().iterator().next(); // UNTESTED 
+        else return plugin.config.getString("TWITCH_CHANNEL_USERNAME");
     }
 
-    public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
+    public List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
         String cursor = null;
         List<String> modsOutput = new ArrayList<>();
 
@@ -154,19 +156,22 @@ public class TwitchClient {
                 throw new RuntimeException("Twitch API Login failed. Provided credentials may be invalid.");
             }
             
-            utils.sendMessage(p, "Logged in as: "+ user.getDisplayName());
+            utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
     
             // Join the twitch chat of this channel and enable stream/follow events
             String channel = config.getString("TWITCH_CHANNEL_USERNAME");
             channel_id = getUserId(channel);
             user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
-            utils.sendMessage(p, "Listening to " + channel + "'s events...");
             client.getChat().joinChannel(channel);
-
-            p.sendMessage("Logged in as: " + user.getDisplayName());
-    
+            
+            // Subscribe to events
             eventSocket = client.getEventSocket();
             eventManager = client.getEventManager();
+
+            CountDownLatch latch = new CountDownLatch(3);
+            eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, e -> latch.countDown());
+            eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> latch.countDown());
+
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_CHANNEL_POINTS) != null) {
                 client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
                 eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
@@ -175,10 +180,10 @@ public class TwitchClient {
                         eventHandler.onChannelPointsRedemption(e);
                     }
                 });
-                utils.sendMessage(p, "Listening for channel point rewards...");
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for channel point rewards...");
             }
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_FOLLOW) != null) {
-                if (TwitchClient.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
+                if (getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
                     eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
                     eventManager.onEvent(ChannelFollowEvent.class, new Consumer<ChannelFollowEvent>() {
                         @Override
@@ -188,11 +193,12 @@ public class TwitchClient {
                             } catch (NullPointerException ex) {}
                         }
                     });
-                    utils.sendMessage(p, "Listening for follows...");            
+                    utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for follows...");            
                 } else {
                     plugin.log.warning("Follow events cannot be listened to on unauthorised channels.");
                 }
-            }
+            } else latch.countDown();
+
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_CHEER) != null) {
                 eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
                 eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>() {
@@ -203,8 +209,8 @@ public class TwitchClient {
                         } catch (NullPointerException ex) {}
                     }
                 }); 
-                utils.sendMessage(p, "Listening for Cheers...");
-            }
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for Cheers...");
+            } else latch.countDown();
     
             if (Rewards.getRewards(Rewards.rewardType.TWITCH_SUB) != null || Rewards.getRewards(Rewards.rewardType.TWITCH_GIFT) != null) {
                 eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
@@ -216,8 +222,8 @@ public class TwitchClient {
                         } catch (NullPointerException ex) {}
                     }
                 });
-                utils.sendMessage(p, "Listening for subscriptions and gifts...");
-            }
+                utils.sendMessage(Bukkit.getConsoleSender(), "Twitch: Listening for subscriptions and gifts...");
+            } else latch.countDown();
     
             if (config.getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
@@ -233,14 +239,23 @@ public class TwitchClient {
                             new ComponentBuilder(event.getMessage()).create()[0]
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            utils.sendMessage(player, components);
+                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                                utils.sendMessage(player, components);
+                            }
                         }
                     }
                 });
             }
             eventHandler = new TwitchEventHandler();
             client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
-            utils.sendMessage(p, "Twitch connection done!");
+            utils.sendMessage(p, "Twitch client was started successfully!");
+
+            try {
+                latch.await();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
             accountConnected = true;
         });
         linkThread.start();
@@ -249,15 +264,21 @@ public class TwitchClient {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 plugin.log.warning(e.toString());
+                linkThread.interrupt();
                 p.sendMessage(ChatColor.RED + "Account linking failed!");
+                accountConnected = true;
                 unlink(Bukkit.getConsoleSender());
                 accountConnected = false;
             }
         });
     }
     public void unlink(CommandSender p) {
+        if (!accountConnected) {
+            p.sendMessage(ChatColor.RED + "There is no connected account.");
+            return;
+        }
         try {
-            linkThread.join(); // Wait until linking is finished
+            if (!linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
             client.getEventSocket().close();
             client.getPubSub().close();
             client.close();

@@ -1,10 +1,13 @@
 package me.gosdev.chatpointsttv.TikTok;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftComboEvent;
 import io.github.jwdeveloper.tiktok.data.events.social.TikTokFollowEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Rewards.Reward;
@@ -38,6 +41,19 @@ public class TikTokEventHandler {
                         plugin.log.warning(e.toString());
                     }
                 }
+                return;
+            } else if (reward.getEvent().equalsIgnoreCase("any")) {
+                reward = Rewards.getReward(rewardType.TIKTOK_GIFT, Optional.of("any"), Optional.empty());
+
+                Events.displayTitle(user, custom_string, "1 x " + event.getGift().getName(), action_color, user_color, plugin.rewardBold);
+                for (String cmd : reward.getCommands()) {
+                    String[] parts = cmd.split(" ", 2);
+                    try {
+                        Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
+                    } catch (Exception e) {
+                        plugin.log.warning(e.toString());
+                    }
+                }
             }
         }
     }
@@ -49,13 +65,30 @@ public class TikTokEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
 
         Events.displayTitle(user, custom_string, "", action_color, user_color, plugin.rewardBold);
-            for (String cmd : Rewards.getRewards(rewardType.TIKTOK_FOLLOW).get(0).getCommands()) {
-                String[] parts = cmd.split(" ", 2);
-                try {
-                    Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
-                } catch (Exception e) {
-                    plugin.log.warning(e.toString());
-                }
+        for (String cmd : Rewards.getRewards(rewardType.TIKTOK_FOLLOW).get(0).getCommands()) {
+            String[] parts = cmd.split(" ", 2);
+            try {
+                Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
+            } catch (Exception e) {
+                plugin.log.warning(e.toString());
             }
+        }
+    }
+
+    public void onShare(TikTokShareEvent event) {
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUser().getName() + " has shared this LIVE!");
+
+        String user = event.getUser().getProfileName();
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("SHARED_STRING");
+
+        Events.displayTitle(user, custom_string, "", action_color, user_color, plugin.rewardBold);
+        for (String cmd : Rewards.getRewards(rewardType.TIKTOK_SHARE).get(0).getCommands()) {
+            String[] parts = cmd.split(" ", 2);
+            try {
+                Events.runAction(parts[0], parts[1], event.getUser().getProfileName());
+            } catch (Exception e) {
+                plugin.log.warning(e.toString());
+            }
+        }
     }
 }
