@@ -20,7 +20,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations... There are two ways to link your Twitch account to the plugin:  
+3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations... You will need to link a Twitch account in order to connect use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
 
     - **Using a key-based authentication** *(recommended)*:  
     You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com). Make sure to add all the [needed scopes](#twitch-scopes).  
@@ -30,7 +30,7 @@ These are the only official download mirrors. Any downloads besides of these lin
     - **Log in through a browser**:  
     You won't need any extra modification in your config.yml file. You will just need to run `/twitch link` in-game and open the provided link. You may need to log in your Twitch account and authorise the app. Once you finish the log in process you can close the browser and your account will be linked.
 > [!WARNING]  
-> Currently due to technical limitations **it's only possible to use the browser method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
+> Currently due to API limitations **it's only possible to use the browser method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
 
 4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
@@ -45,7 +45,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 ## **config.yml docs**
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
 *Sections with a (\*) are required to be changed in order to the plugin to be used.*
-* **Channel Username***: The channel that will be listened for rewards, bits and subs.  
+* **Channel Username***: The channel(s) that will be listened for rewards, bits and subs. (In case of multiple channels, they muse be added as a list: `["channel_1", "channel_2", "..."]`)  
 * **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
 * **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
 * **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  

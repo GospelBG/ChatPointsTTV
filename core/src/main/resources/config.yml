@@ -1,6 +1,7 @@
 # This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
 # For more information about how to use this file, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
 
+# Username(s) of the streamer's channels. In case of multiple streamers, must be set as a list: ["channel_1", "channel_2", "..."]
 CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # Uncomment the following lines (remove the # symbol at the start of the line) to use a key-based authentication instead of the browser login.
