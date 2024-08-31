@@ -78,7 +78,6 @@ public class ChatPointsTTV extends JavaPlugin {
     public Thread linkThread;
 
     private String user_id;
-    private String channel_id;
 
     public Logger log = getLogger();
     public FileConfiguration config;
@@ -314,106 +313,22 @@ public class ChatPointsTTV extends JavaPlugin {
             }
             
             utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
-    
-            // Join the twitch chat of this channel and enable stream/follow events
-            String channel = config.getString("CHANNEL_USERNAME");
-            channel_id = getUserId(channel);
-            user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
-            utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
-            client.getChat().joinChannel(channel);
-    
-            // Subscribe to events
-            eventSocket = client.getEventSocket();
-            eventManager = client.getEventManager();
 
-            CountDownLatch latch = new CountDownLatch(3);
-            eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, e -> latch.countDown());
-            eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> latch.countDown());
-            
-            if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-                client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
-                eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
-                    @Override
-                    public void accept(RewardRedeemedEvent e) {
-                        eventHandler.onChannelPointsRedemption(e);
-                    }
-                });
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for channel point rewards...");
-            }
-            if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
-                if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
-                    eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
-                    eventManager.onEvent(ChannelFollowEvent.class, new Consumer<ChannelFollowEvent>() {
-                        @Override
-                        public void accept(ChannelFollowEvent e) {
-                            try { // May get NullPointerException if event is triggered while still subscribing
-                                eventHandler.onFollow(e);
-                            } catch (NullPointerException ex) {}
-                        }
-                    });
-                    utils.sendMessage(Bukkit.getConsoleSender(), "Listening for follows...");            
-                } else {
-                    log.warning("Follow events cannot be listened to on unauthorised channels.");
-                }
-            } else latch.countDown();
-
-            if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
-                eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-                eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>() {
-                    @Override
-                    public void accept(ChannelChatMessageEvent e) {
-                        try { // May get NullPointerException if event is triggered while still subscribing
-                            eventHandler.onCheer(e);
-                        } catch (NullPointerException ex) {}
-                    }
-                }); 
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for Cheers...");
-            } else latch.countDown();
-    
-            if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
-                eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-                eventManager.onEvent(ChannelChatNotificationEvent.class, new Consumer<ChannelChatNotificationEvent>(){
-                    @Override
-                    public void accept(ChannelChatNotificationEvent e) {
-                        try { // May get NullPointerException if event is triggered while still subscribing
-                            eventHandler.onEvent(e);
-                        } catch (NullPointerException ex) {}
-                    }
-                });
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for subscriptions and gifts...");
-            } else latch.countDown();
-    
-            if (config.getBoolean("SHOW_CHAT")) {
-                eventManager.onEvent(ChannelMessageEvent.class, event -> {
-                    if (!chatBlacklist.contains(event.getUser().getName())) {
-                        net.md_5.bungee.api.ChatColor mcColor;
-                        try {
-                            mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
-                        } catch (Exception e) {
-                            mcColor = net.md_5.bungee.api.ChatColor.RED; 
-                        }
-                        BaseComponent[] components = new BaseComponent[] {
-                            new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
-                            new ComponentBuilder(event.getMessage()).create()[0]
-                        };
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
-                                utils.sendMessage(player, components);
-                            }
-                        }
-                    }
-                });
-            }
             eventHandler = new TwitchEventHandler();
-            client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
-            utils.sendMessage(p, "Twitch client was started successfully!");
-            
-            try {
-                latch.await();
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
 
+            // Linked account UserID
+            user_id = new TwitchIdentityProvider(null, null, null).getAdditionalCredentialInformation(oauth).map(OAuth2Credential::getUserId).orElse(null);
+
+            // Join the twitch chat of this channel(s) and enable stream/follow events
+            if (config.getList("CHANNEL_USERNAME") == null) {                
+                subscribeToEvents(p, config.getString("CHANNEL_USERNAME"));
+            } else {
+                for (String channel : config.getStringList("CHANNEL_USERNAME")) {
+                    subscribeToEvents(p, channel);
+                }
+            }    
+
+            utils.sendMessage(p, "Twitch client was started successfully!");
             accountConnected = true;
         });
         linkThread.start();
@@ -428,7 +343,99 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         });
     }
+    
+    public void subscribeToEvents(CommandSender p, String channel) {
+        String channel_id = getUserId(channel);
+        eventSocket = client.getEventSocket();
+        eventManager = client.getEventManager();
 
+        CountDownLatch latch = new CountDownLatch(3);
+        eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, e -> latch.countDown());
+        eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> latch.countDown());
+        
+        if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
+            client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
+            eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
+                @Override
+                public void accept(RewardRedeemedEvent e) {
+                    eventHandler.onChannelPointsRedemption(e);
+                }
+            });
+            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s channel point redemptions...");
+        }
+        if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
+            if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
+                eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
+                eventManager.onEvent(ChannelFollowEvent.class, new Consumer<ChannelFollowEvent>() {
+                    @Override
+                    public void accept(ChannelFollowEvent e) {
+                        try { // May get NullPointerException if event is triggered while still subscribing
+                            eventHandler.onFollow(e);
+                        } catch (NullPointerException ex) {}
+                    }
+                });
+                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s follows...");            
+            } else {
+                log.warning("Follow events cannot be listened to on unauthorised channels.");
+            }
+        } else latch.countDown();
+
+        if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
+            eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
+            eventManager.onEvent(ChannelChatMessageEvent.class, new Consumer<ChannelChatMessageEvent>() {
+                @Override
+                public void accept(ChannelChatMessageEvent e) {
+                    try { // May get NullPointerException if event is triggered while still subscribing
+                        eventHandler.onCheer(e);
+                    } catch (NullPointerException ex) {}
+                }
+            }); 
+            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s Cheers...");
+        } else latch.countDown();
+
+        if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
+            eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
+            eventManager.onEvent(ChannelChatNotificationEvent.class, new Consumer<ChannelChatNotificationEvent>(){
+                @Override
+                public void accept(ChannelChatNotificationEvent e) {
+                    try { // May get NullPointerException if event is triggered while still subscribing
+                        eventHandler.onEvent(e);
+                    } catch (NullPointerException ex) {}
+                }
+            });
+            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s subscriptions and gifts...");
+        } else latch.countDown();
+
+        if (config.getBoolean("SHOW_CHAT")) {
+            eventManager.onEvent(ChannelMessageEvent.class, event -> {
+                if (!chatBlacklist.contains(event.getUser().getName())) {
+                    net.md_5.bungee.api.ChatColor mcColor;
+                    try {
+                        mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
+                    } catch (Exception e) {
+                        mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                    }
+                    BaseComponent[] components = new BaseComponent[] {
+                        new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
+                        new ComponentBuilder(event.getMessage()).create()[0]
+                    };
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                            utils.sendMessage(player, components);
+                        }
+                    }
+                }
+            });
+        }
+        client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
+        utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
+        client.getChat().joinChannel(channel);        
+        try {
+            latch.await();
+        } catch (InterruptedException e1) {
+            log.warning("Failed to listen to " + channel + "'s events. Channel may not exist or the linked account may lack permissions.");
+        }
+    }
     public void unlink(CommandSender p) {
         if (!accountConnected) {
             p.sendMessage(ChatColor.RED + "There is no connected account.");
