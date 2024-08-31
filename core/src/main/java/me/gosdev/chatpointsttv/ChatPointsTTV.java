@@ -387,10 +387,9 @@ public class ChatPointsTTV extends JavaPlugin {
             }
 
             CountDownLatch latch = new CountDownLatch(subs * channels);
-            log.info(String.valueOf(subs * channels));
 
-            eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, e -> {latch.countDown(); log.info(e.toString());});
-            eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> {latch.countDown(); log.info("sub error");});
+            eventManager.onEvent(EventSocketSubscriptionSuccessEvent.class, e -> latch.countDown());
+            eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> latch.countDown());
 
             // Join the twitch chat of this channel(s) and enable stream/follow events
             if (config.getList("CHANNEL_USERNAME") == null) { // If field is not a list (single channel)            
