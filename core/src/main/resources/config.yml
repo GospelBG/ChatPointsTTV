@@ -33,23 +33,26 @@ SHOW_CHAT: true
 # If your reward contains a text input, you can reference it as:
 #     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
 
+# To add a streamer-specific reward add the actions inside a list named as the desired channel.
+# To target all channels use "default" as the list key.
+
 # Leave any reward class empty to disable it.
 CHANNEL_POINTS_REWARDS:
   [REWARD NAME]:
     - {ACTION 1}
     - {ACTION 2}
 
-# Put the desired action after the colon in the form of a list. You musn't add a "Reward Name".
+# Put the desired action after the colon as a list. You musn't add a "Reward Name".
 FOLLOW_REWARDS:
   - {ACTION}
   - {ACTION}
 
-# Follow the same format as the Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
+# Follow the same format as Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
 CHEER_REWARDS:
   [BITS AMOUNT]:
     - {ACTION}
 
-# Follow the same format as the Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
+# Follow the same format as Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
 # Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions with sub gifting
 SUB_REWARDS:
   [TWITCH_PRIME]:

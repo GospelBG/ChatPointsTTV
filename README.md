@@ -20,7 +20,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations... You will need to link a Twitch account in order to connect use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
+3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and setup events for rewards, donations... You will need to link a Twitch account in order to connect use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
 
     - **Using a key-based authentication** *(recommended)*:  
     You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com). Make sure to add all the [needed scopes](#twitch-scopes).  
@@ -45,7 +45,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 ## **config.yml docs**
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
 *Sections with a (\*) are required to be changed in order to the plugin to be used.*
-* **Channel Username***: The channel(s) that will be listened for rewards, bits and subs. (In case of multiple channels, they muse be added as a list: `["channel_1", "channel_2", "..."]`)  
+* **Channel Username***: The channel(s) that will be listened for rewards, bits and subs. (In case of multiple channels, they must be added as a list: `["channel_1", "channel_2", "..."]`)  
 * **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
 * **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
 * **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  
@@ -110,7 +110,7 @@ Currently, there are 2 types of actions:
 > Argument names surrounded by <> means that it is a required argument.
 > Arguments surrounded by [] are optional.
 
-You should set up your events in your config file with this format:
+You should set up your events in your config file following this format:
 ```
 TYPE_REWARDS:
     - KEY:
@@ -118,9 +118,24 @@ TYPE_REWARDS:
         - Action 2
         - ...
 ```
+or
+```
+TYPE_REWARDS:
+    - KEY:
+        - STREAMER:
+            - Action 1
+            - Action 2
+            - ...
+
+        - default:
+            - Action
+```
 Whereas `TYPE_REWARDS` is replaces with the appropiate config key that is already on the file, `KEY` with the channel points reward name, subscription tier or minimal amount of bits/subs.  
 > [!IMPORTANT]  
-> **For follow events this line should be ommited.** See the placeholders on the default [config.yml](core/src/main/resources/config.yml).
+> **For follow events you shouldn't add reward keys.** See placeholders on the default [config.yml](core/src/main/resources/config.yml).
+
+> [!TIP]
+> You can now target multiple channels. If you do so, you can target some events to a specific channel following the second format. You can still follow the first example if you don't aim to target specific channels. 
 
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  

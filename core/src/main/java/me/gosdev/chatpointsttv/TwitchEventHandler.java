@@ -36,10 +36,12 @@ public class TwitchEventHandler {
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
         ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
+            if (!reward.getTargetId().equals(redemption.getChannelId())) continue;
+
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
             Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
@@ -54,23 +56,26 @@ public class TwitchEventHandler {
     }
 
     public void onFollow(ChannelFollowEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following you");
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following " + event.getBroadcasterUserName());
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
         Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
-        for (String cmd : Rewards.getRewards(rewardType.FOLLOW).get(0).getCommands()) {
-            String[] parts = cmd.split(" ", 2);
-            try {
-                Events.runAction(parts[0], parts[1], event.getUserName());
-            } catch (Exception e) {
-                plugin.log.warning(e.toString());
-            }
-            
+        for (Reward reward : Rewards.getRewards(rewardType.FOLLOW)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+
+            for (String cmd : reward.getCommands()) {
+                String[] parts = cmd.split(" ", 2);
+                try {
+                    Events.runAction(parts[0], parts[1], event.getUserName());
+                } catch (Exception e) {
+                    plugin.log.warning(e.toString());
+                }   
+            }           
         }
     }
 
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits!");
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits to " + event.getBroadcasterUserName() + "!");
 
         String chatter = event.getChatterUserName();
         int amount = event.getCheer().getBits();
@@ -80,10 +85,12 @@ public class TwitchEventHandler {
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.CHEER);
         Collections.sort(rewards, new RewardComparator());
 
-        for (Reward i : rewards) {
-            if (amount >= Integer.parseInt(i.getEvent())) {
+        for (Reward reward : rewards) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+
+            if (amount >= Integer.parseInt(reward.getEvent())) {
                 Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
-                for (String cmd : i.getCommands()) {
+                for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
                     Events.runAction(parts[0], parts[1], event.getChatterUserName());
@@ -98,7 +105,7 @@ public class TwitchEventHandler {
 
     public void onEvent(ChannelChatNotificationEvent event) {
         if (listenForGifts && (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT | event.getNoticeType() == NoticeType.SUB_GIFT)) {
-            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " gifted a sub!"); 
+            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " gifted a sub for " + event.getBroadcasterUserName() + "'s channel!"); 
 
             int amount = 1;
             String chatter = event.getChatterUserName();
@@ -113,10 +120,12 @@ public class TwitchEventHandler {
             ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
             Collections.sort(rewards, Collections.reverseOrder());
             
-            for (Reward i : rewards) {
-                if (amount >= Integer.parseInt(i.getEvent())) {
+            for (Reward reward : rewards) {
+                if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+
+                if (amount >= Integer.parseInt(reward.getEvent())) {
                     Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
-                    for (String cmd : i.getCommands()) {
+                    for (String cmd : reward.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {
                         Events.runAction(parts[0], parts[1], event.getChatterUserName());
@@ -147,13 +156,15 @@ public class TwitchEventHandler {
                 return;
             }
 
-            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub!");
-            for (Reward i : Rewards.getRewards(rewardType.SUB)) {
-                if (i.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
+            if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub to " + event.getBroadcasterUserName() + "!");
+            for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
+                if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+
+                if (reward.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                     String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                     
                     Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
-                    for (String cmd : i.getCommands()) {
+                    for (String cmd : reward.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {
                         Events.runAction(parts[0], parts[1], event.getChatterUserName());
