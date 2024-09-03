@@ -114,8 +114,18 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public String getUserId(String username) {
-        UserList resultList = getTwitchClient().getHelix().getUsers(null, null, Arrays.asList(username)).execute();
+        UserList resultList = getTwitchClient().getHelix().getUsers(oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+        if (resultList.getUsers().isEmpty()) {
+            throw new NullPointerException("Couldn't fetch user: " + username);
+        }
         return resultList.getUsers().get(0).getId();
+    }
+    public String getUsername(String userId) {
+        UserList resultList = client.getHelix().getUsers(oauth.getAccessToken(), Arrays.asList(userId), null).execute();
+        if (resultList.getUsers().isEmpty()) {
+            throw new NullPointerException("Couldn't fetch user ID: " + userId);
+        }
+        return resultList.getUsers().get(0).getDisplayName();
     }
 
     public static ITwitchClient getTwitchClient() {
