@@ -439,27 +439,23 @@ public class ChatPointsTTV extends JavaPlugin {
         
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
-            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s channel point redemptions...");
         }
 
         if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
             if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
                 eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
-                utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s follows...");            
             } else {
-                log.warning("Follow events cannot be listened to on unauthorised channels.");
+                log.warning(channel + ": Follow events cannot be listened to on unauthorised channels.");
                 latch.countDown();
             }
         } 
 
         if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s Cheers...");
         }
 
         if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-            utils.sendMessage(Bukkit.getConsoleSender(), "Listening for " + channel + "'s subscriptions and gifts...");
         }
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
