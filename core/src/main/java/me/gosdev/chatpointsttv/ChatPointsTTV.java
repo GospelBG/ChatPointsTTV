@@ -35,6 +35,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
+import com.github.twitch4j.eventsub.events.ChannelSubscriptionGiftEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
@@ -87,6 +88,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final String scopes = Scopes.join(
         Scopes.CHANNEL_READ_REDEMPTIONS,
+        Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_MODERATED_CHANNELS,
         Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
@@ -373,6 +375,13 @@ public class ChatPointsTTV extends JavaPlugin {
                         } catch (NullPointerException ex) {}
                     }
                 });
+                eventManager.onEvent(ChannelSubscriptionGiftEvent.class, new Consumer<ChannelSubscriptionGiftEvent>() {
+                    @Override
+                    public void accept(ChannelSubscriptionGiftEvent e) {
+                        log.info(e.getUserName());
+                        log.info(e.getTotal() + " subs");
+                    }
+                });
             }
             if (config.getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
@@ -456,6 +465,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
         if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
+            eventSocket.register(SubscriptionTypes.CHANNEL_SUBSCRIPTION_GIFT.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
