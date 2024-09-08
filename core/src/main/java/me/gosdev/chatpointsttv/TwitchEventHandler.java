@@ -58,7 +58,7 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
         Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
         for (Reward reward : Rewards.getRewards(rewardType.FOLLOW)) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
@@ -84,7 +84,7 @@ public class TwitchEventHandler {
         Collections.sort(rewards, new RewardComparator());
 
         for (Reward reward : rewards) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId())) continue;
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             if (amount >= Integer.parseInt(reward.getEvent())) {
                 Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
@@ -121,6 +121,7 @@ public class TwitchEventHandler {
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub to " + event.getBroadcasterUserName() + "!");
         for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             if (reward.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                 String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
@@ -153,6 +154,7 @@ public class TwitchEventHandler {
         Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
         
         for (Reward reward : rewards) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
