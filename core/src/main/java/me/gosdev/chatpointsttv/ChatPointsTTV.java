@@ -32,10 +32,10 @@ import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
-import com.github.twitch4j.eventsub.events.ChannelSubscriptionGiftEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
@@ -371,15 +371,10 @@ public class ChatPointsTTV extends JavaPlugin {
                     @Override
                     public void accept(ChannelChatNotificationEvent e) {
                         try { // May get NullPointerException if event is triggered while still subscribing
-                            eventHandler.onEvent(e);
+                            if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
+                            else if (e.getNoticeType() == NoticeType.SUB_GIFT) eventHandler.onSubGift(e);
+                            else return;
                         } catch (NullPointerException ex) {}
-                    }
-                });
-                eventManager.onEvent(ChannelSubscriptionGiftEvent.class, new Consumer<ChannelSubscriptionGiftEvent>() {
-                    @Override
-                    public void accept(ChannelSubscriptionGiftEvent e) {
-                        log.info(e.getUserName());
-                        log.info(e.getTotal() + " subs");
                     }
                 });
             }
@@ -465,7 +460,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
         if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));
-            eventSocket.register(SubscriptionTypes.CHANNEL_SUBSCRIPTION_GIFT.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
