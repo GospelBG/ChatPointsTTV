@@ -5,6 +5,8 @@ import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
@@ -132,11 +134,17 @@ public class CommandController implements TabExecutor {
     }
 
     private void reload(ChatPointsTTV plugin) {
+        plugin.log.info("Reloading ChatPointsTTV...");
+
         if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop(); // Stop HTTP server if it is actve
+
+        OAuth2Credential cred = plugin.isAccountConnected() ? plugin.oauth : null;
 
         plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
+
+        if (cred != null) plugin.linkToTwitch(Bukkit.getConsoleSender(), cred.getAccessToken());
     }
 
     private void help(CommandSender p) {

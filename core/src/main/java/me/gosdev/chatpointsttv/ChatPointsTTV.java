@@ -96,7 +96,7 @@ public class ChatPointsTTV extends JavaPlugin {
         Scopes.CHAT_READ
         ).replace(":", "%3A"); // Format colon character for browser
 
-    private OAuth2Credential oauth;
+    public OAuth2Credential oauth;
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
