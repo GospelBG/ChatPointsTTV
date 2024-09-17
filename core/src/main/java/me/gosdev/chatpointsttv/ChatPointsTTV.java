@@ -94,7 +94,9 @@ public class ChatPointsTTV extends JavaPlugin {
         Scopes.BITS_READ,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_CHAT,
-        Scopes.CHAT_READ
+        Scopes.CHAT_READ,
+        Scopes.USER_BOT,
+        Scopes.CHANNEL_BOT
         ).replace(":", "%3A"); // Format colon character for browser
 
     private OAuth2Credential oauth;
@@ -372,8 +374,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     public void accept(ChannelChatNotificationEvent e) {
                         try { // May get NullPointerException if event is triggered while still subscribing
                             if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
-                            else if (e.getNoticeType() == NoticeType.SUB_GIFT) eventHandler.onSubGift(e);
-                            else return;
+                            else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT || e.getNoticeType() == NoticeType.SUB_GIFT) eventHandler.onSubGift(e);
                         } catch (NullPointerException ex) {}
                     }
                 });

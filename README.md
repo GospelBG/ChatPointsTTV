@@ -144,8 +144,8 @@ The latest version of the plugin needs the following scopes to function propertl
 * `moderator:read:followers`: Needed to be able to listen for follows.
 * `bits:read`: Needed to listen for cheers.
 * `channel:read:subscriptions`: Needed to listen for subscriptions and gifts.
-* `user:read:chat`: Needed to use Twitch EventSub API.
-* `chat:read`: Needed to show your stream chat in-game.
+* `chat:read` and `user:read:chat`: Needed to show your stream chat in-game and use EventSub API.
+* `user:bot` and `channel:bot`: Joins a stream chat to listen for subs.
 
 ## Permissions
 - TARGET  
