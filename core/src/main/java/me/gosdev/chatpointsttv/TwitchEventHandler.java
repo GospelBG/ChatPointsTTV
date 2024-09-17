@@ -32,13 +32,15 @@ public class TwitchEventHandler {
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
+    private Integer communitySubs = 0;
+
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
         ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
-            if (!reward.getTargetId().equals(redemption.getChannelId())) continue;
+            if (!reward.getTargetId().equals(redemption.getChannelId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
             Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
@@ -66,8 +68,9 @@ public class TwitchEventHandler {
                     Events.runAction(parts[0], parts[1], event.getUserName());
                 } catch (Exception e) {
                     plugin.log.warning(e.toString());
-                }   
-            }           
+                }
+            }
+            return;       
         }
     }
 
@@ -101,25 +104,21 @@ public class TwitchEventHandler {
         } 
     }
 
-    public void onSub(ChannelChatNotificationEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + event.getSub().getSubTier().toString() + " sub!"); 
-        
+    public void onSub(ChannelChatNotificationEvent event) {        
         SubscriptionPlan tier;
 
         if (event.getNoticeType() == NoticeType.SUB) {
             if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
             else tier = event.getSub().getSubTier();
-
         } else if (event.getNoticeType() == NoticeType.RESUB) {
             if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
             else tier = event.getResub().getSubTier();
-
         } else {
             plugin.log.warning("Couldn't fetch sub type!");
             return;
         }
 
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " subscribed with a " + ChatPointsTTV.getUtils().PlanToString(tier) + " sub to " + event.getBroadcasterUserName() + "!");
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + utils.PlanToString(tier) + " sub!"); 
         for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
@@ -139,17 +138,35 @@ public class TwitchEventHandler {
         }
     }
 
-    public void onSubGift(ChannelChatNotificationEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted  " + event.getSubGift().getCumulativeTotal().toString() + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
-        
+    public void onSubGift(ChannelChatNotificationEvent event) {       
         String chatter = event.getChatterUserName();
-        Integer amount = event.getSubGift().getCumulativeTotal();
-        String tier = ChatPointsTTV.getUtils().PlanToString(event.getSubGift().getSubTier()); // event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT ? ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier()) : 
+        Integer amount;
+        String tier;
 
+        if (event.getNoticeType() == NoticeType.SUB_GIFT) {
+            amount = 1; // Single sub gift
+            tier = ChatPointsTTV.getUtils().PlanToString(event.getSubGift().getSubTier());
+
+            if (communitySubs > 0) {
+                communitySubs--;
+                return;
+            } 
+        } else if (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) {
+            amount = event.getCommunitySubGift().getTotal();
+            tier = ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier());
+            plugin.log.info(amount + " COMMUNITY SUB GIFTS!!!");
+
+            communitySubs += amount;
+        } else {
+            plugin.log.warning("Couldn't fetch gift type!");
+            return;
+        }
+
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted " + amount  + " " + tier + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
 
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
-        Collections.sort(rewards, Collections.reverseOrder());
+        Collections.sort(rewards, new RewardComparator());
 
         Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
         
