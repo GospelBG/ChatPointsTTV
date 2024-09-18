@@ -50,6 +50,7 @@ public class TwitchEventHandler {
                     plugin.log.warning(e.toString());
                 }
             }
+            return;
         }
     }
 
@@ -68,7 +69,7 @@ public class TwitchEventHandler {
                     plugin.log.warning(e.toString());
                 }
             }
-            return;       
+            return;    
         }
     }
 
@@ -89,14 +90,14 @@ public class TwitchEventHandler {
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
-                    Events.runAction(parts[0], parts[1], event.getChatterUserName());
+                        Events.runAction(parts[0], parts[1], event.getChatterUserName());
                     } catch (Exception e) {
                         plugin.log.warning(e.toString());
                     }
                 }
-                break;
+                return;
             }
-        } 
+        }
     }
 
     public void onSub(ChannelChatNotificationEvent event) {        
@@ -129,6 +130,7 @@ public class TwitchEventHandler {
                         plugin.log.warning(e.toString());
                     }
                 }
+                return;
             }
         }
     }
@@ -174,7 +176,7 @@ public class TwitchEventHandler {
                     plugin.log.warning(e.toString());
                 }
             }
-            break;
+            return;
         }
     }
 }
