@@ -63,9 +63,7 @@ public class Rewards {
             }
             reward_list.sort(new RewardComparator());
             rewards.put(type, reward_list);
-            for (Reward reward : reward_list) {
-                ChatPointsTTV.getPlugin().log.info(reward.getChannel()+": " + reward.getEvent());
-            }
+
             return reward_list;
         }
 
