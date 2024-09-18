@@ -9,13 +9,11 @@ import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Reward;
-import me.gosdev.chatpointsttv.Rewards.RewardComparator;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -82,10 +80,7 @@ public class TwitchEventHandler {
         int amount = event.getCheer().getBits();
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("CHEERED_STRING");
 
-        // Sort rewards by cheer.
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.CHEER);
-        Collections.sort(rewards, new RewardComparator());
-
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
@@ -166,7 +161,6 @@ public class TwitchEventHandler {
 
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
-        Collections.sort(rewards, new RewardComparator());
 
         Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
         

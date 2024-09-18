@@ -35,11 +35,13 @@ public class Rewards {
                 reward_list.add(new Reward(type, EVERYONE, null, config.getStringList(type.toString().toUpperCase() + "_REWARDS")));
             } else {
                 // Streamer specific events
+                if (config_rewards == null) return null;
                 Set<String> keys = config_rewards.getKeys(false);
                 for (String channel : keys) {
                     reward_list.add(new Reward(type, channel.equals("default") ? EVERYONE : channel, null, config_rewards.getStringList(channel)));
                 }
             }
+            reward_list.sort(new RewardComparator());
             rewards.put(type, reward_list);
             return reward_list;
 
@@ -59,7 +61,11 @@ public class Rewards {
                     }
                 }
             }
+            reward_list.sort(new RewardComparator());
             rewards.put(type, reward_list);
+            for (Reward reward : reward_list) {
+                ChatPointsTTV.getPlugin().log.info(reward.getChannel()+": " + reward.getEvent());
+            }
             return reward_list;
         }
 
