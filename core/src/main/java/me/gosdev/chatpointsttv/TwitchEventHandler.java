@@ -31,7 +31,6 @@ public class TwitchEventHandler {
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
         ChannelPointsRedemption redemption = event.getRedemption();
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
