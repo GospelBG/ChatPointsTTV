@@ -374,7 +374,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     public void accept(ChannelChatNotificationEvent e) {
                         try { // May get NullPointerException if event is triggered while still subscribing
                             if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
-                            else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT || e.getNoticeType() == NoticeType.SUB_GIFT) eventHandler.onSubGift(e);
+                            else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
                         } catch (NullPointerException ex) {}
                     }
                 });

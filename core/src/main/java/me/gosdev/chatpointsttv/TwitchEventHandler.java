@@ -30,8 +30,6 @@ public class TwitchEventHandler {
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
-    private Integer communitySubs = 0;
-
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
@@ -137,30 +135,12 @@ public class TwitchEventHandler {
 
     public void onSubGift(ChannelChatNotificationEvent event) {       
         String chatter = event.getChatterUserName();
-        Integer amount;
-        String tier;
-
-        if (event.getNoticeType() == NoticeType.SUB_GIFT) {
-            amount = 1; // Single sub gift
-            tier = ChatPointsTTV.getUtils().PlanToString(event.getSubGift().getSubTier());
-
-            if (communitySubs > 0) {
-                communitySubs--;
-                return;
-            } 
-        } else if (event.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) {
-            amount = event.getCommunitySubGift().getTotal();
-            tier = ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier());
-            plugin.log.info(amount + " COMMUNITY SUB GIFTS!!!");
-
-            communitySubs += amount;
-        } else {
-            plugin.log.warning("Couldn't fetch gift type!");
-            return;
-        }
+        int amount = event.getCommunitySubGift().getTotal();
+        String tier = ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier());
+        
+        plugin.log.info(amount + " COMMUNITY SUB GIFTS!!!");
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted " + amount  + " " + tier + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
-
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
 
