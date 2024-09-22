@@ -136,8 +136,6 @@ public class TwitchEventHandler {
         String chatter = event.getChatterUserName();
         int amount = event.getCommunitySubGift().getTotal();
         String tier = ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier());
-        
-        plugin.log.info(amount + " COMMUNITY SUB GIFTS!!!");
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted " + amount  + " " + tier + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
