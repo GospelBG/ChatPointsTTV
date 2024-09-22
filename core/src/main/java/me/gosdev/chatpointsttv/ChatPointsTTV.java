@@ -74,7 +74,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Boolean customCredentials = false;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
-    public static Boolean enableAlerts;
+    public static alert_mode alertMode;
     private List<String> chatBlacklist;
     public static boolean configOk = true;
     public Thread linkThread;
@@ -112,6 +112,13 @@ public class ChatPointsTTV extends JavaPlugin {
         private permissions(String label) {
             this.permission_id = label;
         }
+    }
+
+    public static enum alert_mode {
+        NONE,
+        CHAT,
+        TITLE,
+        ALL
     }
 
     public static ChatPointsTTV getPlugin() {
@@ -207,10 +214,6 @@ public class ChatPointsTTV extends JavaPlugin {
             } else {
                 configOk = true;
             }
-        } catch (Exception e) {
-            configOk = false;
-            log.warning(e.getMessage());
-        }
 
 
         if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentials = true;
@@ -226,9 +229,13 @@ public class ChatPointsTTV extends JavaPlugin {
         TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
-        enableAlerts = config.getBoolean("SHOW_INGAME_ALERTS", true);
+        alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
+    } catch (Exception e) {
+        configOk = false;
+        log.warning("There was an error reading config.yml");
+    }
 
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);

@@ -1,11 +1,11 @@
 package me.gosdev.chatpointsttv.Utils;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 
 public interface Utils {
