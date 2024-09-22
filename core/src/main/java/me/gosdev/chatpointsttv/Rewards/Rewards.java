@@ -2,12 +2,11 @@ package me.gosdev.chatpointsttv.Rewards;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 public class Rewards {
@@ -19,29 +18,55 @@ public class Rewards {
         GIFT
     };
 
+    public static final String EVERYONE = "*";
+
     public static Map<rewardType, ArrayList<Reward>> rewards = new HashMap<rewardType, ArrayList<Reward>>();
 
     public static ArrayList<Reward> getRewards(rewardType type) {
-        if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
+        //if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
+        FileConfiguration config = ChatPointsTTV.getPlugin().config;
 
-        ConfigurationSection config_value = ChatPointsTTV.getPlugin().config.getConfigurationSection(type.toString().toUpperCase() + "_REWARDS");
+        ConfigurationSection config_rewards = config.getConfigurationSection(type.toString().toUpperCase() + "_REWARDS");
         ArrayList<Reward> reward_list = new ArrayList<>();
-        if (type == rewardType.FOLLOW) {
-            List<String> follow_rewards = ChatPointsTTV.getPlugin().config.getStringList(type.toString().toUpperCase() + "_REWARDS");
-            if (follow_rewards == null || follow_rewards.isEmpty()) return null;
-            reward_list.add(new Reward(type, null, follow_rewards));
-        } else {
-            Set<String> keys = config_value.getKeys(false);
-            if (config_value == null || keys.size() == 0) return null;
-            Iterator<?> iterator = keys.iterator();
-            for (int i = 0; i < keys.size(); i++) {
-                String key = iterator.next().toString();
 
-                reward_list.add(new Reward(type, key, config_value.getStringList(key)));
+        if (type == rewardType.FOLLOW) {
+            if (config_rewards == null && config.getStringList(type.toString().toUpperCase() + "_REWARDS") != null) {
+                // Global events
+                reward_list.add(new Reward(type, EVERYONE, null, config.getStringList(type.toString().toUpperCase() + "_REWARDS")));
+            } else {
+                // Streamer specific events
+                if (config_rewards == null) return null;
+                Set<String> keys = config_rewards.getKeys(false);
+                for (String channel : keys) {
+                    reward_list.add(new Reward(type, channel.equals("default") ? EVERYONE : channel, null, config_rewards.getStringList(channel)));
+                }
             }
+            reward_list.sort(new RewardComparator());
+            rewards.put(type, reward_list);
+            return reward_list;
+
+        } else if (config_rewards != null) {
+            Set<String> keys = config_rewards.getKeys(false);
+
+            for (String key : keys) {
+                ConfigurationSection channelSection = config_rewards.getConfigurationSection(key);
+                if (channelSection == null) {
+                    // No channel specified
+                    reward_list.add(new Reward(type, EVERYONE, key, config_rewards.getStringList(key)));
+                } else {
+                    // Streamer specific event
+                    Set<String> channelKeys = channelSection.getKeys(false);
+                    for (String channel : channelKeys) {
+                        reward_list.add(new Reward(type, channel.equals("default") ? EVERYONE : channel, key, channelSection.getStringList(channel)));
+                    }
+                }
+            }
+            reward_list.sort(new RewardComparator());
+            rewards.put(type, reward_list);
+
+            return reward_list;
         }
 
-        rewards.put(type, reward_list);
-        return reward_list;
+        return null;
     }
 }
