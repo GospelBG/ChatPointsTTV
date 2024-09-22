@@ -144,11 +144,17 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
+        List<String> channels = plugin.getListenedChannels();
+        String strChannels = "";
+        for (int i = 0; i < channels.size(); i++) {
+            strChannels += channels.get(i);
+            if (i != channels.size() - 1) strChannels += ", ";
+        }
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + plugin.getConnectedUsername() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + plugin.getListenedChannel() + "\n" + 
+            ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" + 
             "\n" +
             ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
         );
