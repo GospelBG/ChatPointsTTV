@@ -98,6 +98,7 @@ public class TwitchEventHandler {
     }
 
     public void onSub(ChannelChatNotificationEvent event) {        
+        String chatter = event.getChatterUserName();
         SubscriptionPlan tier;
 
         if (event.getNoticeType() == NoticeType.SUB) {
@@ -118,7 +119,7 @@ public class TwitchEventHandler {
             if (reward.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                 String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                 
-                Events.showIngameAlert(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
+                Events.showIngameAlert(chatter, custom_string, "a " + tier + " sub", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
@@ -141,7 +142,7 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
 
-        Events.showIngameAlert(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
+        Events.showIngameAlert(chatter, custom_string, tier, action_color, user_color, rewardBold);
         
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
