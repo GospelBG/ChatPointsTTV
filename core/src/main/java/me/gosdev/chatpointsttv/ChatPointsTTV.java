@@ -275,14 +275,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (client != null) {
-            try {
-                client.getEventSocket().close();
-                client.close();
-            } catch (Exception e) {
-                log.warning("Error while disabling ChatPointsTTV: " + e.toString());
-            }
-        }
+        if (client != null) unlink(Bukkit.getConsoleSender());
         
         if (ImplicitGrantFlow.server.isRunning()) {
             ImplicitGrantFlow.server.stop();
