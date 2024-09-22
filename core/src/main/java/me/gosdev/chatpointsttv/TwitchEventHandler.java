@@ -13,12 +13,12 @@ import me.gosdev.chatpointsttv.Rewards.RewardComparator;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.ChatColor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
 public class TwitchEventHandler {
     ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -29,8 +29,8 @@ public class TwitchEventHandler {
     Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
     Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
     Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
-    ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
-    ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
+    ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR").asBungee();
+    ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR").asBungee();
 
     private Integer ignoreSubs = 0;
 
@@ -41,7 +41,7 @@ public class TwitchEventHandler {
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-            Events.displayTitle(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
+            Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
@@ -56,7 +56,7 @@ public class TwitchEventHandler {
     public void onFollow(ChannelFollowEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following you");
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
-        Events.displayTitle(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
+        Events.showIngameAlert(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
         for (String cmd : Rewards.getRewards(rewardType.FOLLOW).get(0).getCommands()) {
             String[] parts = cmd.split(" ", 2);
             try {
@@ -82,7 +82,7 @@ public class TwitchEventHandler {
 
         for (Reward i : rewards) {
             if (amount >= Integer.parseInt(i.getEvent())) {
-                Events.displayTitle(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
+                Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
                 for (String cmd : i.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
@@ -115,7 +115,7 @@ public class TwitchEventHandler {
             
             for (Reward i : rewards) {
                 if (amount >= Integer.parseInt(i.getEvent())) {
-                    Events.displayTitle(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
+                    Events.showIngameAlert(chatter, custom_string, amount + " " + tier + " subs", action_color, user_color, rewardBold);
                     for (String cmd : i.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {
@@ -152,7 +152,7 @@ public class TwitchEventHandler {
                 if (i.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
                     String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                     
-                    Events.displayTitle(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
+                    Events.showIngameAlert(event.getChatterUserName(), custom_string, ChatPointsTTV.getUtils().PlanToString(tier), action_color, user_color, rewardBold);
                     for (String cmd : i.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
                         try {

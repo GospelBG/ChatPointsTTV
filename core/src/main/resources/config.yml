@@ -68,10 +68,12 @@ DISPLAY_NAME_ON_MOB: true
 # Whether the plugin should log to the console when a user (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
 LOG_EVENTS: true
 
-# Customize the in-game title.
-
-# Toggles in-game title messages.
-SHOW_INGAME_ALERTS: true
+# In-game event alerts mode.
+#     none: Disables in-game alerts
+#     chat: Displays a message in the chat
+#     title: Shows a title splash message
+#     all: Uses both "chat" and "title" alerts
+INGAME_ALERTS: chat
 
 # You can use the following options:
 

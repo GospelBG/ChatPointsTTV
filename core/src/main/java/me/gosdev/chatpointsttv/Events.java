@@ -10,23 +10,51 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV.alert_mode;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Utils.SpawnRunnable;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 
 import org.bukkit.entity.EntityType;
 
 public class Events {
     static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     static Logger log = plugin.log;
+    public static void setAlertMode(alert_mode alertMode) {
+        ChatPointsTTV.alertMode = alertMode;
+    }
 
-    public static void displayTitle(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
-        if (!ChatPointsTTV.enableAlerts) return; // Do not show alerts if user has disabled them.
-        plugin.getServer().getOnlinePlayers().forEach (p -> {
-            if (p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
-            }
-        });
+    public static void showIngameAlert(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
+        ComponentBuilder builder = new ComponentBuilder(user).color(userColor).bold(isBold);
+        builder.append(" " + action).color(titleColor);
+        builder.append(" " + rewardName).color(userColor);
+
+        switch (ChatPointsTTV.alertMode) {
+            case CHAT:
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
+                    ChatPointsTTV.getUtils().sendMessage(p, builder.create());
+                }
+                break;
+            case TITLE:
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
+                    ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
+                };
+                break;
+
+            case ALL:
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
+                    ChatPointsTTV.getUtils().sendMessage(p, builder.create());
+                    ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
+                }
+                break;
+                
+            default:
+                return;                
+        }
     }
 
     public static void runAction(String action, String args, String user) throws Exception {
