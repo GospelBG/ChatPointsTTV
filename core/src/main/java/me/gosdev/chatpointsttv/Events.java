@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Utils.SpawnRunnable;
+import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.entity.EntityType;
 
