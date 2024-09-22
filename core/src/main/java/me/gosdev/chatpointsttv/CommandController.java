@@ -8,6 +8,7 @@ import org.bukkit.command.TabExecutor;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +41,13 @@ public class CommandController implements TabExecutor {
             switch (args[0]) {
                 case "link":
                     if (plugin.isAccountConnected()) {
-                        utils.sendMessage(sender, "There is an account connected already!\nUnlink your account before linking another one.");
+                        utils.sendMessage(sender, new TextComponent("There is an account connected already!\nUnlink it before using another one."));
                         break;
                     }
                     if (ChatPointsTTV.configOk) {
                         link(plugin, sender, args.length == 2 ? args[1] : "default");
                     } else {
-                        utils.sendMessage(sender, "Invalid configuration. Please check your config file.");
+                        utils.sendMessage(sender, new TextComponent("Invalid configuration. Please check your config file."));
                         break;
                     }
                     
@@ -64,7 +65,7 @@ public class CommandController implements TabExecutor {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
                             plugin.linkThread.join();
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException | NullPointerException e) {}
                         
                         plugin.unlink(sender);
                     });
@@ -75,7 +76,7 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 default:
-                    utils.sendMessage(sender, ChatColor.RED + "Unknown command: /twitch " + args[0]);
+                    utils.sendMessage(sender, new TextComponent(ChatColor.RED + "Unknown command: /twitch " + args[0]));
                     help(sender);
                     return true;
             }
@@ -115,7 +116,7 @@ public class CommandController implements TabExecutor {
         else if (method.equals("default")) {
             ChatPointsTTV.customCredentials = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
         } else {
-            utils.sendMessage(p, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
+            utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
             help(p);
             return;
         }

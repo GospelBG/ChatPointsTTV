@@ -15,6 +15,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class VersionCheck {
     private final static String url = "https://api.modrinth.com/v2/project/nN0gRvoO/version";
@@ -48,7 +49,7 @@ public class VersionCheck {
                         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                         btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, download_url));
 
-                        utils.sendMessage(p, ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!");
+                        utils.sendMessage(p, new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!"));
                         utils.sendMessage(p, btn);
                     }
                 }

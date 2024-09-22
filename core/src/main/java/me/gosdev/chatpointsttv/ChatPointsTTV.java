@@ -46,6 +46,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
@@ -244,7 +245,7 @@ public class ChatPointsTTV extends JavaPlugin {
         utils.sendMessage(Bukkit.getConsoleSender(), "ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                utils.sendMessage(p, "ChatPointsTTV reloaded!");
+                utils.sendMessage(p, new TextComponent("ChatPointsTTV reloaded!"));
             }
         }
         VersionCheck.check();
@@ -470,7 +471,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
     public void unlink(CommandSender p) {
         if (!accountConnected) {
-            utils.sendMessage(p, ChatColor.RED + "There is no connected account.");
+            utils.sendMessage(p, new TextComponent(ChatColor.RED + "There is no connected account."));
             return;
         }
         try {
