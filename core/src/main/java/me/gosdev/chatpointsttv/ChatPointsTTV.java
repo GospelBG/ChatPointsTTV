@@ -234,7 +234,7 @@ public class ChatPointsTTV extends JavaPlugin {
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
     } catch (Exception e) {
         configOk = false;
-        log.warning("There was an error reading config.yml");
+        log.warning("An error occurred while reading config.yml");
     }
 
         cmdController = new CommandController();
@@ -244,7 +244,7 @@ public class ChatPointsTTV extends JavaPlugin {
         utils.sendMessage(Bukkit.getConsoleSender(), "ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                p.sendMessage("ChatPointsTTV reloaded!");
+                utils.sendMessage(p, "ChatPointsTTV reloaded!");
             }
         }
         VersionCheck.check();
@@ -433,7 +433,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 return;
             }
 
-            utils.sendMessage(p, "Twitch client was started successfully!");
+            utils.sendMessage(p, "Twitch client has started successfully!");
             accountConnected = true;
         });
         linkThread.start();
@@ -442,7 +442,7 @@ public class ChatPointsTTV extends JavaPlugin {
             public void uncaughtException(Thread t, Throwable e) {
                 log.warning(e.toString());
                 linkThread.interrupt();
-                p.sendMessage(ChatColor.RED + "Account linking failed!");
+                utils.sendMessage(p, ChatColor.RED + "Account linking failed!");
                 accountConnected = true;
                 unlink(Bukkit.getConsoleSender());
             }
@@ -477,7 +477,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
     public void unlink(CommandSender p) {
         if (!accountConnected) {
-            p.sendMessage(ChatColor.RED + "There is no connected account.");
+            utils.sendMessage(p, ChatColor.RED + "There is no connected account.");
             return;
         }
         try {
@@ -492,6 +492,6 @@ public class ChatPointsTTV extends JavaPlugin {
             return;
         }
 
-        p.sendMessage(ChatColor.GREEN + "Account disconnected!");
+        utils.sendMessage(p, ChatColor.GREEN + "Account disconnected!");
     }
 }

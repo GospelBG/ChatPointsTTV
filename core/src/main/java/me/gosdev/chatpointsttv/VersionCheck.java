@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
 
+import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -36,19 +37,19 @@ public class VersionCheck {
 
             JSONArray json = new JSONArray(result.toString());
             String latest = json.getJSONObject(0).getString("version_number");
+            Utils utils = ChatPointsTTV.getUtils();
 
             if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latest.replaceAll("[^\\d.]", ""))) {
                 for (Player p: plugin.getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                        p.sendMessage(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!");
-
                         ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version");
             
                         BaseComponent btn = formatted.create()[0];
                         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                         btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, download_url));
 
-                        p.spigot().sendMessage(btn);
+                        utils.sendMessage(p, ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!");
+                        utils.sendMessage(p, btn);
                     }
                 }
                 log.info("ChatPointsTTV v" + latest + " has been released! Download the latest version in " + download_url);

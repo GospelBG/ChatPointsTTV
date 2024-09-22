@@ -13,6 +13,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.gosdev.chatpointsttv.ChatPointsTTV.alert_mode;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Utils.SpawnRunnable;
+import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
@@ -21,6 +22,9 @@ import org.bukkit.entity.EntityType;
 public class Events {
     static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     static Logger log = plugin.log;
+
+    static Utils utils = ChatPointsTTV.getUtils();
+
     public static void setAlertMode(alert_mode alertMode) {
         ChatPointsTTV.alertMode = alertMode;
     }
@@ -34,21 +38,21 @@ public class Events {
             case CHAT:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    ChatPointsTTV.getUtils().sendMessage(p, builder.create());
+                    utils.sendMessage(p, builder.create());
                 }
                 break;
             case TITLE:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
+                    utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
                 };
                 break;
 
             case ALL:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    ChatPointsTTV.getUtils().sendMessage(p, builder.create());
-                    ChatPointsTTV.getUtils().displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
+                    utils.sendMessage(p, builder.create());
+                    utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
                 }
                 break;
                 

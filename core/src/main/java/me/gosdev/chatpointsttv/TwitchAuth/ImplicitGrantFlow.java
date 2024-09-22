@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,6 +19,7 @@ public class ImplicitGrantFlow {
     public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
     private final static String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ChatPointsTTV.getClientID() + "&redirect_uri=http://localhost:3000&scope="+plugin.scopes;
 
+    static Utils utils = ChatPointsTTV.getUtils();
 
     public static CompletableFuture<String> getAccessToken(CommandSender p) {
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -28,7 +30,7 @@ public class ImplicitGrantFlow {
 
         if (p == Bukkit.getServer().getConsoleSender()) {
             String msg = "Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + AuthURL;
-            p.sendMessage(msg);
+            utils.sendMessage(p, msg);
         } else {
             String msg = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up";
             ComponentBuilder formatted = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
@@ -38,7 +40,7 @@ public class ImplicitGrantFlow {
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, AuthURL));
 
-            ChatPointsTTV.getUtils().sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
+            utils.sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
         }
         
         int serverCloseId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
