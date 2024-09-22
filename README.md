@@ -63,7 +63,7 @@ You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the 
 * **Mob Glow**: Whether the spawned mobs should have a glowing effect (highlighted and visible through blocks).
 * **Display Name on Mob**: Whether the spawned mobs should have the name of the user who triggered the action.
 * **Log Event**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
-* **Show In-game Alerts**: Determines whether subscribed events should show an in-game title message.
+* **In-game Alerts Mode***: How will the game notify of an event. Valid options: `chat`, `title`, `all`, `none`. Choosing `none`  will disable In-game alerts.
 * **Reward Name Bold**: Determines whether the reward name is displayed in bold letters in the title banner to people with the `chatpointsttv.broadcast` permission.
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
 You can leave this section unmodified, as there are default colors set up in the original file
