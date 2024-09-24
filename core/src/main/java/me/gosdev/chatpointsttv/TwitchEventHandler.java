@@ -12,6 +12,7 @@ import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 import net.md_5.bungee.api.ChatColor;
 
 import java.util.ArrayList;
@@ -112,14 +113,14 @@ public class TwitchEventHandler {
             return;
         }
 
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + utils.PlanToString(tier) + " sub!"); 
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + TwitchUtils.PlanToString(tier) + " sub!"); 
         for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
-            if (reward.getEvent().equals(ChatPointsTTV.getUtils().PlanToConfig(tier))) {
+            if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
                 String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                 
-                Events.showIngameAlert(chatter, custom_string, "a " + utils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
+                Events.showIngameAlert(chatter, custom_string, "a " + TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
@@ -136,7 +137,7 @@ public class TwitchEventHandler {
     public void onSubGift(ChannelChatNotificationEvent event) {       
         String chatter = event.getChatterUserName();
         int amount = event.getCommunitySubGift().getTotal();
-        String tier = ChatPointsTTV.getUtils().PlanToString(event.getCommunitySubGift().getSubTier());
+        String tier = TwitchUtils.PlanToString(event.getCommunitySubGift().getSubTier());
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted " + amount  + " " + tier + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
