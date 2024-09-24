@@ -48,7 +48,7 @@
   <properties>
       <maven.compiler.source>1.8</maven.compiler.source>
       <maven.compiler.target>1.8</maven.compiler.target>
-      <revision>2.3</revision>
+      <revision>2.3.1</revision>
   </properties>
 
   <repositories>
