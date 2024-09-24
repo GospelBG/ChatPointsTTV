@@ -120,7 +120,7 @@ public class TwitchEventHandler {
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
                 String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
                 
-                Events.showIngameAlert(chatter, custom_string, "a " + TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
+                Events.showIngameAlert(chatter, custom_string,TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {

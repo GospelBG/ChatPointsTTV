@@ -105,5 +105,5 @@ STRINGS:
   REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
   FOLLOWED_STRING: "has started following"
   CHEERED_STRING: "cheered" #..."100 bits"
-  SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
+  SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifted" #..."5 subs"
