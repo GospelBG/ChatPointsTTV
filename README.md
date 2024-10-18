@@ -132,10 +132,12 @@ TYPE_REWARDS:
 ```
 Whereas `TYPE_REWARDS` is replaces with the appropiate config key that is already on the file, `KEY` with the channel points reward name, subscription tier or minimal amount of bits/subs.  
 > [!IMPORTANT]  
-> **For follow events you shouldn't add reward keys.** See placeholders on the default [config.yml](core/src/main/resources/config.yml).
+> **You should omit the `KEY` section to add follow rewards** and go straight to the actions. See placeholders on the default [config.yml](core/src/main/resources/config.yml#L41).
 
 > [!TIP]
 > You can now target multiple channels. If you do so, you can target some events to a specific channel following the second format. You can still follow the first example if you don't aim to target specific channels. 
+
+You can also use the `{USER}` and `{TEXT}` fields to use data from your events inside of your actions. `{USER}` will be replaced with the chatter's username. `{TEXT}` will be replaced with the text input of the Channel Points Reward.
 
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  
