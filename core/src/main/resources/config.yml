@@ -30,8 +30,9 @@ SHOW_CHAT: true
 #     GIVE {ITEM}  [AMOUNT]
 #     TNT {AMOUNT} [EXPLOSION TIME IN TICKS]
 
-# If your reward contains a text input, you can reference it as:
-#     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
+# Extra fields:
+#     {TEXT} Channel Points User Input
+#     {USER} Viewer's username
 
 # To add a streamer-specific reward add the actions inside a list named as the desired channel.
 # To target all channels use "default" as the list key.

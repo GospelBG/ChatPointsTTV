@@ -34,6 +34,8 @@ public class TwitchEventHandler {
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
         ChannelPointsRedemption redemption = event.getRedemption();
+        String chatter = event.getRedemption().getUser().getDisplayName();
+
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
             if (!reward.getTargetId().equals(redemption.getChannelId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
@@ -43,7 +45,7 @@ public class TwitchEventHandler {
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()), redemption.getUser().getDisplayName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()).replaceAll("\\{USER\\}", chatter), redemption.getUser().getDisplayName());
                 } catch (Exception e) {
                     plugin.log.warning(e.toString());
                 }
@@ -54,15 +56,16 @@ public class TwitchEventHandler {
 
     public void onFollow(ChannelFollowEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following " + event.getBroadcasterUserName());
+        String chatter = event.getUserName();
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
-        Events.showIngameAlert(event.getUserName(), custom_string, "", action_color, user_color, rewardBold);
+        Events.showIngameAlert(chatter, custom_string, "", action_color, user_color, rewardBold);
         for (Reward reward : Rewards.getRewards(rewardType.FOLLOW)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
-                    Events.runAction(parts[0], parts[1], event.getUserName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getUserName());
                 } catch (Exception e) {
                     plugin.log.warning(e.toString());
                 }
@@ -88,7 +91,7 @@ public class TwitchEventHandler {
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
-                        Events.runAction(parts[0], parts[1], event.getChatterUserName());
+                        Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
                     } catch (Exception e) {
                         plugin.log.warning(e.toString());
                     }
@@ -124,7 +127,7 @@ public class TwitchEventHandler {
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
                     try {
-                    Events.runAction(parts[0], parts[1], event.getChatterUserName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
                     } catch (Exception e) {
                         plugin.log.warning(e.toString());
                     }
@@ -150,7 +153,7 @@ public class TwitchEventHandler {
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
                 try {
-                    Events.runAction(parts[0], parts[1], event.getChatterUserName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
                 } catch (Exception e) {
                     plugin.log.warning(e.toString());
                 }
