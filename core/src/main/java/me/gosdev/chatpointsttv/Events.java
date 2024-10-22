@@ -62,17 +62,16 @@ public class Events {
         }
     }
 
-    public static void runAction(String action, String args, String user) throws Exception {
+    public static void runAction(String action, String args, String user) {
         List<String> cmd = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
                 try {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        log.info(""+cmd.size());
                         if (cmd.size() < 1) throw new IllegalArgumentException("You must set an entity to spawn!"); // Throw error if there are not enough arguments
                         if (cmd.size() >= 3) { // Is targeting a player?
                             Player query = Bukkit.getPlayer(cmd.get(2));
-                            if (query == null || !query.isOnline()) throw new NullPointerException(p.getName());
+                            if (query == null || !query.isOnline()) throw new NullPointerException(cmd.get(2));
                             if (!p.getName().equalsIgnoreCase(cmd.get(2))) {
                                 continue;
                             }
@@ -140,7 +139,8 @@ public class Events {
                             return;    
                         }
                     }
-                    throw new Exception("Couldn't find player " + runAs);
+                    log.warning("Couldn't find player " + runAs);
+                    return;
                 }
                 break;
 

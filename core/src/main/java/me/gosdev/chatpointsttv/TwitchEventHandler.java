@@ -44,11 +44,13 @@ public class TwitchEventHandler {
             Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
-                try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()).replaceAll("\\{USER\\}", chatter), redemption.getUser().getDisplayName());
-                } catch (Exception e) {
-                    plugin.log.warning(e.toString());
+
+                if (parts.length <= 1) {
+                    plugin.log.warning("Invalid command: " + parts[0]);
+                    return;
                 }
+
+                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()).replaceAll("\\{USER\\}", chatter), redemption.getUser().getDisplayName());
             }
             return;
         }
@@ -64,11 +66,13 @@ public class TwitchEventHandler {
 
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
-                try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getUserName());
-                } catch (Exception e) {
-                    plugin.log.warning(e.toString());
+
+                if (parts.length <= 1) {
+                    plugin.log.warning("Invalid command: " + parts[0]);
+                    return;
                 }
+
+                Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getUserName());
             }
             return;    
         }
@@ -90,11 +94,13 @@ public class TwitchEventHandler {
                 Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
-                    try {
-                        Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
-                    } catch (Exception e) {
-                        plugin.log.warning(e.toString());
+
+                    if (parts.length <= 1) {
+                        plugin.log.warning("Invalid command: " + parts[0]);
+                        return;
                     }
+
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
                 }
                 return;
             }
@@ -126,11 +132,13 @@ public class TwitchEventHandler {
                 Events.showIngameAlert(chatter, custom_string,TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
-                    try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
-                    } catch (Exception e) {
-                        plugin.log.warning(e.toString());
+
+                    if (parts.length <= 1) {
+                        plugin.log.warning("Invalid command: " + parts[0]);
+                        return;
                     }
+
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
                 }
                 return;
             }
@@ -152,11 +160,13 @@ public class TwitchEventHandler {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
-                try {
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
-                } catch (Exception e) {
-                    plugin.log.warning(e.toString());
+
+                if (parts.length <= 1) {
+                    plugin.log.warning("Invalid command: " + parts[0]);
+                    return;
                 }
+
+                Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());                
             }
             return;
         }
