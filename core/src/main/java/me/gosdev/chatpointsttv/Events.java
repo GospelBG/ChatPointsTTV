@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -65,20 +66,45 @@ public class Events {
         List<String> cmd = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
-                    
-                    SpawnRunnable entityRunnable = new SpawnRunnable();
-                    entityRunnable.entity = EntityType.valueOf(cmd.get(0));
-                    try {
-                        entityRunnable.amount = Integer.parseInt(cmd.get(1));
-                    } catch (NumberFormatException  | ArrayIndexOutOfBoundsException e) {
-                        entityRunnable.amount = 1;
+                try {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        log.info(""+cmd.size());
+                        if (cmd.size() < 1) throw new IllegalArgumentException("You must set an entity to spawn!"); // Throw error if there are not enough arguments
+                        if (cmd.size() >= 3) { // Is targeting a player?
+                            Player query = Bukkit.getPlayer(cmd.get(2));
+                            if (query == null || !query.isOnline()) throw new NullPointerException(p.getName());
+                            if (!p.getName().equalsIgnoreCase(cmd.get(2))) {
+                                continue;
+                            }
+                        } else if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
+
+                        if (!EnumUtils.isValidEnum(EntityType.class, cmd.get(0))) throw new IllegalArgumentException("Entity " + cmd.get(0) + " does not exist."); // Check if entity exists
+                        SpawnRunnable entityRunnable = new SpawnRunnable();
+                        entityRunnable.entity = EntityType.valueOf(cmd.get(0));
+
+                        if (cmd.size() >= 2) { // Is specifying an amount?
+                            try {
+                                entityRunnable.amount = Integer.parseInt(cmd.get(1));
+                            } catch (Exception e) {
+                                throw new NumberFormatException(cmd.get(1));
+                            }
+                        } else {
+                            entityRunnable.amount = 1;
+                        }
+
+                        entityRunnable.entityName = user;
+
+                        entityRunnable.p = p;
+                        entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, entityRunnable, 0, 0);
                     }
-                    entityRunnable.entityName = user;
-                    entityRunnable.p = p;
-    
-                    entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, entityRunnable, 0, 0);
+                } catch (NullPointerException e) {
+                    log.warning("Couldn't find player " + e.getMessage() + ".");
+                } catch (NumberFormatException e) {
+                    log.warning("Invalid amount of entities: " + e.getMessage());
+                } catch (IllegalArgumentException e) {
+                    log.warning(e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace(); // Unknown error. Print full stack trace
                 }
                 break;
                 

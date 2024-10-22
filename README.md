@@ -87,9 +87,9 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 ## Reward Actions
 Currently, there are 2 types of actions:
 - Spawning entities  
-    **Format**: `SPAWN <ENTITY NAME> [AMOUNT]`  
+    **Format**: `SPAWN <ENTITY NAME> [AMOUNT] [TARGET USER]`  
     **Example**: `SPAWN CREEPER 2`  
-    *This action will spawn the menctioned entities for each player that is set up as a target (with the `chatpointsttv.target` permission). The example action will spawn 2 Creepers on each player's location.*  
+    *This action will spawn an entity for each player that has the `chatpointsttv.target` permission or a specific player (when the `[TARGET USER] field is used`). The example action will spawn 2 Creepers on each player's location.*  
     
 - Running commands  
     **Format**: `RUN <TARGET / CONSOLE> <COMMAND>`  
@@ -99,7 +99,7 @@ Currently, there are 2 types of actions:
 - Giving Items  
     **Format**: `GIVE <ITEM> [AMOUNT]`  
     **Example**: `GIVE DIAMOND 1`
-    *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
+    *This action will give the established amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
 
 - Explosions
     **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`  
