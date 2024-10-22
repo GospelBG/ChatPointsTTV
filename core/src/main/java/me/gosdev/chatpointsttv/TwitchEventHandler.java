@@ -97,7 +97,6 @@ public class TwitchEventHandler {
 
                     if (parts.length <= 1) {
                         plugin.log.warning("Invalid command: " + parts[0]);
-                        return;
                     }
 
                     Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
@@ -135,7 +134,6 @@ public class TwitchEventHandler {
 
                     if (parts.length <= 1) {
                         plugin.log.warning("Invalid command: " + parts[0]);
-                        return;
                     }
 
                     Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
