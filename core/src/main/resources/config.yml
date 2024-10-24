@@ -27,7 +27,7 @@ SHOW_CHAT: true
 # For the action, follow this format:
 #     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET USER]
 #     RUN {TARGET / CONSOLE} {COMMAND}
-#     GIVE {ITEM}  [AMOUNT]
+#     GIVE {ITEM} [AMOUNT] [TARGET USER]
 #     TNT {AMOUNT} [EXPLOSION TIME IN TICKS]
 
 # Extra fields:

@@ -47,7 +47,7 @@ public class TwitchEventHandler {
 
                 if (parts.length <= 1) {
                     plugin.log.warning("Invalid command: " + parts[0]);
-                    return;
+                    continue;
                 }
 
                 Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()).replaceAll("\\{USER\\}", chatter), redemption.getUser().getDisplayName());
@@ -69,7 +69,7 @@ public class TwitchEventHandler {
 
                 if (parts.length <= 1) {
                     plugin.log.warning("Invalid command: " + parts[0]);
-                    return;
+                    continue;
                 }
 
                 Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getUserName());
@@ -97,6 +97,7 @@ public class TwitchEventHandler {
 
                     if (parts.length <= 1) {
                         plugin.log.warning("Invalid command: " + parts[0]);
+                        continue;
                     }
 
                     Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
@@ -134,6 +135,7 @@ public class TwitchEventHandler {
 
                     if (parts.length <= 1) {
                         plugin.log.warning("Invalid command: " + parts[0]);
+                        continue;
                     }
 
                     Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
@@ -161,7 +163,7 @@ public class TwitchEventHandler {
 
                 if (parts.length <= 1) {
                     plugin.log.warning("Invalid command: " + parts[0]);
-                    return;
+                    continue;
                 }
 
                 Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());                
