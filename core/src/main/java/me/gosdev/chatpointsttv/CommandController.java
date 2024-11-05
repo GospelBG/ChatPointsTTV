@@ -1,6 +1,7 @@
 package me.gosdev.chatpointsttv;
 
 import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.Utils;
 
 import org.bukkit.command.CommandSender;
@@ -147,12 +148,16 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
-        List<String> channels = plugin.getListenedChannels();
+        List<Channel> channels = plugin.getListenedChannels();
         String strChannels = "";
-        for (int i = 0; i < channels.size(); i++) {
-            strChannels += channels.get(i);
-            if (i != channels.size() - 1) strChannels += ", ";
+
+        for (Channel channel : channels) {
+            ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
+            strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }
+
+        strChannels = strChannels.substring(0, strChannels.length() - 2); // Remove last comma
+
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +

@@ -48,6 +48,7 @@ To reset the original configuration, delete `config.yml` and reload the plugin. 
 * **Channel Username***: The channel(s) that will be listened for rewards, bits and subs. (In case of multiple channels, they must be added as a list: `["channel_1", "channel_2", "..."]`)  
 * **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
 * **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
+* **Ignore Offline Events**: If enabled, events from offline streamers will be ignored.  
 * **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  
 * **Chat Blacklist**: List of usernames of chat bots and other users that will be ignored for the in-game stream chat.
 * **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  

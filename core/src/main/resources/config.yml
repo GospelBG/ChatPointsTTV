@@ -12,6 +12,9 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 # Whether the plugin shoud automatically connect to Twitch when a key-based authentication is used.
 AUTO_LINK_CUSTOM: true
 
+# Whether events should be ignored if the streamer is offline.
+IGNORE_OFFLINE_STREAMERS: false
+
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
 

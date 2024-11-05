@@ -12,6 +12,7 @@ import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 import net.md_5.bungee.api.ChatColor;
 
@@ -28,11 +29,17 @@ public class TwitchEventHandler {
     Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
     Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
     Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
+    Boolean ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR").asBungee();
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR").asBungee();
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getRedemption().getChannelId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
         ChannelPointsRedemption redemption = event.getRedemption();
         String chatter = event.getRedemption().getUser().getDisplayName();
 
@@ -58,6 +65,11 @@ public class TwitchEventHandler {
 
     public void onFollow(ChannelFollowEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " started following " + event.getBroadcasterUserName());
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
         String chatter = event.getUserName();
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("FOLLOWED_STRING");
         Events.showIngameAlert(chatter, custom_string, "", action_color, user_color, rewardBold);
@@ -81,6 +93,11 @@ public class TwitchEventHandler {
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " cheered " + event.getCheer().getBits() + " bits to " + event.getBroadcasterUserName() + "!");
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
 
         String chatter = event.getChatterUserName();
         int amount = event.getCheer().getBits();
@@ -123,6 +140,11 @@ public class TwitchEventHandler {
         }
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + TwitchUtils.PlanToString(tier) + " sub!"); 
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
         for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
@@ -151,6 +173,12 @@ public class TwitchEventHandler {
         String tier = TwitchUtils.PlanToString(event.getCommunitySubGift().getSubTier());
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has gifted " + amount  + " " + tier + " subs in " + event.getBroadcasterUserName() + "'s' channel!"); 
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
+        
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
 

@@ -33,6 +33,8 @@ import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
+import com.github.twitch4j.events.ChannelGoLiveEvent;
+import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
@@ -48,6 +50,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
+import com.github.twitch4j.helix.domain.StreamList;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
@@ -56,6 +59,7 @@ import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
@@ -63,6 +67,7 @@ import me.gosdev.chatpointsttv.Utils.Utils;
 
 public class ChatPointsTTV extends JavaPlugin {
     private static ITwitchClient client;
+    private static ArrayList<Channel> channels;
     private User user;
     private static TwitchEventHandler eventHandler;
     private static IEventSubSocket eventSocket;
@@ -169,11 +174,40 @@ public class ChatPointsTTV extends JavaPlugin {
     public String getConnectedUsername() {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
-    public List<String> getListenedChannels() {
-        List<String> channels = new ArrayList<>();
-        if (plugin.config.getStringList("CHANNEL_USERNAME") != null) channels = plugin.config.getStringList("CHANNEL_USERNAME");
-        else channels.add(plugin.config.getString("CHANNEL_USERNAME"));
-        return channels;
+    public List<Channel> getListenedChannels() {
+        boolean needRefresh = false;
+        if (channels != null) {
+            for (int i = 0; i < channels.size(); i++) {
+                if (channels.get(i).getChannelId() == null) needRefresh = true;
+            }
+        }
+
+        if (channels == null || channels.isEmpty()) needRefresh = true;
+
+        if (needRefresh) {
+            channels = new ArrayList<>();
+            List<String> usernames = new ArrayList<>();
+            if (plugin.config.getStringList("CHANNEL_USERNAME") != null)  {
+                usernames = plugin.config.getStringList("CHANNEL_USERNAME");
+            } else {
+                usernames.add(plugin.config.getString("CHANNEL_USERNAME"));
+            }
+
+            if (isAccountConnected()) {
+                for (String name : usernames) {
+                    StreamList request = client.getHelix().getStreams(oauth.getAccessToken(), null, null, null, null, null, null, Arrays.asList(name)).execute();
+                    String id = client.getHelix().getUsers(null, null, Arrays.asList(name)).execute().getUsers().get(0).getId();
+        
+                    channels.add(new Channel(name, id, request.getStreams().size() > 0));
+                }
+            } else {
+                for (String name : usernames) {
+                    channels.add(new Channel(name, null, false)); // If unable to check live status
+                }
+            }
+            return channels;
+        }
+        return ChatPointsTTV.channels;
     }
 
     private static Utils utils;
@@ -289,6 +323,7 @@ public class ChatPointsTTV extends JavaPlugin {
         eventManager = null;
         config = null;
         accountConnected = false;
+        channels = null;
         oauth = null;
         plugin = null;
 
@@ -320,8 +355,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     .withEnablePubSub(true)
                     .withEnableEventSocket(true)
                     .withDefaultEventHandler(SimpleEventHandler.class)
-                    .build();
-        
+                    .build();        
                 
                 user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
             } catch (Exception e) {
@@ -340,7 +374,24 @@ public class ChatPointsTTV extends JavaPlugin {
 
             int channels = getListenedChannels().size();
             int subs = 0;
-            
+
+            eventManager.onEvent(ChannelGoLiveEvent.class, new Consumer<ChannelGoLiveEvent>() {
+                @Override
+                public void accept(ChannelGoLiveEvent e) {
+                    for (Channel channel : getListenedChannels()) {
+                        if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(true);
+                    }
+                }
+            });
+
+            eventManager.onEvent(ChannelGoOfflineEvent.class, new Consumer<ChannelGoOfflineEvent>() {
+                @Override
+                public void accept(ChannelGoOfflineEvent e) {
+                    for (Channel channel : getListenedChannels()) {
+                        if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
+                    }
+                }
+            });            
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
                 eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
                     @Override
@@ -445,6 +496,8 @@ public class ChatPointsTTV extends JavaPlugin {
     
     public void subscribeToEvents(CommandSender p, CountDownLatch latch, String channel) {
         String channel_id = getUserId(channel);
+
+        client.getClientHelper().enableStreamEventListener(channel);
         
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
@@ -469,6 +522,7 @@ public class ChatPointsTTV extends JavaPlugin {
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
     }
+
     public void unlink(CommandSender p) {
         if (!accountConnected) {
             utils.sendMessage(p, new TextComponent(ChatColor.RED + "There is no connected account."));
