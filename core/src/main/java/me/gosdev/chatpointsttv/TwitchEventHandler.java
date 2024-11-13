@@ -41,7 +41,6 @@ public class TwitchEventHandler {
             }
         }
         ChannelPointsRedemption redemption = event.getRedemption();
-        String chatter = event.getRedemption().getUser().getDisplayName();
 
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
@@ -57,7 +56,7 @@ public class TwitchEventHandler {
                     continue;
                 }
 
-                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()).replaceAll("\\{USER\\}", chatter), redemption.getUser().getDisplayName());
+                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()), redemption.getUser().getDisplayName());
             }
             return;
         }
@@ -84,7 +83,7 @@ public class TwitchEventHandler {
                     continue;
                 }
 
-                Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getUserName());
+                Events.runAction(parts[0], parts[1], event.getUserName());
             }
             return;    
         }
@@ -117,7 +116,7 @@ public class TwitchEventHandler {
                         continue;
                     }
 
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());
                 }
                 return;
             }
@@ -160,7 +159,7 @@ public class TwitchEventHandler {
                         continue;
                     }
 
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());
+                    Events.runAction(parts[0], parts[1], event.getChatterUserName());
                 }
                 return;
             }
@@ -194,7 +193,7 @@ public class TwitchEventHandler {
                     continue;
                 }
 
-                Events.runAction(parts[0], parts[1].replaceAll("\\{USER\\}", chatter), event.getChatterUserName());                
+                Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());                
             }
             return;
         }

@@ -63,6 +63,7 @@ public class Events {
     }
 
     public static void runAction(String action, String args, String user) {
+        args.replace("\\{USER\\}", user);
         List<String> cmd = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
