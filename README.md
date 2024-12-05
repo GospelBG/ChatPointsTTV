@@ -10,6 +10,7 @@ This GitHub repository contains all the source code of the plugin. You can downl
 - CurseForge: https://www.curseforge.com/minecraft/bukkit-plugins/chatpointsttv  
 - Modrinth: https://modrinth.com/plugin/chatpointsttv
 - SpigotMC: https://www.spigotmc.org/resources/chatpointsttv.112532/
+- Hangar: https://hangar.papermc.io/GosDev/ChatPointsTTV
 
 These are the only official download mirrors. Any downloads besides of these links may not be genuine.
 
