@@ -23,7 +23,7 @@ public class Rewards {
     public static Map<rewardType, ArrayList<Reward>> rewards = new HashMap<rewardType, ArrayList<Reward>>();
 
     public static ArrayList<Reward> getRewards(rewardType type) {
-        //if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
+        if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
         FileConfiguration config = ChatPointsTTV.getPlugin().config;
 
         ConfigurationSection config_rewards = config.getConfigurationSection(type.toString().toUpperCase() + "_REWARDS");
