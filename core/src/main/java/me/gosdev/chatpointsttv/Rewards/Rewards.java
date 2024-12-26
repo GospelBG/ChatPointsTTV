@@ -15,7 +15,8 @@ public class Rewards {
         CHANNEL_POINTS,
         CHEER,
         SUB,
-        GIFT
+        GIFT,
+        RAID
     };
 
     public static final String EVERYONE = "*";

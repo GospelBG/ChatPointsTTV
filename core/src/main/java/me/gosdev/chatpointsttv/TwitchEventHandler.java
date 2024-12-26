@@ -6,6 +6,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
+import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Reward;
@@ -25,6 +26,8 @@ public class TwitchEventHandler {
     Utils utils = ChatPointsTTV.getUtils();
 
     public static Boolean rewardBold;
+    private static ArrayList<String> lastRaids = new ArrayList<>();
+    private int lastRaidsIndex = 0;
     Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
     Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
     Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
@@ -178,7 +181,7 @@ public class TwitchEventHandler {
             }
         }
         
-        String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");            
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("GIFT_STRING");
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.GIFT);
 
         Events.showIngameAlert(chatter, custom_string, tier, action_color, user_color, rewardBold);
@@ -194,6 +197,43 @@ public class TwitchEventHandler {
                 }
 
                 Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());                
+            }
+            return;
+        }
+    }
+
+    public void onRaid(RaidGoEvent event) {
+        if (lastRaids.contains(event.getRaid().getId())) return; // Deduplicate Raid Events
+        lastRaids.set(lastRaidsIndex, event.getRaid().getId()); // Add raid id to list to prevent event duplication
+        lastRaidsIndex++;
+        if (lastRaidsIndex > 5) lastRaidsIndex = 0; // Limit list to 5 entries (new raids will overwrite old ones)
+
+        String raiderName = plugin.getUsername(event.getRaid().getSourceId());
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), raiderName + " has raided " + event.getRaid().getTargetDisplayName()  + " with a viewer count of " + event.getRaid().getViewerCount().toString() + "!"); 
+        if (ignoreOfflineStreamers) {
+            for (Channel channel : plugin.getListenedChannels()) {
+                if (channel.getChannelId().equals(event.getRaid().getTargetLogin()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+            }
+        }
+
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("RAIDED_STRING").replace("{CHANNEL}", event.getRaid().getTargetDisplayName());
+        Integer amount = event.getRaid().getViewerCount();
+        ArrayList<Reward> rewards = Rewards.getRewards(rewardType.RAID);
+
+        Events.showIngameAlert(raiderName, custom_string, amount.toString(), action_color, user_color, rewardBold);
+
+        for (Reward reward : rewards) {
+            if (!reward.getTargetId().equals(event.getRaid().getTargetId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+            if (amount < Integer.parseInt(reward.getEvent())) continue;
+            for (String cmd : reward.getCommands()) {
+                String[] parts = cmd.split(" ", 2);
+
+                if (parts.length <= 1) {
+                    plugin.log.warning("Invalid command: " + parts[0]);
+                    continue;
+                }
+
+                Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), raiderName);                
             }
             return;
         }
