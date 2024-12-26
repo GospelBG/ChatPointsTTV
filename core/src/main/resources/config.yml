@@ -36,7 +36,7 @@ SHOW_CHAT: true
 # Extra fields:
 #     {TEXT} Channel Points User Input
 #     {USER} Viewer's username
-#     {AMOUNT} Bits/Gifted Subs amount.
+#     {AMOUNT} Bits/Gifted Subs/Viewers amount.
 
 # To add a streamer-specific reward add the actions inside a list named as the desired channel.
 # To target all channels use "default" as the list key.
@@ -67,6 +67,10 @@ SUB_REWARDS:
 
 GIFT_REWARDS:
   [AMOUNT]:
+    - {ACTION}
+
+RAID_REWARDS:
+  [VIEWER THRESHOLD]:
     - {ACTION}
 
 # Add glow effect to spawned mobs
@@ -112,3 +116,4 @@ STRINGS:
   CHEERED_STRING: "cheered" #..."100 bits"
   SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifted" #..."5 subs"
+  RAIDED_STRING: "has raided {CHANNEL} with a viewer count of" # {CHANNEL} will be replaced with the raided channel name.
