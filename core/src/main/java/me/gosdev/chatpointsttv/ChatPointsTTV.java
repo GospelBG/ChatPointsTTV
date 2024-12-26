@@ -419,7 +419,10 @@ public class ChatPointsTTV extends JavaPlugin {
                     public void accept(ChannelChatMessageEvent e) {
                         try { // May get NullPointerException if event is triggered while still subscribing
                             eventHandler.onCheer(e);
-                        } catch (NullPointerException ex) {}
+                        } catch (NullPointerException ex) {}// May get NullPointerException if event is triggered while still subscribing
+                        catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }); 
             }
@@ -431,7 +434,10 @@ public class ChatPointsTTV extends JavaPlugin {
                         try { // May get NullPointerException if event is triggered while still subscribing
                             if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
                             else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
-                        } catch (NullPointerException ex) {}
+                        } catch (NullPointerException ex) {}// May get NullPointerException if event is triggered while still subscribing
+                        catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 });
             }
@@ -443,6 +449,7 @@ public class ChatPointsTTV extends JavaPlugin {
                             eventHandler.onRaid(e);
                         } catch (NullPointerException ex) {}// May get NullPointerException if event is triggered while still subscribing
                         catch (Exception ex) {
+                            ex.printStackTrace();
                         }
                     }
                 }); 
@@ -498,7 +505,8 @@ public class ChatPointsTTV extends JavaPlugin {
         linkThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-                log.warning(e.toString());
+
+                e.printStackTrace();
                 linkThread.interrupt();
                 utils.sendMessage(p, ChatColor.RED + "Account linking failed!");
                 accountConnected = true;
