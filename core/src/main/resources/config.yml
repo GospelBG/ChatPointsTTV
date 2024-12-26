@@ -1,6 +1,7 @@
 # This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
 # For more information about how to use this file, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
 
+# Username(s) of the streamer's channels. In case of multiple streamers, must be set as a list: ["channel_1", "channel_2", "..."]
 CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # Uncomment the following lines (remove the # symbol at the start of the line) to use a key-based authentication instead of the browser login.
@@ -10,6 +11,9 @@ CHANNEL_USERNAME: {YOUR CHANNEL}
 
 # Whether the plugin shoud automatically connect to Twitch when a key-based authentication is used.
 AUTO_LINK_CUSTOM: true
+
+# Whether events should be ignored if the streamer is offline.
+IGNORE_OFFLINE_STREAMERS: false
 
 # Whether your stream chat should show up in the in-game chat
 SHOW_CHAT: true
@@ -24,13 +28,18 @@ SHOW_CHAT: true
 #    - ACTION
 
 # For the action, follow this format:
-#     SPAWN {ENTITY_NAME} [AMOUNT]
+#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET USER]
 #     RUN {TARGET / CONSOLE} {COMMAND}
-#     GIVE {ITEM}  [AMOUNT]
+#     GIVE {ITEM} [AMOUNT] [TARGET USER]
 #     TNT {AMOUNT} [EXPLOSION TIME IN TICKS]
 
-# If your reward contains a text input, you can reference it as:
-#     {TEXT} **ONLY SUPPORTED ON CHANNEL POINTS**
+# Extra fields:
+#     {TEXT} Channel Points User Input
+#     {USER} Viewer's username
+#     {AMOUNT} Bits/Gifted Subs amount.
+
+# To add a streamer-specific reward add the actions inside a list named as the desired channel.
+# To target all channels use "default" as the list key.
 
 # Leave any reward class empty to disable it.
 CHANNEL_POINTS_REWARDS:
@@ -38,17 +47,17 @@ CHANNEL_POINTS_REWARDS:
     - {ACTION 1}
     - {ACTION 2}
 
-# Put the desired action after the colon in the form of a list. You musn't add a "Reward Name".
+# Put the desired action after the colon as a list. You musn't add a "Reward Name".
 FOLLOW_REWARDS:
   - {ACTION}
   - {ACTION}
 
-# Follow the same format as the Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
+# Follow the same format as Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
 CHEER_REWARDS:
   [BITS AMOUNT]:
     - {ACTION}
 
-# Follow the same format as the Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
+# Follow the same format as Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
 # Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions with sub gifting
 SUB_REWARDS:
   [TWITCH_PRIME]:
@@ -68,10 +77,12 @@ DISPLAY_NAME_ON_MOB: true
 # Whether the plugin should log to the console when a user (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
 LOG_EVENTS: true
 
-# Customize the in-game title.
-
-# Toggles in-game title messages.
-SHOW_INGAME_ALERTS: true
+# In-game event alerts mode.
+#     none: Disables in-game alerts
+#     chat: Displays a message in the chat
+#     title: Shows a title splash message
+#     all: Uses both "chat" and "title" alerts
+INGAME_ALERTS: chat
 
 # You can use the following options:
 
@@ -99,5 +110,5 @@ STRINGS:
   REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
   FOLLOWED_STRING: "has started following"
   CHEERED_STRING: "cheered" #..."100 bits"
-  SUB_STRING: "has subscribed with" #..."Tier 1/2/3/Prime"
+  SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifted" #..."5 subs"

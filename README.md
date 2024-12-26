@@ -20,7 +20,7 @@ These are the only official download mirrors. Any downloads besides of these lin
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and add and setup the actions for rewards, donations... There are two ways to link your Twitch account to the plugin:  
+3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and setup events for rewards, donations... You will need to link a Twitch account in order to connect use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
 
     - **Using a key-based authentication** *(recommended)*:  
     You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com). Make sure to add all the [needed scopes](#twitch-scopes).  
@@ -30,7 +30,7 @@ These are the only official download mirrors. Any downloads besides of these lin
     - **Log in through a browser**:  
     You won't need any extra modification in your config.yml file. You will just need to run `/twitch link` in-game and open the provided link. You may need to log in your Twitch account and authorise the app. Once you finish the log in process you can close the browser and your account will be linked.
 > [!WARNING]  
-> Currently due to technical limitations **it's only possible to use the browser method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
+> Currently due to API limitations **it's only possible to use the browser method if the login link is opened with the same machine the server is being ran on**. You also have to repeat this process each time you start the server or reload the plugin.
 
 4. Set up permissions for:
     - linking/reloading (`chatpointsttv.manage`).
@@ -45,9 +45,10 @@ These are the only official download mirrors. Any downloads besides of these lin
 ## **config.yml docs**
 To reset the original configuration, delete `config.yml` and reload the plugin. The file will regenerate automatically.  
 *Sections with a (\*) are required to be changed in order to the plugin to be used.*
-* **Channel Username***: The channel that will be listened for rewards, bits and subs.  
+* **Channel Username***: The channel(s) that will be listened for rewards, bits and subs. (In case of multiple channels, they must be added as a list: `["channel_1", "channel_2", "..."]`)  
 * **Custom Client ID**: Client ID used for key-based authorization. Leave commented if it's not being used.  
 * **Custom Access Token**: Access token used for key-based authorization. Leave commented if it's not being used.  
+* **Ignore Offline Events**: If enabled, events from offline streamers will be ignored.  
 * **Show Chat**: If enabled, your stream chat will be shown in-game to all players in the server.  
 * **Chat Blacklist**: List of usernames of chat bots and other users that will be ignored for the in-game stream chat.
 * **Channel Point Rewards***: A list containing all **channel point rewards** that you want an action set up. See [Reward Actions](#reward-actions) for more information.  
@@ -62,8 +63,8 @@ A list containing all **subscription gifts rewards** that you want an action set
 You need to follow this format: `AMOUNT: {ACTION}`, replacing `AMOUNT` with the minimal ammount of subscriptions that will be needed to be gifted in order to trigger the event and `{ACTION}` with the desired action to run.
 * **Mob Glow**: Whether the spawned mobs should have a glowing effect (highlighted and visible through blocks).
 * **Display Name on Mob**: Whether the spawned mobs should have the name of the user who triggered the action.
-* **Log Event**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
-* **Show In-game Alerts**: Determines whether subscribed events should show an in-game title message.
+* **Log Events**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
+* **In-game Alerts Mode***: How will the game notify of an event. Valid options: `chat`, `title`, `all`, `none`. Choosing `none`  will disable In-game alerts.
 * **Reward Name Bold**: Determines whether the reward name is displayed in bold letters in the title banner to people with the `chatpointsttv.broadcast` permission.
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
 You can leave this section unmodified, as there are default colors set up in the original file
@@ -87,9 +88,9 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 ## Reward Actions
 Currently, there are 2 types of actions:
 - Spawning entities  
-    **Format**: `SPAWN <ENTITY NAME> [AMOUNT]`  
+    **Format**: `SPAWN <ENTITY NAME> [AMOUNT] [TARGET USER]`  
     **Example**: `SPAWN CREEPER 2`  
-    *This action will spawn the menctioned entities for each player that is set up as a target (with the `chatpointsttv.target` permission). The example action will spawn 2 Creepers on each player's location.*  
+    *This action will spawn an entity for each player that has the `chatpointsttv.target` permission or a specific player (when the `[TARGET USER] field is used`). The example action will spawn 2 Creepers on each player's location.*  
     
 - Running commands  
     **Format**: `RUN <TARGET / CONSOLE> <COMMAND>`  
@@ -97,12 +98,12 @@ Currently, there are 2 types of actions:
     *This action will run the command as the console a single time, or as each player once. Command arguments are allowed. The example action will substract each player a heart from their health.*  
 
 - Giving Items  
-    **Format**: `GIVE <ITEM> [AMOUNT]`
+    **Format**: `GIVE <ITEM> [AMOUNT]`  
     **Example**: `GIVE DIAMOND 1`
-    *This action will give the stablished amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
+    *This action will give the established amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
 
 - Explosions
-    **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`
+    **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`  
     **Example**: `TNT 1 0`
     *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*  
 
@@ -110,7 +111,7 @@ Currently, there are 2 types of actions:
 > Argument names surrounded by <> means that it is a required argument.
 > Arguments surrounded by [] are optional.
 
-You should set up your events in your config file with this format:
+You should set up your events in your config file following this format:
 ```
 TYPE_REWARDS:
     - KEY:
@@ -118,9 +119,26 @@ TYPE_REWARDS:
         - Action 2
         - ...
 ```
+or
+```
+TYPE_REWARDS:
+    - KEY:
+        - STREAMER:
+            - Action 1
+            - Action 2
+            - ...
+
+        - default:
+            - Action
+```
 Whereas `TYPE_REWARDS` is replaces with the appropiate config key that is already on the file, `KEY` with the channel points reward name, subscription tier or minimal amount of bits/subs.  
 > [!IMPORTANT]  
-> **For follow events this line should be ommited.** See the placeholders on the default [config.yml](core/src/main/resources/config.yml).
+> **You should omit the `KEY` section to add follow rewards** and go straight to the actions. See placeholders on the default [config.yml](core/src/main/resources/config.yml#L41).
+
+> [!TIP]
+> You can now target multiple channels. If you do so, you can target some events to a specific channel following the second format. You can still follow the first example if you don't aim to target specific channels. 
+
+You can also use the `{USER}` and `{TEXT}` fields to use data from your events inside of your actions. `{USER}` will be replaced with the chatter's username. `{TEXT}` will be replaced with the text input of the Channel Points Reward.
 
 ## Twitch Scopes
 The latest version of the plugin needs the following scopes to function propertly:  
@@ -129,8 +147,8 @@ The latest version of the plugin needs the following scopes to function propertl
 * `moderator:read:followers`: Needed to be able to listen for follows.
 * `bits:read`: Needed to listen for cheers.
 * `channel:read:subscriptions`: Needed to listen for subscriptions and gifts.
-* `user:read:chat`: Needed to use Twitch EventSub API.
-* `chat:read`: Needed to show your stream chat in-game.
+* `chat:read` and `user:read:chat`: Needed to show your stream chat in-game and use EventSub API.
+* `user:bot` and `channel:bot`: Joins a stream chat to listen for subs.
 
 ## Permissions
 - TARGET  

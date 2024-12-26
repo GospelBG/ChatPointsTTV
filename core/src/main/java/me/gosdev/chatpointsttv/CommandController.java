@@ -1,6 +1,8 @@
 package me.gosdev.chatpointsttv;
 
 import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Utils.Utils;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -9,6 +11,7 @@ import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 
 public class CommandController implements TabExecutor {
+    Utils utils = ChatPointsTTV.getUtils();
     private BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
@@ -40,13 +44,13 @@ public class CommandController implements TabExecutor {
             switch (args[0]) {
                 case "link":
                     if (plugin.isAccountConnected()) {
-                        sender.sendMessage("There is an account connected already!\nUnlink your account before linking another one.");
+                        utils.sendMessage(sender, new TextComponent("There is an account connected already!\nUnlink it before using another one."));
                         break;
                     }
                     if (ChatPointsTTV.configOk) {
                         link(plugin, sender, args.length == 2 ? args[1] : "default");
                     } else {
-                        sender.sendMessage("Invalid configuration. Please check your config file.");
+                        utils.sendMessage(sender, new TextComponent("Invalid configuration. Please check your config file."));
                         break;
                     }
                     
@@ -64,7 +68,7 @@ public class CommandController implements TabExecutor {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
                             plugin.linkThread.join();
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException | NullPointerException e) {}
                         
                         plugin.unlink(sender);
                     });
@@ -75,14 +79,14 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
+                    utils.sendMessage(sender, new TextComponent(ChatColor.RED + "Unknown command: /twitch " + args[0]));
                     help(sender);
                     return true;
             }
         }
 
         // If the sender (or console) uses our command correct, we can return true
-        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please edit the config.yml file and reload the plugin.");
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please set it up correctly and reload the plugin.");
         return true;
     }
 
@@ -115,7 +119,7 @@ public class CommandController implements TabExecutor {
         else if (method.equals("default")) {
             ChatPointsTTV.customCredentials = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
         } else {
-            ChatPointsTTV.getUtils().sendMessage(p, new ComponentBuilder(ChatColor.RED + "Unknown command: /twitch link " + method).create()[0]);
+            utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
             help(p);
             return;
         }
@@ -148,20 +152,30 @@ public class CommandController implements TabExecutor {
     }
 
     private void help(CommandSender p) {
-        ChatPointsTTV.getUtils().sendMessage(p, helpMsg);
+        utils.sendMessage(p, helpMsg);
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
+        List<Channel> channels = plugin.getListenedChannels();
+        String strChannels = "";
+
+        for (Channel channel : channels) {
+            ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
+            strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
+        }
+
+        strChannels = strChannels.substring(0, strChannels.length() - 2); // Remove last comma
+
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + plugin.getConnectedUsername() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened channel: " + ChatColor.RESET + plugin.getListenedChannel() + "\n" + 
+            ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" + 
             "\n" +
             ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
         );
 
         ComponentBuilder formatted = new ComponentBuilder(msg);
-        ChatPointsTTV.getUtils().sendMessage(p, formatted.create()[0]);
+        utils.sendMessage(p, formatted.create()[0]);
     }
 }
