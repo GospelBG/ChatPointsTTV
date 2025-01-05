@@ -345,24 +345,21 @@ public class ChatPointsTTV extends JavaPlugin {
                 throw new NullPointerException("Invalid Access Token");
             }
 
-            try {
-                oauth = new OAuth2Credential(getClientID(), token);
-    
-                // Build TwitchClient
-                client = TwitchClientBuilder.builder()
-                    .withDefaultAuthToken(oauth)
-                    .withEnableChat(true)
-                    .withEnableHelix(true)
-                    .withEnablePubSub(true)
-                    .withEnableEventSocket(true)
-                    .withDefaultEventHandler(SimpleEventHandler.class)
-                    .build();        
-                
-                user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
-            } catch (Exception e) {
-                throw new RuntimeException("Twitch API Login failed. Provided credentials may be invalid.");
-            }
+
+            oauth = new OAuth2Credential(getClientID(), token);
+
+            // Build TwitchClient
+            client = TwitchClientBuilder.builder()
+                .withDefaultAuthToken(oauth)
+                .withEnableChat(true)
+                .withEnableHelix(true)
+                .withEnablePubSub(true)
+                .withEnableEventSocket(true)
+                .withDefaultEventHandler(SimpleEventHandler.class)
+                .build();        
             
+            user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
+
             utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
 
             eventHandler = new TwitchEventHandler();
@@ -505,9 +502,8 @@ public class ChatPointsTTV extends JavaPlugin {
         linkThread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
-
-                e.printStackTrace();
                 linkThread.interrupt();
+                e.printStackTrace();
                 utils.sendMessage(p, ChatColor.RED + "Account linking failed!");
                 accountConnected = true;
                 unlink(Bukkit.getConsoleSender());
