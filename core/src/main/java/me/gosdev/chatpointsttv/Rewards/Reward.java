@@ -4,6 +4,7 @@ import java.util.List;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class Reward {
     rewardType type;
@@ -16,7 +17,7 @@ public class Reward {
         this.type = type;
         this.channel = channel;
         
-        channelId = channel.equals(Rewards.EVERYONE) ? "*" : ChatPointsTTV.getPlugin().getUserId(channel);
+        channelId = channel.equals(Rewards.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
 
         this.event = event;
         this.cmds = cmds;

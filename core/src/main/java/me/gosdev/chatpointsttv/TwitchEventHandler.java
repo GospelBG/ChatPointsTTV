@@ -37,7 +37,7 @@ public class TwitchEventHandler {
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR").asBungee();
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + plugin.getUsername(event.getRedemption().getChannelId()));
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + TwitchUtils.getUsername(event.getRedemption().getChannelId()));
         if (ignoreOfflineStreamers) {
             for (Channel channel : plugin.getListenedChannels()) {
                 if (channel.getChannelId().equals(event.getRedemption().getChannelId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
@@ -208,7 +208,7 @@ public class TwitchEventHandler {
         lastRaidsIndex++;
         if (lastRaidsIndex > 5) lastRaidsIndex = 0; // Limit list to 5 entries (new raids will overwrite old ones)
 
-        String raiderName = plugin.getUsername(event.getRaid().getSourceId());
+        String raiderName = TwitchUtils.getUsername(event.getRaid().getSourceId());
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), raiderName + " has raided " + event.getRaid().getTargetDisplayName()  + " with a viewer count of " + event.getRaid().getViewerCount().toString() + "!"); 
         if (ignoreOfflineStreamers) {
             for (Channel channel : plugin.getListenedChannels()) {

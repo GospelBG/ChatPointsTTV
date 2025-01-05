@@ -52,7 +52,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import com.github.twitch4j.helix.domain.StreamList;
 import com.github.twitch4j.helix.domain.User;
-import com.github.twitch4j.helix.domain.UserList;
 import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
@@ -107,7 +106,7 @@ public class ChatPointsTTV extends JavaPlugin {
         Scopes.CHANNEL_BOT
         ).replace(":", "%3A"); // Format colon character for browser
 
-    public OAuth2Credential oauth;
+    public static OAuth2Credential oauth;
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -130,21 +129,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public static ChatPointsTTV getPlugin() {
         return plugin;
-    }
-
-    public String getUserId(String username) {
-        UserList resultList = getTwitchClient().getHelix().getUsers(oauth.getAccessToken(), null, Arrays.asList(username)).execute();
-        if (resultList.getUsers().isEmpty()) {
-            throw new NullPointerException("Couldn't fetch user: " + username);
-        }
-        return resultList.getUsers().get(0).getId();
-    }
-    public String getUsername(String userId) {
-        UserList resultList = client.getHelix().getUsers(oauth.getAccessToken(), Arrays.asList(userId), null).execute();
-        if (resultList.getUsers().isEmpty()) {
-            throw new NullPointerException("Couldn't fetch user ID: " + userId);
-        }
-        return resultList.getUsers().get(0).getDisplayName();
     }
 
     public static ITwitchClient getTwitchClient() {
@@ -512,7 +496,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
     
     public void subscribeToEvents(CommandSender p, CountDownLatch latch, String channel) {
-        String channel_id = getUserId(channel);
+        String channel_id = TwitchUtils.getUserId(channel);
 
         client.getClientHelper().enableStreamEventListener(channel);
         
