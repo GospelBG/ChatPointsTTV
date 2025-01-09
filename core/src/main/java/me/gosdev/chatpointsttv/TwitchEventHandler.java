@@ -224,7 +224,7 @@ public class TwitchEventHandler {
 
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getRaid().getTargetId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
-            if (amount < Integer.parseInt(reward.getEvent())) continue;
+            if (amount > Integer.valueOf(reward.getEvent())) continue;
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
 
