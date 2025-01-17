@@ -202,28 +202,29 @@ public class TwitchEventHandler {
         }
     }
 
-    public void onRaid(RaidGoEvent event) {
-        if (lastRaids.contains(event.getRaid().getId())) return; // Deduplicate Raid Events
-        lastRaids.set(lastRaidsIndex, event.getRaid().getId()); // Add raid id to list to prevent event duplication
-        lastRaidsIndex++;
-        if (lastRaidsIndex > 5) lastRaidsIndex = 0; // Limit list to 5 entries (new raids will overwrite old ones)
+    public void onRaid(ChannelRaidEvent event) {
+        //if (lastRaids.contains(event.getRaid().getId())) return; // Deduplicate Raid Events
+        //lastRaids.set(lastRaidsIndex, event.getRaid().getId()); // Add raid id to list to prevent event duplication
+        //lastRaidsIndex++;
+        //if (lastRaidsIndex > 5) lastRaidsIndex = 0; // Limit list to 5 entries (new raids will overwrite old ones)
+        plugin.log.info("RAID 2"); //TODO: REMOVE
+        String raiderName = event.getFromBroadcasterUserName();
+        Integer amount = event.getViewers();
 
-        String raiderName = TwitchUtils.getUsername(event.getRaid().getSourceId());
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), raiderName + " has raided " + event.getRaid().getTargetDisplayName()  + " with a viewer count of " + event.getRaid().getViewerCount().toString() + "!"); 
-        if (ignoreOfflineStreamers) {
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), raiderName + " has raided " + event.getToBroadcasterUserName()  + " with a viewer count of " + amount + "!"); 
+        if (ignoreOfflineStreamers) { //TODO: Redo (and fix)
             for (Channel channel : plugin.getListenedChannels()) {
-                if (channel.getChannelId().equals(event.getRaid().getTargetLogin()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+                if (channel.getChannelId().equals(event.getFromBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
             }
         }
 
-        String custom_string = ChatPointsTTV.getRedemptionStrings().get("RAIDED_STRING").replace("{CHANNEL}", event.getRaid().getTargetDisplayName());
-        Integer amount = event.getRaid().getViewerCount();
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("RAIDED_STRING").replace("{CHANNEL}", event.getToBroadcasterUserName());
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.RAID);
 
         Events.showIngameAlert(raiderName, custom_string, amount.toString(), action_color, user_color, rewardBold);
 
         for (Reward reward : rewards) {
-            if (!reward.getTargetId().equals(event.getRaid().getTargetId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+            if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             if (amount > Integer.valueOf(reward.getEvent())) continue;
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);

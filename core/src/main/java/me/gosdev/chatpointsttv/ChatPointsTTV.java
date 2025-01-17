@@ -39,6 +39,7 @@ import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
+import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
@@ -423,10 +424,10 @@ public class ChatPointsTTV extends JavaPlugin {
                 });
             }
             if (Rewards.getRewards(Rewards.rewardType.RAID) != null) {
-                eventManager.onEvent(RaidGoEvent.class, new Consumer<RaidGoEvent>() { // Don't count for CountdownLatch because this is PubSub
+                eventManager.onEvent(ChannelRaidEvent.class, new Consumer<ChannelRaidEvent>() { // Don't count for CountdownLatch because this is PubSub
                     @Override
-                    public void accept(RaidGoEvent e) {
-                        try {
+                    public void accept(ChannelRaidEvent e) {
+                        try { // May get NullPointerException if event is triggered while still subscribing
                             eventHandler.onRaid(e);
                         } catch (NullPointerException ex) {}// May get NullPointerException if event is triggered while still subscribing
                         catch (Exception ex) {
@@ -522,7 +523,7 @@ public class ChatPointsTTV extends JavaPlugin {
         }
 
         if (Rewards.getRewards(Rewards.rewardType.RAID) != null) {
-            client.getPubSub().listenForRaidEvents(oauth, channel_id);
+            eventSocket.register(SubscriptionTypes.CHANNEL_RAID.prepareSubscription(b -> b.toBroadcasterUserId(channel_id).build(), null));
         }
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
         client.getChat().joinChannel(channel);
