@@ -280,13 +280,8 @@ public class CommandController implements TabExecutor {
 
         if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop(); // Stop HTTP server if it is actve
 
-        OAuth2Credential cred = plugin.isAccountConnected() ? plugin.oauth : null;
-
-        plugin.reloadConfig();
         plugin.onDisable();
         plugin.onEnable();
-
-        if (cred != null) plugin.linkToTwitch(Bukkit.getConsoleSender(), cred.getAccessToken());
     }
 
     private void help(CommandSender p) {
