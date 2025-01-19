@@ -210,7 +210,7 @@ public class TwitchEventHandler {
         Integer amount = event.getViewers();
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), raiderName + " has raided " + event.getToBroadcasterUserName()  + " with a viewer count of " + amount + "!"); 
-        if (ignoreOfflineStreamers) { //TODO: Redo (and fix)
+        if (ignoreOfflineStreamers) {
             for (Channel channel : plugin.getListenedChannels()) {
                 if (channel.getChannelId().equals(event.getFromBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
             }
