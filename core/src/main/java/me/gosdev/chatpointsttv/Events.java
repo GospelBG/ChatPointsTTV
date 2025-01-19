@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -17,8 +18,6 @@ import me.gosdev.chatpointsttv.Utils.SpawnRunnable;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-
-import org.bukkit.entity.EntityType;
 
 public class Events {
     static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -63,7 +62,7 @@ public class Events {
     }
 
     public static void runAction(String action, String args, String user) {
-        args.replace("\\{USER\\}", user);
+        args = args.replaceAll("\\{USER\\}", user);
         List<String> cmd = Arrays.asList(args.split(" "));
         switch(action.toUpperCase()) {
             case "SPAWN":
