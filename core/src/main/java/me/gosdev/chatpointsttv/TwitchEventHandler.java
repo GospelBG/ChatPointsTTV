@@ -1,25 +1,24 @@
 package me.gosdev.chatpointsttv;
 
+import java.util.ArrayList;
+
+import org.bukkit.Bukkit;
+
 import com.github.twitch4j.common.enums.SubscriptionPlan;
-import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
+import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.events.RaidGoEvent;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
-import me.gosdev.chatpointsttv.Utils.Utils;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
+import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
-
-import java.util.ArrayList;
-
-import org.bukkit.Bukkit;
 
 public class TwitchEventHandler {
     ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -126,19 +125,23 @@ public class TwitchEventHandler {
         }
     }
 
-    public void onSub(ChannelChatNotificationEvent event) {        
+    public void onSub(ChannelChatNotificationEvent event) {
         String chatter = event.getChatterUserName();
         SubscriptionPlan tier;
 
-        if (event.getNoticeType() == NoticeType.SUB) {
-            if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
-            else tier = event.getSub().getSubTier();
-        } else if (event.getNoticeType() == NoticeType.RESUB) {
-            if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
-            else tier = event.getResub().getSubTier();
-        } else {
-            plugin.log.warning("Couldn't fetch sub type!");
-            return;
+        switch (event.getNoticeType()) {
+            case SUB:
+                if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
+                else tier = event.getSub().getSubTier();
+                break;
+            case RESUB:
+                if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
+                else tier = event.getResub().getSubTier();
+                break;
+            default:
+                plugin.log.warning("Couldn't fetch sub type!");
+                return;
+            
         }
 
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getChatterUserName() + " has subscribed to " + event.getBroadcasterUserName() + " with a " + TwitchUtils.PlanToString(tier) + " sub!"); 
@@ -169,7 +172,7 @@ public class TwitchEventHandler {
         }
     }
 
-    public void onSubGift(ChannelChatNotificationEvent event) {       
+    public void onSubGift(ChannelChatNotificationEvent event) {
         String chatter = event.getChatterUserName();
         int amount = event.getCommunitySubGift().getTotal();
         String tier = TwitchUtils.PlanToString(event.getCommunitySubGift().getSubTier());
@@ -203,11 +206,6 @@ public class TwitchEventHandler {
     }
 
     public void onRaid(ChannelRaidEvent event) {
-        //if (lastRaids.contains(event.getRaid().getId())) return; // Deduplicate Raid Events
-        //lastRaids.set(lastRaidsIndex, event.getRaid().getId()); // Add raid id to list to prevent event duplication
-        //lastRaidsIndex++;
-        //if (lastRaidsIndex > 5) lastRaidsIndex = 0; // Limit list to 5 entries (new raids will overwrite old ones)
-        plugin.log.info("RAID 2"); //TODO: REMOVE
         String raiderName = event.getFromBroadcasterUserName();
         Integer amount = event.getViewers();
 
