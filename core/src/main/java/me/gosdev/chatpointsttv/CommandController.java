@@ -1,19 +1,7 @@
 package me.gosdev.chatpointsttv;
 
-import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
-import me.gosdev.chatpointsttv.Utils.Channel;
-import me.gosdev.chatpointsttv.Utils.Utils;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
-
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,6 +9,19 @@ import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
+
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.common.enums.SubscriptionPlan;
+
+import me.gosdev.chatpointsttv.Tests.TestCommand;
+import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
     Utils utils = ChatPointsTTV.getUtils();
@@ -30,6 +31,7 @@ public class CommandController implements TabExecutor {
         ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch connection.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files. You will need to link again your Twitch account.\n" + 
+        ChatColor.LIGHT_PURPLE + "/twitch test <type> <...>: " + ChatColor.RESET + "Summons a test event.\n" +         
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
     
     @Override
@@ -78,6 +80,10 @@ public class CommandController implements TabExecutor {
                     status(sender, plugin);
                     return true;
 
+                case "test":
+                    TestCommand.test(sender, args);
+                    return true;
+
                 default:
                     utils.sendMessage(sender, new TextComponent(ChatColor.RED + "Unknown command: /twitch " + args[0]));
                     help(sender);
@@ -92,24 +98,156 @@ public class CommandController implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> available = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<String>();
 
         if (args.length == 1) {
-            if (!ChatPointsTTV.getPlugin().isAccountConnected()) list.add("link");
-            else list.add("unlink");
-            list.add("reload");
-            list.add("status");
-            list.add("help");
+            if (!ChatPointsTTV.getPlugin().isAccountConnected()) available.add("link");
+            else available.add("unlink");
+            available.add("reload");
+            available.add("status");
+            if (!ChatPointsTTV.getPlugin().isAccountConnected()) available.add("test");
+            available.add("help");
 
-            return list;
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
-            list.add("key");
-            list.add("browser");
+            available.add("key");
+            available.add("browser");
 
-            return list;
+        } else if (args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
+            if (args.length == 2) {
+                available.add("channelpoints");
+                available.add("cheer");
+                available.add("sub");
+                available.add("follow");
+                available.add("subgift");
+                available.add("raid");
+            } else if (args[1].equalsIgnoreCase("channelpoints")) {
+                int rewardNameEnd = args.length - 1;
+                if (args.length >= 5 && args[4].startsWith("\"")) { // Check if the reward name starts with a quote. If so, wait to find the closing quote
+                    for (int i = 5; i < args.length; i++) {
+                        if (args[i].endsWith("\"")) {
+                            rewardNameEnd = i;
+                        }
+                    }
+                } else rewardNameEnd = 4;
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+
+                    case 4:
+                        result.add("<Redeemer Name>");
+                        break;
+
+                    case 5:
+                        result.add("<Reward Name>");
+                        break;
+                
+                    default:
+                        if (args.length > rewardNameEnd + 1) {
+                            result.add("[User Input]");
+                        } else {
+                            result.add("<Reward Name>");
+                        }
+                        break;
+                }
+                return result;
+            } else if (args[1].equalsIgnoreCase("cheer")) {
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+
+                    case 4:
+                        result.add("<Chatter Name>");
+                        break;
+
+                    case 5:
+                        result.add("<Amount>");
+                        break;
+                }
+
+                return result;
+            } else if (args[1].equalsIgnoreCase("sub")) {
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+
+                    case 4:
+                        result.add("<Chatter Name>");
+                        break;
+
+                    case 5:
+                        for (SubscriptionPlan plan : EnumSet.allOf(SubscriptionPlan.class)) {
+                            if (plan.equals(SubscriptionPlan.NONE)) continue;
+                            result.add(plan.name());
+                        }
+                        break;
+
+                    case 6:
+                        result.add("<Months>");
+                        break;
+                }
+                return result;
+            } else if (args[1].equalsIgnoreCase("follow")) {
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+                    
+                    case 4:
+                        result.add("<Chatter Name>");
+                        break;
+                }
+                return result;
+            } else if (args[1].equalsIgnoreCase("subgift")) {
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+
+                    case 4:
+                        result.add("<Chatter Name>");
+                        break;
+
+                    case 5:
+                        for (SubscriptionPlan plan : EnumSet.allOf(SubscriptionPlan.class)) {
+                            if (plan.equals(SubscriptionPlan.NONE)) continue;
+                            result.add(plan.name());
+                        }
+                        break;
+
+                    case 6:
+                        result.add("<Amount>");
+                        break;
+                }
+                return result;
+            } else if (args[1].equalsIgnoreCase("raid")) {
+                switch (args.length) {
+                    case 3:
+                        result.add("<Streamer Channel>");
+                        break;
+
+                    case 4:
+                        result.add("<Raider Name>");
+                        break;
+
+                    case 5:
+                        result.add("<Viewers>");
+                        break;
+                }
+                return result;
+            }
+        }
+            
+        for (String s : available) {
+            if (s.startsWith(args[args.length - 1])) {
+                result.add(s);
+            }
         }
 
-        return null;        
+        return result;
     }
 
     private void link(ChatPointsTTV plugin, CommandSender p, String method) {
