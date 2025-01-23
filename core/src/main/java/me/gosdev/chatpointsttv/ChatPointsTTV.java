@@ -40,6 +40,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
@@ -53,8 +54,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 import com.github.twitch4j.helix.domain.StreamList;
 import com.github.twitch4j.helix.domain.User;
-import com.github.twitch4j.pubsub.events.RaidGoEvent;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Reward;
@@ -87,6 +86,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public Thread linkThread;
 
     private String user_id;
+    
 
     public Logger log = getLogger();
     public FileConfiguration config;
@@ -95,12 +95,11 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final String scopes = Scopes.join(
-        Scopes.CHANNEL_READ_REDEMPTIONS,
+        Scopes.CHANNEL_MANAGE_REDEMPTIONS,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_MODERATED_CHANNELS,
         Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
-        Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_CHAT,
         Scopes.CHAT_READ,
         Scopes.USER_BOT,
@@ -376,9 +375,9 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
             });            
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-                eventManager.onEvent(RewardRedeemedEvent.class, new Consumer<RewardRedeemedEvent>() {
+                eventManager.onEvent(CustomRewardRedemptionAddEvent.class, new Consumer<CustomRewardRedemptionAddEvent>() {
                     @Override
-                    public void accept(RewardRedeemedEvent e) {
+                    public void accept(CustomRewardRedemptionAddEvent e) {
                         eventHandler.onChannelPointsRedemption(e);
                     }
                 });
@@ -501,8 +500,8 @@ public class ChatPointsTTV extends JavaPlugin {
 
         client.getClientHelper().enableStreamEventListener(channel);
         
-        if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-            client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
+        if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) { //TODO: Fix API issues with EventSub Channel Points
+            //eventSocket.register(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
         if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
@@ -512,7 +511,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 log.warning(channel + ": Follow events cannot be listened to on unauthorised channels.");
                 latch.countDown();
             }
-        } 
+        }
 
         if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.broadcasterUserId(channel_id).userId(user_id).build(), null));

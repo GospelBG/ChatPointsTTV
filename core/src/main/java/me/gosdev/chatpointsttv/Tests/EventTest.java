@@ -17,8 +17,6 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class EventTest {
-    
-    
     @SuppressWarnings("deprecation")
     public static RewardRedeemedEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) { //TODO: Move away from PubSub
         ChannelPointsRedemption redemption = new ChannelPointsRedemption();

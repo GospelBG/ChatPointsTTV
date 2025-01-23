@@ -9,8 +9,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
-import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
@@ -25,31 +24,25 @@ public class TwitchEventHandler {
     Utils utils = ChatPointsTTV.getUtils();
 
     public static Boolean rewardBold;
-    private static ArrayList<String> lastRaids = new ArrayList<>();
-    private int lastRaidsIndex = 0;
-    Boolean listenForCheers = !plugin.config.getConfigurationSection("CHEER_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForSubs = !plugin.config.getConfigurationSection("SUB_REWARDS").getKeys(true).isEmpty();
-    Boolean listenForGifts = !plugin.config.getConfigurationSection("GIFT_REWARDS").getKeys(true).isEmpty();
     Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
     Boolean ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR").asBungee();
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR").asBungee();
 
-    public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + TwitchUtils.getUsername(event.getRedemption().getChannelId()));
+    public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " has redeemed " + event.getReward().getTitle() + " in " + (event.getBroadcasterUserName()));
         if (ignoreOfflineStreamers) {
             for (Channel channel : plugin.getListenedChannels()) {
-                if (channel.getChannelId().equals(event.getRedemption().getChannelId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
             }
         }
-        ChannelPointsRedemption redemption = event.getRedemption();
 
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
-            if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
-            if (!reward.getTargetId().equals(redemption.getChannelId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+            if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-            Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
+            Events.showIngameAlert(event.getUserName(), custom_string, event.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
 
@@ -58,7 +51,7 @@ public class TwitchEventHandler {
                     continue;
                 }
 
-                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()), redemption.getUser().getDisplayName());
+                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", event.getUserInput()), event.getUserName());
             }
             return;
         }
