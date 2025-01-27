@@ -42,7 +42,7 @@ body:
         - Spigot
         - Paper
         - Bukkit
-        - Other (please specify)
+        - Other (please specify in your report)
     validations:
       required: true
   - type: input
