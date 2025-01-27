@@ -17,13 +17,15 @@ import net.md_5.bungee.api.chat.HoverEvent;
 
 public class ImplicitGrantFlow {
     private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+    private static final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
-    private final static String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + ChatPointsTTV.getClientID() + "&redirect_uri=http://localhost:3000&scope="+plugin.scopes;
 
     static Utils utils = ChatPointsTTV.getUtils();
 
-    public static CompletableFuture<String> getAccessToken(CommandSender p) {
+    public static CompletableFuture<String> getAccessToken(CommandSender p, String clientID) {
         CompletableFuture<String> future = new CompletableFuture<>();
+        String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + clientID + "&redirect_uri=http://localhost:3000&scope=" + plugin.scopes;
+
         server = new AuthenticationCallbackServer(3000);
         if (ChatPointsTTV.getTwitchClient() != null) {
             ChatPointsTTV.getTwitchClient().close();

@@ -252,26 +252,26 @@ public class CommandController implements TabExecutor {
 
     private void link(ChatPointsTTV plugin, CommandSender p, String method) {
 
-        if (method.equalsIgnoreCase("browser"))  ChatPointsTTV.customCredentials = false;
-        else if (method.equalsIgnoreCase("key")) ChatPointsTTV.customCredentials = true;
+        if (method.equalsIgnoreCase("browser"))  ChatPointsTTV.customCredentialsFound = false;
+        else if (method.equalsIgnoreCase("key")) ChatPointsTTV.customCredentialsFound = true;
         else if (method.equals("default")) {
-            ChatPointsTTV.customCredentials = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
+            ChatPointsTTV.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
         } else {
             utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
             help(p);
             return;
         }
-        if (ChatPointsTTV.customCredentials) {
+        if (ChatPointsTTV.customCredentialsFound) {
             // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            plugin.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
+            plugin.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         } else {
-            CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p);
+            CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p, ChatPointsTTV.getClientID());
             future.thenAccept(token -> {
-                plugin.linkToTwitch(p, token);
+                plugin.linkToTwitch(p, ChatPointsTTV.getClientID(), token);
             });
         }
         plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
-            return ChatPointsTTV.customCredentials ? "OAuth Keys" : "Browser Login";
+            return ChatPointsTTV.customCredentialsFound ? "OAuth Keys" : "Browser Login";
         }));
     }
 

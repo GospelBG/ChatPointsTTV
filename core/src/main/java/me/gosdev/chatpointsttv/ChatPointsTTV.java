@@ -77,7 +77,8 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private static Map<String, ChatColor> colors = new HashMap<String, org.bukkit.ChatColor>();
     private static Map<String, String> titleStrings = new HashMap<String, String>();
-    public static Boolean customCredentials = false;
+    public static Boolean customCredentialsFound = false;
+    public static Boolean usingCustomOauth = false;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
     public static alert_mode alertMode;
@@ -236,7 +237,7 @@ public class ChatPointsTTV extends JavaPlugin {
             }
 
 
-        if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentials = true;
+            if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentialsFound = true;
 
         config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
             colors.put(i, org.bukkit.ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
@@ -269,12 +270,12 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         VersionCheck.check();
 
-        if(customCredentials && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
+        if(customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
             metrics.addCustomChart(new SimplePie("authentication_method", () -> {
                 return "Twitch Auto-Link (Key)";
             }));
             
-            linkToTwitch(Bukkit.getConsoleSender(), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
+            linkToTwitch(Bukkit.getConsoleSender(), config.getString("CUSTOM_CLIENT_ID") , config.getString("CUSTOM_ACCESS_TOKEN"));
         }
 
         pm.registerEvents(new Listener() {
@@ -318,19 +319,18 @@ public class ChatPointsTTV extends JavaPlugin {
         HandlerList.unregisterAll(this);
     }
 
-    public void linkToTwitch(CommandSender p, String token) {
+    public void linkToTwitch(CommandSender p, String clientID, String token) {
         linkThread = new Thread(() -> {
-            utils.sendMessage(p, "Logging in...");
-
-            if(getClientID() == null || getClientID().isEmpty()) {
+            if(clientID == null || clientID.isEmpty()) {
                 throw new NullPointerException("Invalid Client ID");
             }
             if (token == null || token.isEmpty()) {
                 throw new NullPointerException("Invalid Access Token");
             }
 
+            utils.sendMessage(p, "Logging in...");
 
-            oauth = new OAuth2Credential(getClientID(), token);
+            oauth = new OAuth2Credential(clientID, token);
 
             // Build TwitchClient
             client = TwitchClientBuilder.builder()
