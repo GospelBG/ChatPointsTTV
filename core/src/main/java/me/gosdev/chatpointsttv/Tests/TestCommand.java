@@ -94,12 +94,15 @@ public class TestCommand {
                     return;
                 }
 
+                try {
                 String cheerChannel = args.get(2);
                 String cheerUser = args.get(3);
                 int cheerAmount = Integer.parseInt(args.get(4));
 
-                try {
-                    eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
+                eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
+                } catch (NumberFormatException e) {
+                    log.info(ChatColor.RED + "Invalid cheer amount: " + args.get(4));
+                    return;
                 } catch (NullPointerException e) {
                     log.info(ChatColor.RED + e.getMessage());
                     return;
