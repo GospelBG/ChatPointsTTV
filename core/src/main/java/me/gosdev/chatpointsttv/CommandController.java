@@ -15,7 +15,8 @@ import org.bukkit.command.TabExecutor;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.Tests.TestCommand;
-import me.gosdev.chatpointsttv.TwitchAuth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -44,7 +45,7 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    if (plugin.isAccountConnected()) {
+                    if (plugin.getTwitch().isAccountConnected()) {
                         utils.sendMessage(sender, new TextComponent("There is an account connected already!\nUnlink it before using another one."));
                         break;
                     }
@@ -68,10 +69,10 @@ public class CommandController implements TabExecutor {
                 case "unlink":
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
-                            plugin.linkThread.join();
+                            plugin.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        plugin.unlink(sender);
+                        plugin.getTwitch().unlink(sender);
                     });
                     return true;
                     
@@ -80,7 +81,7 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "test":
-                    if (!plugin.isAccountConnected()) {
+                    if (!plugin.getTwitch().isAccountConnected()) {
                         utils.sendMessage(sender, new TextComponent(ChatColor.RED + "You need to link your account first."));
                         return true;
                     }
@@ -104,11 +105,11 @@ public class CommandController implements TabExecutor {
         ArrayList<String> result = new ArrayList<>();
 
         if (args.length == 1) {
-            if (!ChatPointsTTV.getPlugin().isAccountConnected()) available.add("link");
+            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("link");
             else available.add("unlink");
             available.add("reload");
             available.add("status");
-            if (!ChatPointsTTV.getPlugin().isAccountConnected()) available.add("test");
+            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("test");
             available.add("help");
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
@@ -253,29 +254,29 @@ public class CommandController implements TabExecutor {
     }
 
     private void link(ChatPointsTTV plugin, CommandSender p, String method) {
-
-        if (method.equalsIgnoreCase("browser"))  ChatPointsTTV.customCredentialsFound = false;
-        else if (method.equalsIgnoreCase("key")) ChatPointsTTV.customCredentialsFound = true;
+        TwitchClient twitch = plugin.getTwitch();
+        if (method.equalsIgnoreCase("browser"))  twitch.customCredentialsFound = false;
+        else if (method.equalsIgnoreCase("key")) twitch.customCredentialsFound = true;
         else if (method.equals("default")) {
-            ChatPointsTTV.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
+            twitch.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
         } else {
             utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
             help(p);
             return;
         }
-        if (ChatPointsTTV.customCredentialsFound) {
+        if (twitch.customCredentialsFound) {
             // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            plugin.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
+            twitch.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         } else {
             if (!ImplicitGrantFlow.server.isRunning()) {
-                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p, ChatPointsTTV.getClientID());
+                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(plugin, p, TwitchClient.getClientID());
                 future.thenAccept(token -> {
-                    plugin.linkToTwitch(p, ChatPointsTTV.getClientID(), token);
+                    twitch.linkToTwitch(p, TwitchClient.getClientID(), token);
                 });
             }
         }
         plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
-            return ChatPointsTTV.customCredentialsFound ? "OAuth Keys" : "Browser Login";
+            return twitch.customCredentialsFound ? "OAuth Keys" : "Browser Login";
         }));
     }
 
@@ -293,10 +294,10 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
-        List<Channel> channels = plugin.getListenedChannels();
+        TwitchClient twitch = plugin.getTwitch();
         String strChannels = "";
 
-        for (Channel channel : channels) {
+        for (Channel channel : twitch.getListenedChannels()) {
             ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
             strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }
@@ -306,10 +307,10 @@ public class CommandController implements TabExecutor {
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + plugin.getConnectedUsername() + "\n" +
+            ChatColor.LIGHT_PURPLE + "Connected account: " + ChatColor.RESET + twitch.getConnectedUsername() + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" + 
             "\n" +
-            ChatColor.LIGHT_PURPLE + "Connection status: " + (plugin.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
+            ChatColor.LIGHT_PURPLE + "Connection status: " + (twitch.isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")
         );
 
         ComponentBuilder formatted = new ComponentBuilder(msg);

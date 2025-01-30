@@ -1,7 +1,11 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.Auth;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.URL;
 
 import me.gosdev.chatpointsttv.Utils.Scopes;
 

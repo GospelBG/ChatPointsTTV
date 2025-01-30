@@ -13,7 +13,7 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
-    private static final EventManager eventManager = ChatPointsTTV.getClient().getEventManager();
+    private static final EventManager eventManager = ChatPointsTTV.getPlugin().getTwitch().getClient().getEventManager();
     private static final Logger log = ChatPointsTTV.getPlugin().log;
 
     public static void test(CommandSender sender, String[] cmdInput) {

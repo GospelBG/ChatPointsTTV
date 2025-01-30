@@ -11,6 +11,7 @@ import com.github.twitch4j.helix.domain.UserList;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 
 public class TwitchUtils {
     public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
@@ -18,7 +19,7 @@ public class TwitchUtils {
         List<String> modsOutput = new ArrayList<>();
 
         do {
-            ModeratedChannelList moderatorList = ChatPointsTTV.getClient().getHelix().getModeratedChannels(
+            ModeratedChannelList moderatorList = ChatPointsTTV.getTwitch().getClient().getHelix().getModeratedChannels(
                     auth,
                     userId,
                     100,
@@ -62,14 +63,14 @@ public class TwitchUtils {
         }
     }
     public static String getUserId(String username) {
-        UserList resultList = ChatPointsTTV.getClient().getHelix().getUsers(ChatPointsTTV.oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+        UserList resultList = ChatPointsTTV.getTwitch().getClient().getHelix().getUsers(TwitchClient.oauth.getAccessToken(), null, Arrays.asList(username)).execute();
         if (resultList.getUsers().isEmpty()) {
             throw new NullPointerException("Couldn't fetch user: " + username);
         }
         return resultList.getUsers().get(0).getId();
     }
     public static String getUsername(String userId) {
-        UserList resultList = ChatPointsTTV.getClient().getHelix().getUsers(ChatPointsTTV.oauth.getAccessToken(), Arrays.asList(userId), null).execute();
+        UserList resultList = ChatPointsTTV.getTwitch().getClient().getHelix().getUsers(TwitchClient.oauth.getAccessToken(), Arrays.asList(userId), null).execute();
         if (resultList.getUsers().isEmpty()) {
             throw new NullPointerException("Couldn't fetch user ID: " + userId);
         }
