@@ -10,13 +10,12 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class ImplicitGrantFlow {
-    private static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private static final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
 
@@ -43,28 +42,22 @@ public class ImplicitGrantFlow {
             utils.sendMessage(p, new BaseComponent[]{new ComponentBuilder(msg + "\n").create()[0], btn});
         }
         
-        int serverCloseId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                server.stop();
-            }
-        }, 6000L);// 60 L == 3 sec, 20 ticks == 1 sec
+        int serverCloseId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            server.stop();
+        }, 6000L); // 60 L == 3 sec, 20 ticks == 1 sec
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (!server.isRunning()) {
-                        server.start();
-                    }
-                    if(server.getAccessToken() != null) {;
-                        server.stop();
-                        Bukkit.getScheduler().cancelTask(serverCloseId);
-                        future.complete(server.getAccessToken());
-                    }
-                } catch(IOException e) {
-                    e.getMessage();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            try {
+                if (!server.isRunning()) {
+                    server.start();
                 }
+                if(server.getAccessToken() != null) {
+                    server.stop();
+                    Bukkit.getScheduler().cancelTask(serverCloseId);
+                    future.complete(server.getAccessToken());
+                }
+            } catch(IOException e) {
+                plugin.log.warning(e.getMessage());
             }
         });
         return future;

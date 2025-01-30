@@ -12,7 +12,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.Tests.TestCommand;
@@ -25,7 +24,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
     Utils utils = ChatPointsTTV.getUtils();
-    private BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link [method]: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink: " + ChatColor.RESET + "Use this command to unlink your account and disable the plugin.\n" +
@@ -81,6 +80,10 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "test":
+                    if (!plugin.isAccountConnected()) {
+                        utils.sendMessage(sender, new TextComponent(ChatColor.RED + "You need to link your account first."));
+                        return true;
+                    }
                     TestCommand.test(sender, args);
                     return true;
 
@@ -91,7 +94,6 @@ public class CommandController implements TabExecutor {
             }
         }
 
-        // If the sender (or console) uses our command correct, we can return true
         if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please set it up correctly and reload the plugin.");
         return true;
     }
@@ -99,7 +101,7 @@ public class CommandController implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
         ArrayList<String> available = new ArrayList<>();
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
 
         if (args.length == 1) {
             if (!ChatPointsTTV.getPlugin().isAccountConnected()) available.add("link");
@@ -265,10 +267,12 @@ public class CommandController implements TabExecutor {
             // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
             plugin.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
         } else {
-            CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p, ChatPointsTTV.getClientID());
-            future.thenAccept(token -> {
-                plugin.linkToTwitch(p, ChatPointsTTV.getClientID(), token);
-            });
+            if (!ImplicitGrantFlow.server.isRunning()) {
+                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(p, ChatPointsTTV.getClientID());
+                future.thenAccept(token -> {
+                    plugin.linkToTwitch(p, ChatPointsTTV.getClientID(), token);
+                });
+            }
         }
         plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
             return ChatPointsTTV.customCredentialsFound ? "OAuth Keys" : "Browser Login";
