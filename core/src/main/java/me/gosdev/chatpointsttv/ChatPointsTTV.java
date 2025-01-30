@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
+import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -110,6 +111,11 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+
+        log.info("Loading ChatPointsTTV v" + getDescription().getVersion());
+
+        LibraryLoader.LoadLibraries(plugin);
+
         PluginManager pm = Bukkit.getServer().getPluginManager();
         metrics = new Metrics(this, 22873);
 

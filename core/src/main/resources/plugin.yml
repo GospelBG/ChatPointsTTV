@@ -4,10 +4,6 @@ author: GospelDev
 website: ${project.url}
 main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
 api-version: '1.13'
-libraries:
-  - com.github.twitch4j:twitch4j:1.23.0
-  - com.github.philippheuer.events4j:events4j-handler-simple:0.12.2
-  - org.json:json:20240303
 
 commands:
   twitch:
