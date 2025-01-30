@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import javax.naming.ConfigurationException;
 
 import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,6 +23,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -111,8 +111,7 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-
-        log.info("Loading ChatPointsTTV v" + getDescription().getVersion());
+        twitch = new TwitchClient();
 
         LibraryLoader.LoadLibraries(plugin);
 
@@ -120,12 +119,12 @@ public class ChatPointsTTV extends JavaPlugin {
         metrics = new Metrics(this, 22873);
 
         utils = getUtils();
+        
+        // Get the latest config after saving the default if missing
+        this.saveDefaultConfig();
+        config = getConfig();
 
         try {
-            // Get the latest config after saving the default if missing
-            this.saveDefaultConfig();
-            config = getConfig();
-
             config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
                 colors.put(i, org.bukkit.ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
             });
@@ -140,8 +139,8 @@ public class ChatPointsTTV extends JavaPlugin {
             alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
             nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
-            twitch = new TwitchClient(); // Initialize the TwitchClient if the config is valid
-        } catch (Exception e) {
+            twitch.enableTwitch();
+        } catch (ConfigurationException e) {
             configOk = false;
             log.warning("An error occurred while reading config.yml");
         }
@@ -157,19 +156,6 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
         VersionCheck.check();
-
-        if(twitch.customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
-            metrics.addCustomChart(new SimplePie("authentication_method", () -> {
-                return "Twitch Auto-Link (Key)";
-            }));
-            try {
-                twitch.enableTwitch();
-            } catch (ConfigurationException e) {
-                log.warning(e.getMessage());
-                configOk = false;
-            }
-            twitch.linkToTwitch(Bukkit.getConsoleSender(), config.getString("CUSTOM_CLIENT_ID") , config.getString("CUSTOM_ACCESS_TOKEN"));
-        }
 
         pm.registerEvents(new Listener() {
             @EventHandler

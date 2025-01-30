@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import javax.naming.ConfigurationException;
 
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -40,7 +41,6 @@ import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
-import me.gosdev.chatpointsttv.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
@@ -51,25 +51,26 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchClient {
-    private static ITwitchClient client;
-    private static ArrayList<Channel> channels;
-    private User user;
-    private String user_id;
-    private static TwitchEventHandler eventHandler;
-    private static IEventSubSocket eventSocket;
     public Thread linkThread;
-
-    private List<String> chatBlacklist;
     public Boolean customCredentialsFound = false;
     public static Boolean usingCustomOauth = false;
-    public Boolean accountConnected = false;
-    private static EventManager eventManager;
+    public static Boolean accountConnected = false;
+    public static OAuth2Credential oauth;
 
+    private User user;
+    private String user_id;
+    private List<String> chatBlacklist;
+
+    private static ITwitchClient client;
+    private static ArrayList<Channel> channels;
+    private static TwitchEventHandler eventHandler;
+    private static IEventSubSocket eventSocket;
+    private static EventManager eventManager;
+    
     private final Utils utils = ChatPointsTTV.getUtils();
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private final Logger log = plugin.log;
     private final FileConfiguration config = plugin.getConfig();
-
 
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static String scopes = Scopes.join(
@@ -85,34 +86,23 @@ public class TwitchClient {
         Scopes.CHANNEL_BOT
         ).replace(":", "%3A"); // Format colon character for browser
 
-        public static String getClientID() {
-            return usingCustomOauth ? ChatPointsTTV.getPlugin().getConfig().getString("CUSTOM_CLIENT_ID") : ClientID;
-        }
+    public static String getClientID() {
+        return usingCustomOauth ? ChatPointsTTV.getPlugin().getConfig().getString("CUSTOM_CLIENT_ID") : ClientID;
+    }
     
-        public Boolean isAccountConnected() {
-            return accountConnected;
-        }
-        public ITwitchClient getClient() {
-            return client;
-        }
-        
-
-    public static OAuth2Credential oauth;
+    public Boolean isAccountConnected() {
+        return accountConnected;
+    }
+    public ITwitchClient getClient() {
+        return client;
+    }
 
     public String getConnectedUsername() {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
+
     public List<Channel> getListenedChannels() {
-        boolean needRefresh = false;
-        if (channels != null) {
-            for (int i = 0; i < channels.size(); i++) {
-                if (channels.get(i).getChannelId() == null) needRefresh = true;
-            }
-        }
-
-        if (channels == null || channels.isEmpty()) needRefresh = true;
-
-        if (needRefresh) {
+        if (channels == null && channels.isEmpty()) {
             channels = new ArrayList<>();
             List<String> usernames = new ArrayList<>();
             if (plugin.config.getStringList("CHANNEL_USERNAME") != null)  {
@@ -133,13 +123,29 @@ public class TwitchClient {
                     channels.add(new Channel(name, null, false)); // If unable to check live status
                 }
             }
-            return channels;
         }
         return channels;
     }
 
+    public void enableTwitch() throws ConfigurationException {
+        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
+            throw new ConfigurationException("Cannot read channel. Config file may be not set up or invalid.");
+        }
 
-        public void linkToTwitch(CommandSender p, String clientID, String token) {
+        if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentialsFound = true;
+            
+        chatBlacklist = config.getStringList("CHAT_BLACKLIST");
+
+        if(customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
+            plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
+                return "Twitch Auto-Link (Key)";
+            }));
+
+            linkToTwitch(Bukkit.getConsoleSender(), config.getString("CUSTOM_CLIENT_ID") , config.getString("CUSTOM_ACCESS_TOKEN"));
+        }
+    }
+
+    public void linkToTwitch(CommandSender p, String clientID, String token) {
         linkThread = new Thread(() -> {
             if(clientID == null || clientID.isEmpty()) {
                 throw new NullPointerException("Invalid Client ID");
@@ -263,6 +269,7 @@ public class TwitchClient {
             utils.sendMessage(p, "Twitch client has started successfully!");
             accountConnected = true;
         });
+
         linkThread.start();
         linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
             linkThread.interrupt();
@@ -276,12 +283,11 @@ public class TwitchClient {
     public void subscribeToEvents(CommandSender p, CountDownLatch latch, String channel) {
         String channel_id = TwitchUtils.getUserId(channel);
         utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
-
-        //client.getClientHelper().enableStreamEventListener(channel); // Idk what this does tbh
         
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
         }
+
         if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
             if (TwitchUtils.getModeratedChannelIDs(oauth.getAccessToken(), user_id).contains(channel_id) || user_id.equals(channel_id)) { // If account is the streamer or a mod (need to have mod permissions on the channel)
                 eventSocket.register(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(user_id).broadcasterUserId(channel_id).build(), null));
@@ -330,16 +336,5 @@ public class TwitchClient {
         oauth = null;
 
         utils.sendMessage(p, ChatColor.GREEN + "Account disconnected!");
-    }
-
-    public void enableTwitch() throws ConfigurationException {
-    if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
-        throw new ConfigurationException("Cannot read channel. Config file may be not set up or invalid.");
-    }
-
-
-    if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentialsFound = true;
-    chatBlacklist = config.getStringList("CHAT_BLACKLIST");
-
     }
 }
