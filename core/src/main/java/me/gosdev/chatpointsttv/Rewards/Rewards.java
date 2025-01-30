@@ -30,8 +30,7 @@ public class Rewards {
         Object config_obj = config.get(type.toString().toUpperCase() + "_REWARDS");
         ArrayList<Reward> reward_list = new ArrayList<>();
 
-        if (config_obj instanceof ArrayList) { // Should only be non-specific Follow rewards
-            if (type != rewardType.FOLLOW) return null; //TODO: ERROR MSG
+        if (config_obj instanceof ArrayList && type.equals(rewardType.FOLLOW)) { // Should only be non-specific Follow rewards
             reward_list.add(new Reward(type, EVERYONE, null, config.getStringList(type.toString().toUpperCase() + "_REWARDS")));
         } else if (config_obj instanceof  ConfigurationSection) {
             ConfigurationSection config_rewards = (ConfigurationSection) config_obj;
@@ -58,24 +57,11 @@ public class Rewards {
                 }
             }
         } else {
-            ChatPointsTTV.getPlugin().log.warning("wtf is this: " + config_obj.getClass().getName());
+            ChatPointsTTV.getPlugin().log.warning("Invalid config for " + type.toString() + " rewards");
             return null; 
-            
         }
         reward_list.sort(new RewardComparator());
         rewards.put(type, reward_list);
-
-        ChatPointsTTV.getPlugin().log.info("Rewards for " + type.toString() + ":");
-        if (rewards.get(type) != null && rewards.get(type).size() > 0) {
-            for (Reward reward : rewards.get(type)) {
-                ChatPointsTTV.getPlugin().log.info(    "Streamer: " + reward.getTargetId() + " Event: " + reward.getEvent() + " Commands: ");
-                if (reward.getCommands().size() > 0) {
-                    for (String command : reward.getCommands()) {
-                        ChatPointsTTV.getPlugin().log.info("        - " + command);
-                    }
-                }
-            }    
-        }
 
         return rewards.get(type);
     }

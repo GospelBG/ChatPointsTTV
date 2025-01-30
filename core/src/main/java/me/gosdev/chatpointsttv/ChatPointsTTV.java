@@ -102,7 +102,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_9_R1").getDeclaredConstructor().newInstance();
             }
             return utils;
-        } catch (Exception e) { //TODO: Look up exception type
+        } catch (Exception e) {
             plugin.log.warning(e.toString());
             return null;
         }
