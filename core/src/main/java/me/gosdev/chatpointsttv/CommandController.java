@@ -135,11 +135,11 @@ public class CommandController implements TabExecutor {
                 } else rewardNameEnd = 4;
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
+                        result.add("<Redeemer Name>");
                         break;
 
                     case 4:
-                        result.add("<Redeemer Name>");
+                        result.add("<Streamer Channel>");
                         break;
 
                     case 5:
@@ -158,11 +158,11 @@ public class CommandController implements TabExecutor {
             } else if (args[1].equalsIgnoreCase("cheer")) {
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
+                        result.add("<Chatter Name>");
                         break;
 
                     case 4:
-                        result.add("<Chatter Name>");
+                        result.add("<Streamer Channel>");
                         break;
 
                     case 5:
@@ -174,11 +174,11 @@ public class CommandController implements TabExecutor {
             } else if (args[1].equalsIgnoreCase("sub")) {
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
+                        result.add("<Chatter Name>");
                         break;
 
                     case 4:
-                        result.add("<Chatter Name>");
+                        result.add("<Streamer Channel>");
                         break;
 
                     case 5:
@@ -196,22 +196,22 @@ public class CommandController implements TabExecutor {
             } else if (args[1].equalsIgnoreCase("follow")) {
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
-                        break;
-                    
-                    case 4:
                         result.add("<Chatter Name>");
+                        break;
+
+                    case 4:
+                        result.add("<Streamer Channel>");
                         break;
                 }
                 return result;
             } else if (args[1].equalsIgnoreCase("subgift")) {
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 4:
                         result.add("<Chatter Name>");
+                        break;
+                    
+                    case 4:
+                        result.add("<Streamer Channel>");
                         break;
 
                     case 5:
@@ -229,11 +229,11 @@ public class CommandController implements TabExecutor {
             } else if (args[1].equalsIgnoreCase("raid")) {
                 switch (args.length) {
                     case 3:
-                        result.add("<Streamer Channel>");
+                        result.add("<Raider Name>");
                         break;
 
                     case 4:
-                        result.add("<Raider Name>");
+                        result.add("<Streamer Channel>");
                         break;
 
                     case 5:

@@ -18,7 +18,7 @@ public class TestCommand {
 
     public static void test(CommandSender sender, String[] cmdInput) {
         if (cmdInput.length < 3) {
-            sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> <args>");
+            sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> ...");
             return;
         }
 
@@ -47,12 +47,12 @@ public class TestCommand {
         switch (args.get(1).toLowerCase()) {
             case "channelpoints":
                 if (args.size() < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <channel> <redeemer> <reward> [userInput]");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
                     return;
                 }
 
-                String pointsChannel = args.get(2);
-                String pointsChatter = args.get(3);
+                String pointsChatter = args.get(2);
+                String pointsChannel = args.get(3);
                 String pointsReward = args.get(4);
                 String userInput;
 
@@ -73,12 +73,12 @@ public class TestCommand {
                 break;
             case "follow":
                 if (args.size() < 3) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <channel> <user>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
                     return;
                 }
 
-                String followChannel = args.get(2);
-                String followUser = args.get(3);
+                String followUser = args.get(2);
+                String followChannel = args.get(3);
 
                 try {
                     eventManager.publish(EventTest.FollowEvent(followChannel, followUser));
@@ -90,13 +90,13 @@ public class TestCommand {
 
             case "cheer":
                 if (args.size() < 4) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <channel> <user> <amount>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
                     return;
                 }
 
                 try {
-                String cheerChannel = args.get(2);
-                String cheerUser = args.get(3);
+                String cheerUser = args.get(2);
+                String cheerChannel = args.get(3);
                 int cheerAmount = Integer.parseInt(args.get(4));
 
                 eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
@@ -111,12 +111,12 @@ public class TestCommand {
 
             case "sub":
                 if (args.size() < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <channel> <user> <plan> <months>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                     return;
                 }
 
-                String subChannel = args.get(2);
-                String subUser = args.get(3);
+                String subUser = args.get(2);
+                String subChannel = args.get(3);
                 String subTier = args.get(4);
                 int subMonths = Integer.parseInt(args.get(5));
 
@@ -130,12 +130,12 @@ public class TestCommand {
 
             case "subgift":
                 if (args.size() < 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <channel> <user> <tier> <amount>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <tier> <amount>");
                     return;
                 }
 
-                String giftChannel = args.get(2);
-                String giftChatter = args.get(3);
+                String giftChatter = args.get(2);
+                String giftChannel = args.get(3);
                 String giftTier = args.get(4);
                 int giftAmount = Integer.parseInt(args.get(5));
 
@@ -149,12 +149,12 @@ public class TestCommand {
 
             case "raid":
                 if (args.size() < 4) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <channel> <raider> <viewer count>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
                     return;
                 }
 
-                String raidChannel = args.get(2);
-                String raidUser = args.get(3);
+                String raidUser = args.get(2);
+                String raidChannel = args.get(3);
                 int raidViewers = Integer.parseInt(args.get(4));
 
                 try {
