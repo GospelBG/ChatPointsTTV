@@ -1,6 +1,6 @@
 name: ChatPointsTTV
 version: ${project.version}
-author: GospelDev
+author: GosDev
 website: ${project.url}
 main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
 api-version: '1.13'
