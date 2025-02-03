@@ -109,9 +109,13 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     @Override
+    public void onLoad() {
+        LibraryLoader.LoadLibraries(this);
+    }
+
+    @Override
     public void onEnable() {
         plugin = this;
-        LibraryLoader.LoadLibraries(plugin);
         twitch = new TwitchClient();
 
         PluginManager pm = Bukkit.getServer().getPluginManager();

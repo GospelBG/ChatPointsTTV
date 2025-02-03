@@ -2,8 +2,6 @@ package me.gosdev.chatpointsttv.Utils;
 
 import java.util.ArrayList;
 
-import org.bukkit.ChatColor;
-
 import com.alessiodp.libby.BukkitLibraryManager;
 import com.alessiodp.libby.Library;
 import com.alessiodp.libby.logging.LogLevel;
@@ -47,7 +45,9 @@ public class LibraryLoader {
 
     public static void LoadLibraries(ChatPointsTTV plugin) {
         libraryManager = new BukkitLibraryManager(plugin);
+        libraryManager.setLogLevel(LogLevel.WARN);
         libraryManager.addMavenCentral();
+        plugin.log.info("Loading libraries...");
         for (Library lib : libraries) {
             libraryManager.loadLibrary(lib);
         }
