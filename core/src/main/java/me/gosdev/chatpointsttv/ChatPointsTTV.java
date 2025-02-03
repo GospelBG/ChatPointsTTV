@@ -111,9 +111,8 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        twitch = new TwitchClient();
-
         LibraryLoader.LoadLibraries(plugin);
+        twitch = new TwitchClient();
 
         PluginManager pm = Bukkit.getServer().getPluginManager();
         metrics = new Metrics(this, 22873);
@@ -160,7 +159,7 @@ public class ChatPointsTTV extends JavaPlugin {
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
-                if (twitch != null && !twitch.accountConnected && player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) {
+                if (twitch != null && !TwitchClient.accountConnected && player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) {
                     String msg = "Welcome! Remember to log in with your Twitch account for ChatPointsTTV to be able to connect and listen.\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "[Click here to login]").create()[0];
 

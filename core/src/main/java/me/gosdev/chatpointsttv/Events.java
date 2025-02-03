@@ -126,7 +126,7 @@ public class Events {
                             Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
                         }
                     }.runTask(plugin);
-                } else  {
+                } else if (runAs.equalsIgnoreCase("TARGET")) {
                     for (Player p : plugin.getServer().getOnlinePlayers()) {
                         if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
                             new BukkitRunnable() {
@@ -138,7 +138,10 @@ public class Events {
                             return;    
                         }
                     }
-                    log.warning("Couldn't find player " + runAs);
+                    log.warning("Couldn't find any target players!");
+                    return;
+                } else {
+                    log.warning("Invalid parameter: " + runAs);
                     return;
                 }
                 break;

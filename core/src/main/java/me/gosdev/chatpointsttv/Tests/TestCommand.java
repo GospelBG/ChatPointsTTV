@@ -62,7 +62,7 @@ public class TestCommand {
                     for (int i = 6; i < args.size(); i++) {
                         args.set(5, args.get(5) + " " + args.get(i)); // All arguments after index 4 are considered user input
                     }
-                    userInput = args.get(5);
+                    userInput = args.get(4);
                 }
                 try {
                     eventManager.publish(EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty()));

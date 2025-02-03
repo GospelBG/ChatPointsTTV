@@ -102,7 +102,7 @@ public class TwitchClient {
     }
 
     public List<Channel> getListenedChannels() {
-        if (channels == null && channels.isEmpty()) {
+        if (channels == null || channels.isEmpty()) {
             channels = new ArrayList<>();
             List<String> usernames = new ArrayList<>();
             if (plugin.config.getStringList("CHANNEL_USERNAME") != null)  {
@@ -163,9 +163,10 @@ public class TwitchClient {
                 .withDefaultAuthToken(oauth)
                 .withEnableChat(true)
                 .withEnableHelix(true)
+                .withEnablePubSub(true)
                 .withEnableEventSocket(true)
                 .withDefaultEventHandler(SimpleEventHandler.class)
-                .build();        
+                .build();
             
             user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
 
