@@ -57,6 +57,7 @@
 
   <properties>
       <revision>2.4</revision>
+      <createDependencyReducedPom>false</createDependencyReducedPom>
   </properties>
 
   <repositories>
