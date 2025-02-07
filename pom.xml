@@ -9,8 +9,9 @@
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
   <modules>
     <module>core</module>
-    <module>craftbukkit_1_12_R1</module>
-    <module>craftbukkit_1_9_R1</module>
+    <!-- temporally disable craftbukkit_x_xx_R1 modules-->
+    <!-- <module>craftbukkit_1_12_R1</module>
+    <module>craftbukkit_1_9_R1</module> -->
     <module>dist</module>
   </modules>
   <build>
@@ -41,6 +42,9 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+      </plugin>
     </plugins>
     <resources>
         <resource>
@@ -52,21 +56,52 @@
 
   <properties>
       <revision>2.4</revision>
-      <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <repositories>
-      <repository>
-          <id>spigot-repo</id>
-          <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
+      <!-- <repository>
+        <id>spigot-repo</id>
+        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+      </repository> -->
       <repository>
         <id>maven-snapshots</id>
         <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
       </repository>
+      <repository>
+        <id>maven-central</id>
+        <url>https://repo.maven.apache.org/maven2</url>
+      </repository>
+      <repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+      </repository>
+      <repository>
+        <id>papermc</id>
+        <url>https://repo.papermc.io/repository/maven-public/</url>
+    </repository>
   </repositories>
 
   <dependencies>
+    <!-- UNIT TESTING -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.11.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.seeseemelk</groupId>
+      <artifactId>MockBukkit-v1.20</artifactId>
+      <version>3.9.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>1.21.4-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.bstats</groupId>
       <artifactId>bstats-bukkit</artifactId>
@@ -96,6 +131,6 @@
       <artifactId>libby-bukkit</artifactId>
       <version>2.0.0-SNAPSHOT</version>
       <scope>compile</scope>
-  </dependency>
+    </dependency>
   </dependencies>
 </project>

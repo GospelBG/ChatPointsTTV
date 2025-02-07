@@ -3,7 +3,7 @@ version: ${project.version}
 author: GosDev
 website: ${project.url}
 main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
-api-version: '1.13'
+api-version: '1.21'
 
 commands:
   twitch:

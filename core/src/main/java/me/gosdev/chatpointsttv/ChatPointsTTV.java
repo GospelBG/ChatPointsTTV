@@ -3,8 +3,6 @@ package me.gosdev.chatpointsttv;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.naming.ConfigurationException;
 
@@ -26,6 +24,7 @@ import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import me.gosdev.chatpointsttv.Utils.Utils_1_12_R1;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -90,7 +89,8 @@ public class ChatPointsTTV extends JavaPlugin {
     private static Utils utils;
 
     public static Utils getUtils() {
-        if (utils != null) return  utils;
+        return new Utils_1_12_R1();
+        /*if (utils != null) return  utils;
         final Pattern pattern = Pattern.compile("1\\.\\d\\d?");
         final Matcher matcher = pattern.matcher(Bukkit.getVersion());
         matcher.find();
@@ -105,7 +105,7 @@ public class ChatPointsTTV extends JavaPlugin {
         } catch (Exception e) {
             plugin.log.warning(e.toString());
             return null;
-        }
+        }*/
     }
 
     @Override

@@ -186,7 +186,7 @@ public class Events {
                     if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
 
                     SpawnRunnable tntRunnable = new SpawnRunnable();
-                    tntRunnable.entity = EntityType.PRIMED_TNT;
+                    tntRunnable.entity = EntityType.TNT;
                     tntRunnable.amount = Integer.valueOf(cmd.get(0));
                     try {
                         tntRunnable.explosionTime = Integer.valueOf(cmd.get(1));

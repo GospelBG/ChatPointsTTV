@@ -21,8 +21,8 @@ public class SpawnRunnable implements Runnable {
     public void run() {
         iterations++;
         if (iterations >= amount) Bukkit.getScheduler().cancelTask(id);
-        if (entity == EntityType.PRIMED_TNT) {
-            TNTPrimed tnt = (TNTPrimed) p.getWorld().spawnEntity(p.getLocation(), EntityType.PRIMED_TNT);
+        if (entity == EntityType.TNT) {
+            TNTPrimed tnt = (TNTPrimed) p.getWorld().spawnEntity(p.getLocation(), EntityType.TNT);
             if (explosionTime != null) tnt.setFuseTicks(explosionTime);
         } else {
             Entity e = p.getWorld().spawnEntity(p.getLocation(), entity);

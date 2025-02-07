@@ -81,10 +81,6 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "test":
-                    if (!plugin.getTwitch().isAccountConnected()) {
-                        utils.sendMessage(sender, new TextComponent(ChatColor.RED + "You need to link your account first."));
-                        return true;
-                    }
                     TestCommand.test(sender, args);
                     return true;
 
