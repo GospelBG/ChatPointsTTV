@@ -44,6 +44,7 @@
       </plugin>
       <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
+          <version>3.5.2</version>
       </plugin>
     </plugins>
     <resources>
@@ -91,8 +92,8 @@
     </dependency>
     <dependency>
       <groupId>com.github.seeseemelk</groupId>
-      <artifactId>MockBukkit-v1.20</artifactId>
-      <version>3.9.0</version>
+      <artifactId>MockBukkit-v1.19</artifactId>
+      <version>3.1.0</version>
       <scope>test</scope>
     </dependency>
 
