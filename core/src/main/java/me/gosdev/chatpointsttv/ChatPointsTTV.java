@@ -72,7 +72,7 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin;
     }
 
-    public static TwitchClient getTwitch() {
+    public TwitchClient getTwitch() {
         return twitch;
     }
 

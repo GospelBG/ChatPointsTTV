@@ -26,8 +26,8 @@ public class ImplicitGrantFlow {
         String AuthURL = "https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=" + clientID + "&redirect_uri=http://localhost:3000&scope=" + TwitchClient.scopes;
 
         server = new AuthenticationCallbackServer(3000);
-        if (ChatPointsTTV.getTwitch().getClient() != null) {
-            ChatPointsTTV.getTwitch().getClient().close();
+        if (plugin.getTwitch().getClient() != null) {
+            plugin.getTwitch().getClient().close();
         }
 
         if (p == Bukkit.getServer().getConsoleSender()) {
