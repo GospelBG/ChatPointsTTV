@@ -297,7 +297,7 @@ public class CommandController implements TabExecutor {
         TwitchClient twitch = plugin.getTwitch();
         String strChannels = "";
 
-        for (Channel channel : twitch.getListenedChannels()) {
+        for (Channel channel : twitch.getListenedChannels().values()) {
             ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
             strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }

@@ -3,6 +3,7 @@ package me.gosdev.chatpointsttv.Twitch;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
@@ -53,16 +54,15 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class TwitchClient {
     public Thread linkThread;
     public Boolean customCredentialsFound = false;
+    public Boolean ignoreOfflineStreamers = false;
     public static Boolean usingCustomOauth = false;
     public static Boolean accountConnected = false;
     public static OAuth2Credential oauth;
-
     private User user;
     private String user_id;
     private List<String> chatBlacklist;
-
     private static ITwitchClient client;
-    private static ArrayList<Channel> channels;
+    private static HashMap<String, Channel> channels;
     private static TwitchEventHandler eventHandler;
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
@@ -101,9 +101,9 @@ public class TwitchClient {
         return accountConnected ? user.getLogin() : "Not Linked";
     }
 
-    public List<Channel> getListenedChannels() {
+    public HashMap<String, Channel> getListenedChannels() {
         if (channels == null || channels.isEmpty()) {
-            channels = new ArrayList<>();
+            channels = new HashMap<>();
             List<String> usernames = new ArrayList<>();
             if (plugin.config.getStringList("CHANNEL_USERNAME") != null)  {
                 usernames = plugin.config.getStringList("CHANNEL_USERNAME");
@@ -116,11 +116,11 @@ public class TwitchClient {
                     StreamList request = client.getHelix().getStreams(oauth.getAccessToken(), null, null, null, null, null, null, Arrays.asList(name)).execute();
                     String id = client.getHelix().getUsers(null, null, Arrays.asList(name)).execute().getUsers().get(0).getId();
         
-                    channels.add(new Channel(name, id, !request.getStreams().isEmpty()));
+                    channels.put(name.toLowerCase(), new Channel(name, id, !request.getStreams().isEmpty()));
                 }
             } else {
                 for (String name : usernames) {
-                    channels.add(new Channel(name, null, false)); // If unable to check live status
+                    channels.put(name.toLowerCase(), new Channel(name, null, false)); // If unable to check live status
                 }
             }
         }
@@ -135,6 +135,7 @@ public class TwitchClient {
         if (config.getString("CUSTOM_CLIENT_ID") != null || config.getString("CUSTOM_CLIENT_SECRET") != null) customCredentialsFound = true;
             
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
+        ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
 
         if(customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
             plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
@@ -183,13 +184,13 @@ public class TwitchClient {
             int subs = 0;
 
             eventManager.onEvent(ChannelGoLiveEvent.class, (ChannelGoLiveEvent e) -> {
-                for (Channel channel : getListenedChannels()) {
+                for (Channel channel : getListenedChannels().values()) {
                     if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(true);
                 }
             });
 
             eventManager.onEvent(ChannelGoOfflineEvent.class, (ChannelGoOfflineEvent e) -> {
-                for (Channel channel : getListenedChannels()) {
+                for (Channel channel : getListenedChannels().values()) {
                     if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
                 }
             });            
@@ -225,6 +226,7 @@ public class TwitchClient {
             }
             if (config.getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
+                    if (ignoreOfflineStreamers && !getListenedChannels().get(event.getChannel().getName().toLowerCase()).isLive()) return;
                     if (!chatBlacklist.contains(event.getUser().getName())) {
                         net.md_5.bungee.api.ChatColor mcColor;
                         try {
