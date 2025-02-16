@@ -23,7 +23,7 @@ public class LibraryLoader {
                 .resolveTransitiveDependencies(true)
                 .build());
 
-            // Define the main library with relocation
+            // Define the main libraries with relocations
             add(Library.builder()
                 .groupId("com{}github{}philippheuer.events4j")
                 .artifactId("events4j-handler-simple")
@@ -49,7 +49,12 @@ public class LibraryLoader {
         libraryManager.addMavenCentral();
         plugin.log.info("Loading libraries...");
         for (Library lib : libraries) {
-            libraryManager.loadLibrary(lib);
+            try {
+                libraryManager.loadLibrary(lib);
+            } catch (Exception e) {
+                plugin.log.severe("Failed to load library: " + lib.getArtifactId() + " v" + lib.getVersion() + " \n" + e.getMessage());
+            }
+            
         }
     }
 }
