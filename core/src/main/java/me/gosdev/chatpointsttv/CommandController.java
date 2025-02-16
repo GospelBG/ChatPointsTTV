@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -19,6 +18,7 @@ import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;

@@ -28,8 +28,8 @@ public class TwitchEventHandler {
 
     public static Boolean rewardBold;
     Boolean logEvents = plugin.config.getBoolean("LOG_EVENTS");
-    ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR").asBungee();
-    ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR").asBungee();
+    ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
+    ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
         if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + TwitchUtils.getUsername(event.getRedemption().getChannelId()));

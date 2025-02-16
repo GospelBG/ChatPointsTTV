@@ -10,7 +10,6 @@ import javax.naming.ConfigurationException;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +25,7 @@ import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -81,7 +81,7 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
 
-    public static Map<String, org.bukkit.ChatColor> getChatColors() {
+    public static Map<String, ChatColor> getChatColors() {
         return colors;
     }
     public static Map<String, String> getRedemptionStrings() {
@@ -129,7 +129,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
         try {
             config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
-                colors.put(i, org.bukkit.ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
+                colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
             });
 
             config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {

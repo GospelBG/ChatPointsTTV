@@ -13,7 +13,7 @@ import javax.naming.ConfigurationException;
 
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -58,6 +58,7 @@ public class TwitchClient {
     public static Boolean usingCustomOauth = false;
     public static Boolean accountConnected = false;
     public static OAuth2Credential oauth;
+    
     private User user;
     private String user_id;
     private List<String> chatBlacklist;
@@ -228,11 +229,11 @@ public class TwitchClient {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
                     if (ignoreOfflineStreamers && !getListenedChannels().get(event.getChannel().getName().toLowerCase()).isLive()) return;
                     if (!chatBlacklist.contains(event.getUser().getName())) {
-                        net.md_5.bungee.api.ChatColor mcColor;
+                        ChatColor mcColor;
                         try {
                             mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
                         } catch (Exception e) {
-                            mcColor = net.md_5.bungee.api.ChatColor.RED; 
+                            mcColor = ChatColor.RED; 
                         }
                         BaseComponent[] components = new BaseComponent[] {
                             new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],

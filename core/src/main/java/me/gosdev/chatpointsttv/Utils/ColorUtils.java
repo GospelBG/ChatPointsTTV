@@ -1,7 +1,7 @@
 package me.gosdev.chatpointsttv.Utils;
 
-import java.util.Map;
 import java.awt.Color;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
