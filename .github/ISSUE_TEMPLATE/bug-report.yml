@@ -8,7 +8,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this bug report!  
+        ⚠️ Please only make an issue for bug reports. If you're having general issues with the plugin please open a [new Discussion](https://github.com/GospelBG/ChatPointsTTV/discussions/new/choose) ⚠️  
   - type: textarea
     id: what-happened
     attributes:
@@ -49,7 +50,7 @@ body:
     id: server-version
     attributes:
       label: Server Version
-      description: What is the version of your server software (Spigot/Paper/etc)?
+      description: What is the version of your server software (i.e. Paper 1.21.4 #165)?
       placeholder: ex. #82
     validations:
       required: true
