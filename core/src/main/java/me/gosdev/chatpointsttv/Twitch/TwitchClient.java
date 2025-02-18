@@ -1,8 +1,6 @@
 package me.gosdev.chatpointsttv.Twitch;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -36,7 +34,6 @@ import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.helix.domain.StreamList;
 import com.github.twitch4j.helix.domain.User;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
@@ -103,33 +100,37 @@ public class TwitchClient {
     }
 
     public HashMap<String, Channel> getListenedChannels() {
-        if (channels == null || channels.isEmpty()) {
-            channels = new HashMap<>();
-            List<String> usernames = new ArrayList<>();
-            if (plugin.config.getStringList("CHANNEL_USERNAME") != null)  {
-                usernames = plugin.config.getStringList("CHANNEL_USERNAME");
-            } else {
-                usernames.add(plugin.config.getString("CHANNEL_USERNAME"));
-            }
-
-            if (isAccountConnected()) {
-                for (String name : usernames) {
-                    StreamList request = client.getHelix().getStreams(oauth.getAccessToken(), null, null, null, null, null, null, Arrays.asList(name)).execute();
-                    String id = client.getHelix().getUsers(null, null, Arrays.asList(name)).execute().getUsers().get(0).getId();
-        
-                    channels.put(name.toLowerCase(), new Channel(name, id, !request.getStreams().isEmpty()));
-                }
-            } else {
-                for (String name : usernames) {
-                    channels.put(name.toLowerCase(), new Channel(name, null, false)); // If unable to check live status
-                }
-            }
-        }
         return channels;
     }
 
     public void enableTwitch() throws ConfigurationException {
-        if (config.getString("CHANNEL_USERNAME") == null | config.getString("CHANNEL_USERNAME").startsWith("MemorySection[path=")) { // Invalid string (probably left default "{YOUR CHANNEL}")
+        String channel_allowedChars = "^[a-zA-Z0-9_]*$";
+        Object cfg_channel = config.get("CHANNEL_USERNAME");
+        channels = new HashMap<>();
+
+        if (cfg_channel instanceof String) {
+            if (((String) cfg_channel).isEmpty()) {
+                throw new ConfigurationException("Channel field is blank.");
+            } else if (!((String) cfg_channel).matches(channel_allowedChars)) {
+                throw new ConfigurationException("Invalid channel name: " + cfg_channel.toString());
+            } else {
+                channels.put((String) cfg_channel, null);
+            }
+        } else if (cfg_channel instanceof List) {
+            if (((List<String>) cfg_channel).isEmpty()) {
+                throw new ConfigurationException("Channel list is blank.");
+            } else {
+                for (String channel : (List<String>) cfg_channel) {
+                    if (!channel.matches(channel_allowedChars)) {
+                        throw new ConfigurationException("Invalid channel name: " + channel);
+                    } else if (channel.isEmpty()) {
+                        throw new ConfigurationException("A channel field is blank.");
+                    } else {
+                        channels.put(channel, null);
+                    }
+                }
+            }
+        } else {
             throw new ConfigurationException("Cannot read channel. Config file may be not set up or invalid.");
         }
 
@@ -173,6 +174,10 @@ public class TwitchClient {
             user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
 
             utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
+
+            for (String username : channels.keySet()) { // Populate "channels" hashmap values
+                channels.put(username, new Channel(username, TwitchUtils.getUserId(username), TwitchUtils.isLive(token, username)));
+            }
 
             eventHandler = new TwitchEventHandler();
 

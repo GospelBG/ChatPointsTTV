@@ -109,14 +109,14 @@ public class CommandController implements TabExecutor {
             else available.add("unlink");
             available.add("reload");
             available.add("status");
-            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("test");
+            if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("test");
             available.add("help");
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             available.add("key");
             available.add("browser");
 
-        } else if (args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
+        } else if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
             if (args.length == 2) {
                 available.add("channelpoints");
                 available.add("cheer");

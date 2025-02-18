@@ -7,6 +7,7 @@ import java.util.List;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.helix.domain.ModeratedChannel;
 import com.github.twitch4j.helix.domain.ModeratedChannelList;
+import com.github.twitch4j.helix.domain.StreamList;
 import com.github.twitch4j.helix.domain.UserList;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
@@ -75,5 +76,10 @@ public class TwitchUtils {
             throw new NullPointerException("Couldn't fetch user ID: " + userId);
         }
         return resultList.getUsers().get(0).getDisplayName();
+    }
+    public static boolean isLive(String accessToken, String username) {
+        StreamList request = ChatPointsTTV.getPlugin().getTwitch().getClient().getHelix().getStreams(accessToken, null, null, null, null, null, null, Arrays.asList(username)).execute();
+
+        return !request.getStreams().isEmpty();
     }
 }

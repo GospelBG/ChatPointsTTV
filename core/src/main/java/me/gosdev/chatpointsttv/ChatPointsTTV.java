@@ -116,15 +116,14 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
-        twitch = new TwitchClient();
-
         PluginManager pm = Bukkit.getServer().getPluginManager();
-        metrics = new Metrics(this, 22873);
-
         utils = getUtils();
+
+        metrics = new Metrics(this, 22873);
         
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
+        reloadConfig();
         config = getConfig();
 
         try {
@@ -142,10 +141,12 @@ public class ChatPointsTTV extends JavaPlugin {
             alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
             nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
-            twitch.enableTwitch();
+            twitch = new TwitchClient();
+            twitch.enableTwitch(); 
         } catch (ConfigurationException e) {
             configOk = false;
-            log.warning("An error occurred while reading config.yml");
+            log.warning("An error occurred while reading config.yml. (if this is the first time running the plugin, you should set it up first)");
+            log.warning(e.getExplanation());
         }
 
         cmdController = new CommandController();
@@ -178,12 +179,13 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (twitch != null) twitch.unlink(Bukkit.getConsoleSender());
+        if (twitch != null && twitch.isAccountConnected()) twitch.unlink(Bukkit.getConsoleSender());
 
         ImplicitGrantFlow.server.stop();
     
         // Erase variables
         config = null;
+        configOk = true;
         plugin = null;
         twitch = null;
 
