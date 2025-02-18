@@ -77,7 +77,6 @@ public class TwitchClient {
         Scopes.USER_READ_MODERATED_CHANNELS,
         Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
-        Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.USER_READ_CHAT,
         Scopes.CHAT_READ,
         Scopes.USER_BOT,
