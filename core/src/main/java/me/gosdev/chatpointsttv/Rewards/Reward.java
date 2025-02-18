@@ -2,16 +2,15 @@ package me.gosdev.chatpointsttv.Rewards;
 
 import java.util.List;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class Reward {
     rewardType type;
-    private String event;
-    private List<String> cmds;
-    private String channel;
-    private String channelId;
+    private final String event;
+    private final List<String> cmds;
+    private final String channel;
+    private final String channelId;
 
     public Reward (rewardType type, String channel, String event, List<String> cmds) {
         this.type = type;

@@ -30,6 +30,7 @@ public class Events {
     }
 
     public static void showIngameAlert(String user, String action, String rewardName, ChatColor titleColor, ChatColor userColor, Boolean isBold) {
+        if (ChatPointsTTV.alertMode.equals(ChatPointsTTV.alert_mode.NONE)) return;
         ComponentBuilder builder = new ComponentBuilder(user).color(userColor).bold(isBold);
         builder.append(" " + action).color(titleColor);
         builder.append(" " + rewardName).color(userColor);
@@ -54,10 +55,7 @@ public class Events {
                     utils.sendMessage(p, builder.create());
                     utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
                 }
-                break;
-                
-            default:
-                return;                
+                break;            
         }
     }
 
@@ -75,7 +73,7 @@ public class Events {
                         if (cmd.size() >= 2) { // Is specifying an amount?
                             try {
                                 entityRunnable.amount = Integer.parseInt(cmd.get(1));
-                            } catch (Exception e) {
+                            } catch (NumberFormatException e) {
                                 throw new NumberFormatException(cmd.get(1));
                             }
                         } else {
@@ -139,10 +137,8 @@ public class Events {
                         }
                     }
                     log.warning("Couldn't find any target players!");
-                    return;
                 } else {
                     log.warning("Invalid parameter: " + runAs);
-                    return;
                 }
                 break;
 
@@ -161,7 +157,7 @@ public class Events {
                         if (cmd.size() >= 2) { // Is specifying an amount?
                             try {
                                 amount = Integer.parseInt(cmd.get(1));
-                            } catch (Exception e) {
+                            } catch (NumberFormatException e) {
                                 throw new NumberFormatException(cmd.get(1));
                             }
                         } else amount = 1;
@@ -187,7 +183,7 @@ public class Events {
 
                     SpawnRunnable tntRunnable = new SpawnRunnable();
                     tntRunnable.entity = EntityType.PRIMED_TNT;
-                    tntRunnable.amount = Integer.valueOf(cmd.get(0));
+                    tntRunnable.amount = Integer.parseInt(cmd.get(0));
                     try {
                         tntRunnable.explosionTime = Integer.valueOf(cmd.get(1));
                     } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {}
@@ -199,7 +195,7 @@ public class Events {
 
             default:
                 log.warning("No such action: " + action.toUpperCase());
-                return;
+                break;
         }
     }
 }
