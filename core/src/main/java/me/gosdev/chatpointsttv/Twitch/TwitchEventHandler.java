@@ -104,18 +104,24 @@ public class TwitchEventHandler {
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
-            if (amount >= Integer.parseInt(reward.getEvent())) {
-                Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
-                for (String cmd : reward.getCommands()) {
-                    String[] parts = cmd.split(" ", 2);
-
-                    if (parts.length <= 1) {
-                        plugin.log.warning("Invalid command: " + parts[0]);
-                        continue;
+            try {
+                if (amount >= Integer.parseInt(reward.getEvent())) {
+                    Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
+                    for (String cmd : reward.getCommands()) {
+                        String[] parts = cmd.split(" ", 2);
+    
+                        if (parts.length <= 1) {
+                            plugin.log.warning("Invalid command: " + parts[0]);
+                            continue;
+                        }
+    
+                        Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());
                     }
-
-                    Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());
+                    return;
                 }
+    
+            } catch (NumberFormatException e) {
+                plugin.log.warning("Invalid cheer amount: " + reward.getEvent());
                 return;
             }
         }
