@@ -302,7 +302,7 @@ public class CommandController implements TabExecutor {
             strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }
 
-        strChannels = strChannels.substring(0, strChannels.length() - 2); // Remove last comma
+        strChannels = !twitch.getListenedChannels().isEmpty() ? strChannels.substring(0, strChannels.length() - 2) : "None"; // Get a comma-separated list of channels. If empty, display "None"
 
         String msg = (
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
