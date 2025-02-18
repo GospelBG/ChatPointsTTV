@@ -66,9 +66,9 @@ public class Events {
             case "SPAWN":
                 try {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        if (!EnumUtils.isValidEnum(EntityType.class, cmd.get(0))) throw new IllegalArgumentException(cmd.get(0)); // Check if entity exists
+                        if (!EnumUtils.isValidEnum(EntityType.class, cmd.get(0).toUpperCase())) throw new IllegalArgumentException(cmd.get(0)); // Check if entity exists
                         SpawnRunnable entityRunnable = new SpawnRunnable();
-                        entityRunnable.entity = EntityType.valueOf(cmd.get(0));
+                        entityRunnable.entity = EntityType.valueOf(cmd.get(0).toUpperCase());
 
                         if (cmd.size() >= 2) { // Is specifying an amount?
                             try {
