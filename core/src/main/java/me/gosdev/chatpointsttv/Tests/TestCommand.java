@@ -94,12 +94,14 @@ public class TestCommand {
                     return;
                 }
 
-                try {
-                String cheerUser = args.get(2);
-                String cheerChannel = args.get(3);
-                int cheerAmount = Integer.parseInt(args.get(4));
+                String cheerUser;
+                String cheerChannel;
+                int cheerAmount;
 
-                eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
+                try {
+                    cheerUser = args.get(2);
+                    cheerChannel = args.get(3);
+                    cheerAmount = Integer.parseInt(args.get(4));
                 } catch (NumberFormatException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid cheer amount: " + args.get(4));
                     return;
