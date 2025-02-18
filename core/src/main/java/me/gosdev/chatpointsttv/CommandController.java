@@ -20,7 +20,9 @@ import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
@@ -46,13 +48,13 @@ public class CommandController implements TabExecutor {
             switch (args[0]) {
                 case "link":
                     if (plugin.getTwitch().isAccountConnected()) {
-                        utils.sendMessage(sender, new TextComponent("There is an account connected already!\nUnlink it before using another one."));
+                        utils.sendMessage(sender, "There is an account connected already!\nUnlink it before using another one.");
                         break;
                     }
                     if (ChatPointsTTV.configOk) {
                         link(plugin, sender, args.length == 2 ? args[1] : "default");
                     } else {
-                        utils.sendMessage(sender, new TextComponent("Invalid configuration. Please check your config file."));
+                        utils.sendMessage(sender, "Invalid configuration. Please check your config file.");
                         break;
                     }
                     
@@ -82,20 +84,20 @@ public class CommandController implements TabExecutor {
 
                 case "test":
                     if (!plugin.getTwitch().isAccountConnected()) {
-                        utils.sendMessage(sender, new TextComponent(ChatColor.RED + "You need to link your account first."));
+                        utils.sendMessage(sender, ChatColor.RED + "You need to link your account first.");
                         return true;
                     }
                     TestCommand.test(sender, args);
                     return true;
 
                 default:
-                    utils.sendMessage(sender, new TextComponent(ChatColor.RED + "Unknown command: /twitch " + args[0]));
+                    utils.sendMessage(sender, ChatColor.RED + "Unknown command: /twitch " + args[0]);
                     help(sender);
                     return true;
             }
         }
 
-        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file is invalid or has been left at default. Please set it up correctly and reload the plugin.");
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
         return true;
     }
 
