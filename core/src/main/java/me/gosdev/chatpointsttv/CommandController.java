@@ -285,8 +285,6 @@ public class CommandController implements TabExecutor {
     private void reload(ChatPointsTTV plugin) {
         plugin.log.info("Reloading ChatPointsTTV...");
 
-        if (ImplicitGrantFlow.server != null) ImplicitGrantFlow.server.stop(); // Stop HTTP server if it is actve
-
         plugin.onDisable();
         plugin.onEnable();
     }
