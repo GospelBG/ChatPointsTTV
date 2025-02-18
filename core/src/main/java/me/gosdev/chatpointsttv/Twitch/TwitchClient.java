@@ -11,7 +11,6 @@ import javax.naming.ConfigurationException;
 
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -44,6 +43,7 @@ import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 import me.gosdev.chatpointsttv.Utils.Utils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -238,7 +238,7 @@ public class TwitchClient {
                         try {
                             mcColor = ColorUtils.getClosestChatColor(new Color(ColorUtils.hexToRgb(event.getMessageEvent().getUserChatColor().get())));
                         } catch (Exception e) {
-                            mcColor = ChatColor.RED; 
+                            mcColor = ChatColor.RED; // Use red as fallback
                         }
                         BaseComponent[] components = new BaseComponent[] {
                             new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
