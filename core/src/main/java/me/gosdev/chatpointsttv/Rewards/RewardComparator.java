@@ -8,7 +8,7 @@ public class RewardComparator implements Comparator<Reward> {
         if (o1.getType() != o2.getType()) throw new java.lang.UnsupportedOperationException("Cannot compare " + o1.getType().toString() + " rewards with " + o2.getType().toString());
 
         try {
-            int difference = Integer.parseInt(o1.getEvent()) - Integer.parseInt(o2.getEvent());
+            int difference = Integer.parseInt(o2.getEvent()) - Integer.parseInt(o1.getEvent());
 
             if (difference == 0) throw new NumberFormatException(); // If value matches compare target channel (go straight to catch)
             return difference;
