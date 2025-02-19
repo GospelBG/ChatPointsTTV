@@ -40,12 +40,13 @@ public class TwitchEventHandler {
         }
         ChannelPointsRedemption redemption = event.getRedemption();
 
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
+        Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
+
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
             if (!reward.getTargetId().equals(redemption.getChannelId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
-            String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-            Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
 
@@ -100,13 +101,13 @@ public class TwitchEventHandler {
         int amount = event.getCheer().getBits();
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("CHEERED_STRING");
 
+        Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
+
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.CHEER);
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
-
             try {
                 if (amount >= Integer.parseInt(reward.getEvent())) {
-                    Events.showIngameAlert(chatter, custom_string, amount + " bits", action_color, user_color, rewardBold);
                     for (String cmd : reward.getCommands()) {
                         String[] parts = cmd.split(" ", 2);
     
@@ -152,13 +153,14 @@ public class TwitchEventHandler {
                 if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
             }
         }
+
+        String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
+        Events.showIngameAlert(chatter, custom_string,TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
+
         for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                String custom_string = ChatPointsTTV.getRedemptionStrings().get("SUB_STRING");
-                
-                Events.showIngameAlert(chatter, custom_string,TwitchUtils.PlanToString(tier) + " sub", action_color, user_color, rewardBold);
                 for (String cmd : reward.getCommands()) {
                     String[] parts = cmd.split(" ", 2);
 
@@ -193,17 +195,19 @@ public class TwitchEventHandler {
         
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
-            for (String cmd : reward.getCommands()) {
-                String[] parts = cmd.split(" ", 2);
-
-                if (parts.length <= 1) {
-                    plugin.log.warning("Invalid command: " + parts[0]);
-                    continue;
+            if (amount >= Integer.valueOf(reward.getEvent())) {
+                for (String cmd : reward.getCommands()) {
+                    String[] parts = cmd.split(" ", 2);
+    
+                    if (parts.length <= 1) {
+                        plugin.log.warning("Invalid command: " + parts[0]);
+                        continue;
+                    }
+    
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());                
                 }
-
-                Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), event.getChatterUserName());                
+                return;
             }
-            return;
         }
     }
 
@@ -221,22 +225,24 @@ public class TwitchEventHandler {
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("RAIDED_STRING").replace("{CHANNEL}", event.getToBroadcasterUserName());
         ArrayList<Reward> rewards = Rewards.getRewards(rewardType.RAID);
 
+
         Events.showIngameAlert(raiderName, custom_string, amount.toString(), action_color, user_color, rewardBold);
 
         for (Reward reward : rewards) {
             if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
-            if (amount >= Integer.valueOf(reward.getEvent())) continue;
-            for (String cmd : reward.getCommands()) {
-                String[] parts = cmd.split(" ", 2);
-
-                if (parts.length <= 1) {
-                    plugin.log.warning("Invalid command: " + parts[0]);
-                    continue;
+            if (amount >= Integer.valueOf(reward.getEvent())) {
+                for (String cmd : reward.getCommands()) {
+                    String[] parts = cmd.split(" ", 2);
+    
+                    if (parts.length <= 1) {
+                        plugin.log.warning("Invalid command: " + parts[0]);
+                        continue;
+                    }
+    
+                    Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), raiderName);                
                 }
-
-                Events.runAction(parts[0], parts[1].replaceAll("\\{AMOUNT\\}", String.valueOf(amount)), raiderName);                
+                return;
             }
-            return;
         }
     }
 }
