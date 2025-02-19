@@ -15,7 +15,7 @@ public class TestCommand {
     private static final EventManager eventManager = ChatPointsTTV.getPlugin().getTwitch().getClient().getEventManager();
 
     public static void test(CommandSender sender, String[] cmdInput) {
-        if (cmdInput.length < 3) {
+        if (cmdInput.length < 2) {
             ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test <type> ...");
             return;
         }
@@ -54,13 +54,13 @@ public class TestCommand {
                 String pointsReward = args.get(4);
                 String userInput;
 
-                if (args.size() <= 4) {
+                if (args.size() <= 5) {
                     userInput = null;
                 } else {
                     for (int i = 6; i < args.size(); i++) {
                         args.set(5, args.get(5) + " " + args.get(i)); // All arguments after index 4 are considered user input
                     }
-                    userInput = args.get(4);
+                    userInput = args.get(5);
                 }
                 try {
                     eventManager.publish(EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty()));
@@ -70,7 +70,7 @@ public class TestCommand {
                 }
                 break;
             case "follow":
-                if (args.size() < 3) {
+                if (args.size() < 4) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
                     return;
                 }
@@ -87,18 +87,16 @@ public class TestCommand {
                 break;
 
             case "cheer":
-                if (args.size() < 4) {
+                if (args.size() < 5) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
                     return;
                 }
 
-                String cheerUser;
-                String cheerChannel;
+                String cheerUser = args.get(2);
+                String cheerChannel = args.get(3);
                 int cheerAmount;
 
                 try {
-                    cheerUser = args.get(2);
-                    cheerChannel = args.get(3);
                     cheerAmount = Integer.parseInt(args.get(4));
                 } catch (NumberFormatException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid cheer amount: " + args.get(4));
@@ -114,18 +112,30 @@ public class TestCommand {
                 break;
 
             case "sub":
-                if (args.size() < 5) {
+                if (args.size() < 6) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                     return;
                 }
 
                 String subUser = args.get(2);
                 String subChannel = args.get(3);
-                String subTier = args.get(4);
-                int subMonths = Integer.parseInt(args.get(5));
+                SubscriptionPlan subTier;
+                int subMonths;
 
                 try {
-                    eventManager.publish(EventTest.SubEvent(subChannel, subUser, SubscriptionPlan.valueOf(subTier.toUpperCase()), subMonths));
+                    subTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
+                    subMonths = Integer.parseInt(args.get(5));
+                } catch (NumberFormatException e) {
+                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid amount of months: " + args.get(5));
+                    return;
+                } catch (IllegalArgumentException e) {
+                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                    return;
+                }
+                
+
+                try {
+                    eventManager.publish(EventTest.SubEvent(subChannel, subUser, subTier, subMonths));
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -133,18 +143,29 @@ public class TestCommand {
                 break;
 
             case "subgift":
-                if (args.size() < 5) {
+                if (args.size() < 6) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <tier> <amount>");
                     return;
                 }
 
                 String giftChatter = args.get(2);
                 String giftChannel = args.get(3);
-                String giftTier = args.get(4);
-                int giftAmount = Integer.parseInt(args.get(5));
+                SubscriptionPlan giftTier;
+                int giftAmount;
 
                 try {
-                    eventManager.publish(EventTest.SubGiftEvent(giftChannel, giftChatter, SubscriptionPlan.valueOf(giftTier.toUpperCase()), giftAmount));
+                    giftAmount = Integer.parseInt(args.get(5));
+                    giftTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
+                } catch (NumberFormatException e) {
+                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid gifted subs amount: " + args.get(5));
+                    return;
+                } catch (IllegalArgumentException e) {
+                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                    return;
+                }
+                
+                try {
+                    eventManager.publish(EventTest.SubGiftEvent(giftChannel, giftChatter, giftTier, giftAmount));
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -152,15 +173,22 @@ public class TestCommand {
                 break;
 
             case "raid":
-                if (args.size() < 4) {
+                if (args.size() < 5) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
                     return;
                 }
 
                 String raidUser = args.get(2);
                 String raidChannel = args.get(3);
-                int raidViewers = Integer.parseInt(args.get(4));
+                int raidViewers;
 
+                try {
+                    raidViewers = Integer.parseInt(args.get(4));
+                } catch (NumberFormatException e) {
+                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid viewer amount: " + args.get(4));
+                    return;
+                }
+                
                 try {
                     eventManager.publish(EventTest.RaidReward(raidChannel, raidUser, raidViewers));
                 } catch (NullPointerException e) {
