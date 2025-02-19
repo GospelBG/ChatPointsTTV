@@ -316,6 +316,8 @@ public class CommandController implements TabExecutor {
         status.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to toggle connection").create()));
         status.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, twitch.isAccountConnected() ? "/twitch unlink" : "/twitch link"));
 
-        utils.sendMessage(p, new BaseComponent[] {msg, status});
+        msg.addExtra(status);
+
+        utils.sendMessage(p, msg);
     }
 }
