@@ -340,7 +340,6 @@ public class TwitchClient {
         eventSocket = null;
         eventManager = null;
         accountConnected = false;
-        channels = null;
         oauth = null;
 
         utils.sendMessage(p, ChatColor.GREEN + "Account disconnected!");
