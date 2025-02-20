@@ -19,50 +19,55 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.6.0</version>
-        <configuration>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
-          <relocations>
-            <relocation>
-              <pattern>org.bstats</pattern>
-              <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
-            </relocation>
-            <relocation>
-              <pattern>com.alessiodp.libby</pattern>
-              <shadedPattern>me.gosdev.chatpointsttv.libraries.libby</shadedPattern>
-            </relocation>
-          </relocations>
-        </configuration>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <relocations>
+                <relocation>
+                  <pattern>org.bstats</pattern>
+                  <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.github.twitch4j</pattern>
+                  <shadedPattern>me.gosdev.chatpointsttv.libraries.twitch4j</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.github.philippheuer.events4j</pattern>
+                  <shadedPattern>me.gosdev.chatpointsttv.libraries.events4j</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.fasterxml.jackson</pattern>
+                  <shadedPattern>me.gosdev.chatpointsttv.libraries.jackson</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
     <resources>
-        <resource>
-            <directory>src/main/resources</directory>
-            <filtering>true</filtering>
-         </resource>
-      </resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 
   <properties>
-      <revision>2.4</revision>
+      <maven.compiler.source>1.8</maven.compiler.source>
       <maven.compiler.target>1.8</maven.compiler.target>
+      <revision>2.3.1</revision>
   </properties>
 
   <repositories>
       <repository>
           <id>spigot-repo</id>
           <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-      </repository>
-      <repository>
-        <id>maven-snapshots</id>
-        <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
       </repository>
   </repositories>
 
@@ -77,12 +82,12 @@
       <groupId>com.github.philippheuer.events4j</groupId>
       <artifactId>events4j-handler-simple</artifactId>
       <version>0.12.2</version>
-      <scope>provided</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.twitch4j</groupId>
       <artifactId>twitch4j</artifactId>
-      <version>1.23.0</version>
+      <version>1.21.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -91,11 +96,5 @@
       <version>20240303</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.alessiodp.libby</groupId>
-      <artifactId>libby-bukkit</artifactId>
-      <version>877bdfb</version> <!-- There's an issue with the latest version on Maven Central, so we need to use a build from the latest commit -->
-      <scope>compile</scope>
-  </dependency>
   </dependencies>
 </project>

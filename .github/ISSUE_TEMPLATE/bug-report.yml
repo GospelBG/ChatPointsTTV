@@ -1,0 +1,62 @@
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+assignees:
+  - gospelbg
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!  
+        ⚠️ Please only make an issue for bug reports. If you're having general issues with the plugin please open a [new Discussion](https://github.com/GospelBG/ChatPointsTTV/discussions/new/choose) ⚠️  
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce the issue
+      description: Give us a step-by-step guide to reproduce the issue.
+      placeholder: What did you do?
+    validations:
+      required: true
+  - type: input
+    id: minecraft-version
+    attributes:
+      label: Minecraft Version
+      description: What is your game version?
+      placeholder: ex. 1.16.5
+    validations:
+      required: true
+  - type: dropdown
+    id: server-type
+    attributes:
+      label: Server Software
+      description: What server are you running?
+      options:
+        - Spigot
+        - Paper
+        - Bukkit
+        - Other (please specify in your report)
+    validations:
+      required: true
+  - type: input
+    id: server-version
+    attributes:
+      label: Server Version
+      description: What is the version of your server software (i.e. Paper 1.21.4 \#165)?
+      placeholder: ex. #82
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log file
+      description: Please upload tour log file to any paste service (i.e. mclo.gs) and paste the link here.
+      render: shell
