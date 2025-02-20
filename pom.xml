@@ -20,7 +20,6 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.6.0</version>
         <configuration>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
           <relocations>
             <relocation>
               <pattern>org.bstats</pattern>
