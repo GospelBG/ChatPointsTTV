@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.Auth;
 
 import me.gosdev.chatpointsttv.Utils.Scopes;
 

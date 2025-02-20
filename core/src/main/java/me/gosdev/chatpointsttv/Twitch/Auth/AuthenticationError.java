@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.TwitchAuth;
+package me.gosdev.chatpointsttv.Twitch.Auth;
 
 /**
  * The <code>AuthenticationError</code> class represents an error during

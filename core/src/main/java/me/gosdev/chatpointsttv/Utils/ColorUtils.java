@@ -1,7 +1,7 @@
 package me.gosdev.chatpointsttv.Utils;
 
-import java.util.Map;
 import java.awt.Color;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -34,7 +34,7 @@ public class ColorUtils {
 
     public static int hexToRgb(String hex) {
         if (hex.startsWith("#")) hex = hex.substring(1); // Remove # from color code
-        return Integer.valueOf(hex, 16);
+        return Integer.parseInt(hex, 16);
     }
 
     public static int getRgb(int red, int green, int blue) {
@@ -46,30 +46,24 @@ public class ColorUtils {
     }
 
     public static ChatColor getClosestChatColor(Color color) {
-        ChatColor closest = null;
-        int mark = 0;
-        for (Map.Entry<ChatColor, Color> entry : COLOR_MAPPINGS.entrySet()) {
-            ChatColor key = entry.getKey();
-            Color value = entry.getValue();
+        ChatColor closestColor = null;
+        double closestDistance = Double.MAX_VALUE;
 
-            int diff = getDiff(value, color);
-            if (closest == null || diff < mark) {
-                closest = key;
-                mark = diff;
+        for (Map.Entry<ChatColor, Color> entry : COLOR_MAPPINGS.entrySet()) {
+            double distance = getColorDistance(color, entry.getValue());
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestColor = entry.getKey();
             }
         }
-        
-        return closest;
+
+        return closestColor;
     }
 
-    // Algorithm to determine the difference between two colors, source:
-    // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color
-    private static int getDiff(Color color, Color compare) {
-        int a = color.getAlpha() - compare.getAlpha(),
-                r = color.getRed() - compare.getRed(),
-                g = color.getGreen() - compare.getGreen(),
-                b = color.getBlue() - compare.getBlue();
-        return a * a + r * r + g * g + b * b;
+    private static double getColorDistance(Color c1, Color c2) {
+        int redDiff = c1.getRed() - c2.getRed();
+        int greenDiff = c1.getGreen() - c2.getGreen();
+        int blueDiff = c1.getBlue() - c2.getBlue();
+        return Math.sqrt(redDiff * redDiff + greenDiff * greenDiff + blueDiff * blueDiff);
     }
 }
-
