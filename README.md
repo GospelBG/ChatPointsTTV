@@ -10,7 +10,6 @@ This GitHub repository contains all the source code of the plugin. You can downl
 - CurseForge: https://www.curseforge.com/minecraft/bukkit-plugins/chatpointsttv  
 - Modrinth: https://modrinth.com/plugin/chatpointsttv
 - SpigotMC: https://www.spigotmc.org/resources/chatpointsttv.112532/
-- Hangar: https://hangar.papermc.io/GosDev/ChatPointsTTV
 
 These are the only official download mirrors. Any downloads besides of these links may not be genuine.
 
@@ -21,10 +20,10 @@ These are the only official download mirrors. Any downloads besides of these lin
 > [!TIP]
 >  If needed, you can copy-paste the names of the Channel Points Rewards into a text document for later use.
   
-3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and setup events for rewards, donations... You will need to link a Twitch account in order to use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
+3. Set your [config.yml](core/src/main/resources/config.yml) up. Adjust the settings and setup events for rewards, donations... You will need to link a Twitch account in order to connect use the Twitch API (the linked account **needs to own/moderate all Twitch channels** set in config.yml) There are two ways to link your Twitch account to the plugin:  
 
     - **Using a key-based authentication** *(recommended)*:  
-    You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com/quick/7RWW5IlqTa). Make sure to add all the [needed scopes](#twitch-scopes) (the above link is already set to allow the needed scopes).  
+    You will need a Client ID and Access token. You can get one mannually or through a website as [Twitch Token Generator](https://twitchtokengenerator.com). Make sure to add all the [needed scopes](#twitch-scopes).  
     Uncomment `CUSTOM_CLIENT_ID` and `CUSTOM_ACCESS_TOKEN` on the config file and add your Client ID and Token onto the corresponding fields.  
     Once the server has started you just need to run `/twitch link` and your account will be automatically logged in. You may need to refresh the token when it expires.
 
