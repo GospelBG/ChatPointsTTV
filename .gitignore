@@ -27,7 +27,7 @@ replay_pid*
 target/
 
 # Maven Shade Plugin 
-dependency-reduced-pom.xml
+**dependency-reduced-pom.xml
 
 # VSCode folder
 .vscode/

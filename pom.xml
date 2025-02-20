@@ -19,43 +19,34 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.6.0</version>
+        <configuration>
+          <relocations>
+            <relocation>
+              <pattern>org.bstats</pattern>
+              <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.alessiodp.libby</pattern>
+              <shadedPattern>me.gosdev.chatpointsttv.libraries.libby</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
         <executions>
           <execution>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <relocations>
-                <relocation>
-                  <pattern>org.bstats</pattern>
-                  <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.github.twitch4j</pattern>
-                  <shadedPattern>me.gosdev.chatpointsttv.libraries.twitch4j</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.github.philippheuer.events4j</pattern>
-                  <shadedPattern>me.gosdev.chatpointsttv.libraries.events4j</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>com.fasterxml.jackson</pattern>
-                  <shadedPattern>me.gosdev.chatpointsttv.libraries.jackson</shadedPattern>
-                </relocation>
-              </relocations>
-            </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
     <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
+        <resource>
+            <directory>src/main/resources</directory>
+            <filtering>true</filtering>
+         </resource>
+      </resources>
   </build>
 
   <properties>
@@ -85,7 +76,7 @@
       <groupId>com.github.philippheuer.events4j</groupId>
       <artifactId>events4j-handler-simple</artifactId>
       <version>0.12.2</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.github.twitch4j</groupId>
