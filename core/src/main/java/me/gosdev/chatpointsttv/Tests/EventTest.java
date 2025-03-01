@@ -14,6 +14,7 @@ import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
 import com.github.twitch4j.pubsub.domain.ChannelPointsUser;
 import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class EventTest {
@@ -69,17 +70,19 @@ public class EventTest {
 
     public static ChannelChatNotificationEvent SubEvent(String channel, String chatter, SubscriptionPlan plan, int months) {
         ChannelChatNotificationEvent event = jsonToObject(
-            "{\"user_id\":\"" + TwitchUtils.getUserId(chatter) +
-            "\",\"user_login\":\"" + chatter.toLowerCase() +
-            "\",\"user_name\":\"" + chatter +
+            "{\"chatter_user_id\":\"" + TwitchUtils.getUserId(chatter) +
+            "\",\"chatter_user_login\":\"" + chatter.toLowerCase() +
+            "\",\"chatter_user_name\":\"" + chatter +
             "\",\"broadcaster_user_id\":\"" + TwitchUtils.getUserId(channel) +
             "\",\"broadcaster_user_login\":\"" + channel.toLowerCase() +
             "\",\"broadcaster_user_name\":\"" + channel +
             "\",\"notice_type\": \"sub" +
-            "\",\"sub\":{\"sub_tier\":\"" + plan.name() + 
+            "\",\"sub\":{\"sub_tier\":\"" + (plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "1000" : plan.toString()) + 
             "\",\"is_prime\":" + (plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "true" : "false") +
             ",\"duration_months\":" + months + "}}",
             ChannelChatNotificationEvent.class);
+
+        ChatPointsTTV.getPlugin().log.info(plan.toString());
 
         return event;
             }
