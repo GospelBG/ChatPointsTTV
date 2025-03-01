@@ -34,7 +34,7 @@ public class ImplicitGrantFlow {
             TextComponent msg = new TextComponent("Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + AuthURL);
             utils.sendMessage(p, msg);
         } else {
-            BaseComponent msg = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up");
+            BaseComponent msg = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up\n");
             BaseComponent btn = new TextComponent(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
             btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
             btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, AuthURL));
