@@ -55,7 +55,9 @@ public class Events {
                     utils.sendMessage(p, builder.create());
                     utils.displayTitle(p.getPlayer(), user, action, rewardName, isBold, userColor, titleColor);
                 }
-                break;            
+                break;
+            default:
+                break;
         }
     }
 
