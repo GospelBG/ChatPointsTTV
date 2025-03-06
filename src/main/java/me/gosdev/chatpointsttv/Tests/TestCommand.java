@@ -16,7 +16,7 @@ public class TestCommand {
 
     public static void test(CommandSender sender, String[] cmdInput) {
         if (cmdInput.length < 2) {
-            ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test <type> ...");
+            sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> ...");
             return;
         }
 
@@ -45,7 +45,7 @@ public class TestCommand {
         switch (args.get(1).toLowerCase()) {
             case "channelpoints":
                 if (args.size() < 5) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
                     return;
                 }
 
@@ -65,13 +65,13 @@ public class TestCommand {
                 try {
                     eventManager.publish(EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty()));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
             case "follow":
                 if (args.size() < 4) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
                     return;
                 }
 
@@ -81,14 +81,14 @@ public class TestCommand {
                 try {
                     eventManager.publish(EventTest.FollowEvent(followChannel, followUser));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
 
             case "cheer":
                 if (args.size() < 5) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
                     return;
                 }
 
@@ -99,21 +99,21 @@ public class TestCommand {
                 try {
                     cheerAmount = Integer.parseInt(args.get(4));
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid cheer amount: " + args.get(4));
+                    sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args.get(4));
                     return;
                 }
 
                 try {
                     eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
 
             case "sub":
                 if (args.size() < 6) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                     return;
                 }
 
@@ -126,10 +126,10 @@ public class TestCommand {
                     subTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
                     subMonths = Integer.parseInt(args.get(5));
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid amount of months: " + args.get(5));
+                    sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args.get(5));
                     return;
                 } catch (IllegalArgumentException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                    sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args.get(4));
                     return;
                 }
                 
@@ -137,14 +137,14 @@ public class TestCommand {
                 try {
                     eventManager.publish(EventTest.SubEvent(subChannel, subUser, subTier, subMonths));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
 
             case "subgift":
                 if (args.size() < 6) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <tier> <amount>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <tier> <amount>");
                     return;
                 }
 
@@ -157,24 +157,24 @@ public class TestCommand {
                     giftAmount = Integer.parseInt(args.get(5));
                     giftTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid gifted subs amount: " + args.get(5));
+                    sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args.get(5));
                     return;
                 } catch (IllegalArgumentException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                    sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args.get(4));
                     return;
                 }
                 
                 try {
                     eventManager.publish(EventTest.SubGiftEvent(giftChannel, giftChatter, giftTier, giftAmount));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
 
             case "raid":
                 if (args.size() < 5) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
                     return;
                 }
 
@@ -185,23 +185,23 @@ public class TestCommand {
                 try {
                     raidViewers = Integer.parseInt(args.get(4));
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Invalid viewer amount: " + args.get(4));
+                    sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args.get(4));
                     return;
                 }
                 
                 try {
                     eventManager.publish(EventTest.RaidReward(raidChannel, raidUser, raidViewers));
                 } catch (NullPointerException e) {
-                    ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
+                    sender.sendMessage(ChatColor.RED + e.getMessage());
                     return;
                 }
                 break;
 
             default:
-                ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Unknown test type: " + args.get(1));
+                sender.sendMessage(ChatColor.RED + "Unknown test type: " + args.get(1));
                 return;
         }
 
-        ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.GREEN + "Test event sent!");
+        sender.sendMessage(ChatColor.GREEN + "Test event sent!");
     }
 }
