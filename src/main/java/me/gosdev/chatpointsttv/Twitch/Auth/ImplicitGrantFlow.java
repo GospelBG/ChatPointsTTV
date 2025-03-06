@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
-import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,8 +17,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ImplicitGrantFlow {
     public static AuthenticationCallbackServer server = new AuthenticationCallbackServer(3000);
-
-    static Utils utils = ChatPointsTTV.getUtils();
 
     public static CompletableFuture<String> getAccessToken(ChatPointsTTV plugin, CommandSender p, String clientID) {
         CompletableFuture<String> future = new CompletableFuture<>();
@@ -32,7 +29,7 @@ public class ImplicitGrantFlow {
 
         if (p == Bukkit.getServer().getConsoleSender()) {
             TextComponent msg = new TextComponent("Link your Twitch account to set ChatPointsTTV up. Open this link in your browser to login:\n" + AuthURL);
-            utils.sendMessage(p, msg);
+            p.spigot().sendMessage(msg);
         } else {
             BaseComponent msg = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "--------------- ChatPointsTTV ---------------\n" + ChatColor.RESET + ChatColor.WHITE + "Link your Twitch account to set ChatPointsTTV up\n");
             BaseComponent btn = new TextComponent(ChatColor.LIGHT_PURPLE + "[Click here to login with Twitch]");
@@ -41,7 +38,7 @@ public class ImplicitGrantFlow {
 
             msg.addExtra(btn);
 
-            utils.sendMessage(p, msg);
+            p.spigot().sendMessage(msg);
         }
         
         int serverCloseId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {

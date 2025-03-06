@@ -7,10 +7,10 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
+
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
 
-import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -39,7 +39,6 @@ public class VersionCheck {
 
             JSONArray json = new JSONArray(result.toString());
             String latest = json.getJSONObject(0).getString("version_number");
-            Utils utils = ChatPointsTTV.getUtils();
 
             if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latest.replaceAll("[^\\d.]", ""))) {
                 for (Player p: plugin.getServer().getOnlinePlayers()) {
@@ -50,8 +49,8 @@ public class VersionCheck {
                         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                         btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, download_url));
 
-                        utils.sendMessage(p, new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!"));
-                        utils.sendMessage(p, btn);
+                        p.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!"));
+                        p.spigot().sendMessage(btn);
                     }
                 }
                 log.info("ChatPointsTTV v" + latest + " has been released! Download the latest version in " + download_url);

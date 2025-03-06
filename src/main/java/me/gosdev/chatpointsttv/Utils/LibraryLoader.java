@@ -45,7 +45,7 @@ public class LibraryLoader {
 
     public static void LoadLibraries(ChatPointsTTV plugin) {
         libraryManager = new BukkitLibraryManager(plugin);
-        libraryManager.setLogLevel(LogLevel.WARN);
+        libraryManager.setLogLevel(LogLevel.DEBUG);
         libraryManager.addMavenCentral();
         plugin.log.info("Loading libraries...");
         for (Library lib : libraries) {

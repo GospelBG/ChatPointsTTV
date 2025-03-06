@@ -29,6 +29,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
@@ -42,7 +43,6 @@ import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
-import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -64,9 +64,7 @@ public class TwitchClient {
     private static TwitchEventHandler eventHandler;
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
-    
-    private final Utils utils = ChatPointsTTV.getUtils();
-    private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+        private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private final Logger log = plugin.log;
     private final FileConfiguration config = plugin.getConfig();
 
@@ -138,7 +136,7 @@ public class TwitchClient {
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
         ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
 
-        if(customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
+        if(!ChatPointsTTV.isUnitTest && customCredentialsFound && config.getBoolean("AUTO_LINK_CUSTOM", false) == true) {
             plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
                 return "Twitch Auto-Link (Key)";
             }));
@@ -156,7 +154,7 @@ public class TwitchClient {
                 throw new NullPointerException("Invalid Access Token");
             }
 
-            utils.sendMessage(p, "Logging in...");
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in...");
 
             oauth = new OAuth2Credential(clientID, token);
 
@@ -172,7 +170,7 @@ public class TwitchClient {
             
             user = client.getHelix().getUsers(token, null, null).execute().getUsers().get(0);
 
-            utils.sendMessage(Bukkit.getConsoleSender(), "Logged in as: "+ user.getDisplayName());
+            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logged in as: "+ user.getDisplayName());
 
             for (String username : channels.keySet()) { // Populate "channels" hashmap values
                 channels.put(username, new Channel(username, TwitchUtils.getUserId(username), TwitchUtils.isLive(token, username)));
@@ -202,6 +200,11 @@ public class TwitchClient {
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
                 eventManager.onEvent(RewardRedeemedEvent.class, (RewardRedeemedEvent e) -> {
                     eventHandler.onChannelPointsRedemption(e);
+                });
+
+                eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
+                    log.info("NEW REWARD REDEMPTION: " + e.getReward().getTitle());
+                    log.info("By: " + e.getUserName());
                 });
             }
             if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
@@ -245,7 +248,7 @@ public class TwitchClient {
                         };
                         for (Player player : Bukkit.getOnlinePlayers()) {
                             if (player.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                                utils.sendMessage(player, components);
+                                player.spigot().sendMessage(components);
                             }
                         }
                     }
@@ -274,7 +277,7 @@ public class TwitchClient {
                 return;
             }
 
-            utils.sendMessage(p, "Twitch client has started successfully!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
             accountConnected = true;
         });
 
@@ -282,7 +285,7 @@ public class TwitchClient {
         linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
             linkThread.interrupt();
             e.printStackTrace();
-            utils.sendMessage(p, ChatColor.RED + "Account linking failed!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Account linking failed!");
             accountConnected = true;
             unlink(Bukkit.getConsoleSender());
         });
@@ -290,10 +293,12 @@ public class TwitchClient {
     
     public void subscribeToEvents(CommandSender p, CountDownLatch latch, String channel) {
         String channel_id = TwitchUtils.getUserId(channel);
-        utils.sendMessage(Bukkit.getConsoleSender(), "Listening to " + channel + "'s events...");
+        Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Listening to " + channel + "'s events...");
         
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             client.getPubSub().listenForChannelPointsRedemptionEvents(null, channel_id);
+
+            eventSocket.register(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
         if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
@@ -321,7 +326,7 @@ public class TwitchClient {
 
     public void unlink(CommandSender p) {
         if (!accountConnected) {
-            utils.sendMessage(p, new TextComponent(ChatColor.RED + "There is no connected account."));
+            p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "There is no connected account."));
             return;
         }
         try {
@@ -342,6 +347,6 @@ public class TwitchClient {
         accountConnected = false;
         oauth = null;
 
-        utils.sendMessage(p, ChatColor.GREEN + "Account disconnected!");
+        p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.GREEN + "Account disconnected!");
     }
 }
