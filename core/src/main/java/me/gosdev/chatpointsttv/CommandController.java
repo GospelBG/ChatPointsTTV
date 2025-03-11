@@ -11,9 +11,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
+import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.Tests.TestCommand;
+import me.gosdev.chatpointsttv.Twitch.Auth.DeviceCodeGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
@@ -117,6 +121,7 @@ public class CommandController implements TabExecutor {
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             available.add("key");
             available.add("browser");
+            available.add("code");
 
         } else if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
             if (args.length == 2) {
@@ -261,10 +266,7 @@ public class CommandController implements TabExecutor {
         else if (method.equalsIgnoreCase("key")) twitch.customCredentialsFound = true;
         else if (method.equals("default")) {
             twitch.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
-        } else {
-            utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
-            help(p);
-            return;
+            method = twitch.customCredentialsFound ? "key" : "code";
         }
         if (twitch.customCredentialsFound) {
             // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
@@ -276,7 +278,42 @@ public class CommandController implements TabExecutor {
                     twitch.linkToTwitch(p, TwitchClient.getClientID(), token);
                 });
             }
+
+        switch (method) {
+            case "code":
+                DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
+                TextComponent comp;
+                if (p.equals(Bukkit.getConsoleSender())) {
+                    comp = new TextComponent(ChatColor.LIGHT_PURPLE + "Go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode());
+                } else {
+                    TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
+                    button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
+                    button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
+
+                    comp = new TextComponent();
+                    comp.addExtra(button);
+                    comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
+
+                }
+                utils.sendMessage(p, comp);
+
+                break;
+
+            case "browser":
+                if (!ImplicitGrantFlow.server.isRunning()) {
+                    CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(plugin, p, TwitchClient.getClientID());
+                    future.thenAccept(token -> {
+                        twitch.link(p, new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, token));
+                    });
+                }
+                
+
+            default:
+                utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
+                help(p);
+                return;
         }
+
         plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
             return twitch.customCredentialsFound ? "OAuth Keys" : "Browser Login";
         }));

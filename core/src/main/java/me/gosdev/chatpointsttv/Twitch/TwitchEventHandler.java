@@ -32,7 +32,7 @@ public class TwitchEventHandler {
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
     public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle() + " in " + TwitchUtils.getUsername(event.getRedemption().getChannelId()));
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
         if (plugin.getTwitch().ignoreOfflineStreamers) {
             for (Channel channel : plugin.getTwitch().getListenedChannels().values()) {
                 if (channel.getChannelId().equals(event.getRedemption().getChannelId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
