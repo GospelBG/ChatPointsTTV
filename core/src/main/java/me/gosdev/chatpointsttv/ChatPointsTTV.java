@@ -48,6 +48,8 @@ public class ChatPointsTTV extends JavaPlugin {
     public FileConfiguration config;
     public Metrics metrics;
 
+    public final static String msgPrefix = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "[ChatPointsTTV] " + ChatColor.RESET;
+
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),

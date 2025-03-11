@@ -51,10 +51,6 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    if (plugin.getTwitch().isAccountConnected()) {
-                        utils.sendMessage(sender, "There is an account connected already!\nUnlink it before using another one.");
-                        break;
-                    }
                     if (ChatPointsTTV.configOk) {
                         link(plugin, sender, args.length == 2 ? args[1] : "default");
                     } else {
@@ -119,7 +115,6 @@ public class CommandController implements TabExecutor {
             available.add("help");
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
-            available.add("key");
             available.add("browser");
             available.add("code");
 
@@ -262,35 +257,23 @@ public class CommandController implements TabExecutor {
 
     private void link(ChatPointsTTV plugin, CommandSender p, String method) {
         TwitchClient twitch = plugin.getTwitch();
-        if (method.equalsIgnoreCase("browser"))  twitch.customCredentialsFound = false;
-        else if (method.equalsIgnoreCase("key")) twitch.customCredentialsFound = true;
-        else if (method.equals("default")) {
+
+        if (method.equals("default")) {
             twitch.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
             method = twitch.customCredentialsFound ? "key" : "code";
         }
-        if (twitch.customCredentialsFound) {
-            // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            twitch.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
-        } else {
-            if (!ImplicitGrantFlow.server.isRunning()) {
-                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(plugin, p, TwitchClient.getClientID());
-                future.thenAccept(token -> {
-                    twitch.linkToTwitch(p, TwitchClient.getClientID(), token);
-                });
-            }
 
         switch (method) {
             case "code":
                 DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
-                TextComponent comp;
+                TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
                 if (p.equals(Bukkit.getConsoleSender())) {
-                    comp = new TextComponent(ChatColor.LIGHT_PURPLE + "Go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode());
+                    comp.addExtra(new TextComponent("Go to " + auth.getVerificationUri() + " and enter the code: " + auth.getUserCode()));
                 } else {
                     TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
                     button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
                     button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
 
-                    comp = new TextComponent();
                     comp.addExtra(button);
                     comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
 
@@ -339,7 +322,7 @@ public class CommandController implements TabExecutor {
             strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }
 
-        strChannels = !twitch.getListenedChannels().isEmpty() ? strChannels.substring(0, strChannels.length() - 2) : "None"; // Get a comma-separated list of channels. If empty, display "None"
+        strChannels = !twitch.getListenedChannels().isEmpty() && twitch.getListenedChannels() != null ? strChannels.substring(0, strChannels.length() - 2) : "None"; // Get a comma-separated list of channels. If empty or null, display "None"
 
         BaseComponent msg = new ComponentBuilder(
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
