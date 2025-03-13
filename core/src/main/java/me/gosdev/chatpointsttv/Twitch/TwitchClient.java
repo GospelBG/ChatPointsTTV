@@ -34,7 +34,6 @@ import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailure
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 import com.github.twitch4j.helix.domain.User;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
@@ -152,7 +151,6 @@ public class TwitchClient {
                 .withDefaultAuthToken(credential)
                 .withEnableChat(true)
                 .withEnableHelix(true)
-                .withEnablePubSub(true)
                 .withEnableEventSocket(true)
                 .withDefaultEventHandler(SimpleEventHandler.class)
                 .build();
@@ -185,13 +183,9 @@ public class TwitchClient {
                 }
             });            
             if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
-                eventManager.onEvent(RewardRedeemedEvent.class, (RewardRedeemedEvent e) -> {
-                    eventHandler.onChannelPointsRedemption(e);
-                });
-
+                subs++;
                 eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
-                    log.info("NEW REWARD REDEMPTION: " + e.getReward().getTitle());
-                    log.info("By: " + e.getUserName());
+                    eventHandler.onChannelPointsRedemption(e);
                 });
             }
             if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {

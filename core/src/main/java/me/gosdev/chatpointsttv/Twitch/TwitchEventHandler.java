@@ -9,8 +9,7 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
-import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events;
@@ -31,21 +30,20 @@ public class TwitchEventHandler {
     ChatColor action_color = ChatPointsTTV.getChatColors().get("ACTION_COLOR");
     ChatColor user_color = ChatPointsTTV.getChatColors().get("USER_COLOR");
 
-    public void onChannelPointsRedemption(RewardRedeemedEvent event) {
-        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getRedemption().getUser().getDisplayName() + " has redeemed " + event.getRedemption().getReward().getTitle());
+    public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
+        if (logEvents) utils.sendMessage(Bukkit.getConsoleSender(), event.getUserName() + " has redeemed " + event.getReward().getTitle() + " in " + event.getBroadcasterUserName());
         if (plugin.getTwitch().ignoreOfflineStreamers) {
             for (Channel channel : plugin.getTwitch().getListenedChannels().values()) {
-                if (channel.getChannelId().equals(event.getRedemption().getChannelId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
+                if (channel.getChannelId().equals(event.getBroadcasterUserId()) && !channel.isLive()) return; // Return if channel matches and it's offline.
             }
         }
-        ChannelPointsRedemption redemption = event.getRedemption();
 
         String custom_string = ChatPointsTTV.getRedemptionStrings().get("REDEEMED_STRING");
-        Events.showIngameAlert(redemption.getUser().getDisplayName(), custom_string, redemption.getReward().getTitle(), action_color, user_color, rewardBold);
+        Events.showIngameAlert(event.getUserName(), custom_string, event.getReward().getTitle(), action_color, user_color, rewardBold);
 
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
-            if (!reward.getEvent().equalsIgnoreCase(redemption.getReward().getTitle())) continue;
-            if (!reward.getTargetId().equals(redemption.getChannelId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+            if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             for (String cmd : reward.getCommands()) {
                 String[] parts = cmd.split(" ", 2);
@@ -55,7 +53,7 @@ public class TwitchEventHandler {
                     continue;
                 }
 
-                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", redemption.getUserInput()), redemption.getUser().getDisplayName());
+                Events.runAction(parts[0], parts[1].replaceAll("\\{TEXT\\}", event.getUserInput()), event.getUserName());
             }
             return;
         }

@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.events.EventSubEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import net.md_5.bungee.api.ChatColor;
@@ -19,6 +20,8 @@ public class TestCommand {
             ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Usage: /twitch test <type> ...");
             return;
         }
+
+        EventSubEvent event;
 
         ArrayList<String> args =  new ArrayList<>();
         for (int i = 0; i < cmdInput.length; i++) {
@@ -63,7 +66,7 @@ public class TestCommand {
                     userInput = args.get(5);
                 }
                 try {
-                    eventManager.publish(EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty()));
+                    event = EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty());
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -79,7 +82,7 @@ public class TestCommand {
                 String followChannel = args.get(3);
 
                 try {
-                    eventManager.publish(EventTest.FollowEvent(followChannel, followUser));
+                    event = EventTest.FollowEvent(followChannel, followUser);
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -104,7 +107,7 @@ public class TestCommand {
                 }
 
                 try {
-                    eventManager.publish(EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount));
+                    event = EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount);
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -135,7 +138,7 @@ public class TestCommand {
                 
 
                 try {
-                    eventManager.publish(EventTest.SubEvent(subChannel, subUser, subTier, subMonths));
+                    event = EventTest.SubEvent(subChannel, subUser, subTier, subMonths);
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -165,7 +168,7 @@ public class TestCommand {
                 }
                 
                 try {
-                    eventManager.publish(EventTest.SubGiftEvent(giftChannel, giftChatter, giftTier, giftAmount));
+                    event = EventTest.SubGiftEvent(giftChannel, giftChatter, giftTier, giftAmount);
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -190,7 +193,7 @@ public class TestCommand {
                 }
                 
                 try {
-                    eventManager.publish(EventTest.RaidReward(raidChannel, raidUser, raidViewers));
+                    event = EventTest.RaidReward(raidChannel, raidUser, raidViewers);
                 } catch (NullPointerException e) {
                     ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + e.getMessage());
                     return;
@@ -201,7 +204,7 @@ public class TestCommand {
                 ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.RED + "Unknown test type: " + args.get(1));
                 return;
         }
-
+        eventManager.publish(event);
         ChatPointsTTV.getUtils().sendMessage(sender, ChatColor.GREEN + "Test event sent!");
     }
 }
