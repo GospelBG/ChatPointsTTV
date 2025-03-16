@@ -1,6 +1,8 @@
 package me.gosdev.chatpointsttv.Twitch;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +14,9 @@ import javax.naming.ConfigurationException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
@@ -20,6 +24,7 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
+import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
@@ -63,6 +68,9 @@ public class TwitchClient {
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private final Logger log = plugin.log;
     private final FileConfiguration config = plugin.getConfig();
+    private FileConfiguration accounts;
+    private File accountsFile;
+    private TwitchIdentityProvider identityProvider;
 
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
@@ -131,6 +139,27 @@ public class TwitchClient {
             
         chatBlacklist = config.getStringList("CHAT_BLACKLIST");
         ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+
+        accountsFile = new File(plugin.getDataFolder(), "twitch.yml");
+        accounts = YamlConfiguration.loadConfiguration(accountsFile);
+        identityProvider = new TwitchIdentityProvider(getClientID(), null, null);
+        
+        for (String userid : accounts.getKeys(false)) {
+            ConfigurationSection account = accounts.getConfigurationSection(userid);
+            OAuth2Credential credential = new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"), account.getString("refresh_token"), userid, null, null, null);
+            if (!identityProvider.isCredentialValid(credential).orElse(false)) {
+                // Try to refresh token
+                credential = identityProvider.refreshCredential(credential).orElse(null);
+                if (credential == null) { // Cannot refresh token (refresh expired or invalid)
+                    plugin.log.warning("Credentials for User ID: " + userid + " are expired. You will need to link your account again.");
+                    accounts.set(userid, null); // Remove invalid credentials from file
+                    continue;
+                }
+            }
+
+            credential = identityProvider.getAdditionalCredentialInformation(credential).get();//new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"))).orElse(null);
+            link(Bukkit.getConsoleSender(), credential);
+        }
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
@@ -139,7 +168,18 @@ public class TwitchClient {
         } else {
             start(p, credential);
         }
-        
+
+        credential = identityProvider.getAdditionalCredentialInformation(credential).get();
+
+        ConfigurationSection account = accounts.createSection(credential.getUserId());
+        account.set("access_token", credential.getAccessToken());
+        account.set("refresh_token", credential.getRefreshToken());
+
+        try {
+            accounts.save(accountsFile);
+        } catch (IOException e) {
+            plugin.log.severe("There was an issue saving account session credentials.");
+        }
     }
 
     public void start(CommandSender p, OAuth2Credential credential) {
@@ -159,10 +199,8 @@ public class TwitchClient {
             user = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
 
             Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logged in as: "+ user.getDisplayName());
-
-            for (String username : channels.keySet()) { // Populate "channels" hashmap values
-                channels.put(username, new Channel(username, credential.getUserId(), TwitchUtils.isLive(credential.getAccessToken(), username)));
-            }
+            
+            channels.put(user.getLogin(), new Channel(user.getLogin(), credential.getUserId(), TwitchUtils.isLive(credential.getAccessToken(), user.getLogin())));
 
             eventHandler = new TwitchEventHandler();
 
@@ -269,6 +307,8 @@ public class TwitchClient {
     public void subscribeToEvents(CommandSender p, OAuth2Credential channel) {
         String channel_id = channel.getUserId();
         Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Listening to " + channel.getUserName() + "'s events...");
+
+        channels.put(user.getLogin(), new Channel(user.getLogin(), channel.getUserId(), TwitchUtils.isLive(channel.getAccessToken(), user.getLogin())));
         
         if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
             eventSocket.register(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
