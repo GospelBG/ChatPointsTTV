@@ -3,20 +3,20 @@ package me.gosdev.chatpointsttv;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.Tests.TestCommand;
-import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
+import me.gosdev.chatpointsttv.Twitch.Auth.DeviceCodeGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -25,6 +25,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
+    Utils utils = ChatPointsTTV.getUtils();
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link [method]: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
@@ -45,14 +46,10 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    if (plugin.getTwitch().isAccountConnected()) {
-                        sender.sendMessage(ChatPointsTTV.msgPrefix + "There is an account connected already!\nUnlink it before using another one.");
-                        break;
-                    }
                     if (ChatPointsTTV.configOk) {
-                        link(plugin, sender, args.length == 2 ? args[1] : "default");
+                        link(plugin, sender);
                     } else {
-                        sender.sendMessage(ChatPointsTTV.msgPrefix + "Invalid configuration. Please check your config file.");
+                        utils.sendMessage(sender, "Invalid configuration. Please check your config file.");
                         break;
                     }
                     
@@ -72,7 +69,7 @@ public class CommandController implements TabExecutor {
                             plugin.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        plugin.getTwitch().unlink(sender);
+                        plugin.getTwitch().stop(sender);
                     });
                     return true;
                     
@@ -82,20 +79,20 @@ public class CommandController implements TabExecutor {
 
                 case "test":
                     if (!plugin.getTwitch().isAccountConnected()) {
-                        sender.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "You need to link your account first.");
+                        utils.sendMessage(sender, ChatColor.RED + "You need to link your account first.");
                         return true;
                     }
                     TestCommand.test(sender, args);
                     return true;
 
                 default:
-                    sender.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Unknown command: /twitch " + args[0]);
+                    utils.sendMessage(sender, ChatColor.RED + "Unknown command: /twitch " + args[0]);
                     help(sender);
                     return true;
             }
         }
 
-        if (!ChatPointsTTV.configOk) sender.sendMessage(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
+        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
         return true;
     }
 
@@ -113,8 +110,8 @@ public class CommandController implements TabExecutor {
             available.add("help");
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
-            available.add("key");
             available.add("browser");
+            available.add("code");
 
         } else if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
             if (args.length == 2) {
@@ -253,33 +250,24 @@ public class CommandController implements TabExecutor {
         return result;
     }
 
-    private void link(ChatPointsTTV plugin, CommandSender p, String method) {
+    private void link(ChatPointsTTV plugin, CommandSender p) {
         TwitchClient twitch = plugin.getTwitch();
-        if (method.equalsIgnoreCase("browser"))  twitch.customCredentialsFound = false;
-        else if (method.equalsIgnoreCase("key")) twitch.customCredentialsFound = true;
-        else if (method.equals("default")) {
-            twitch.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
+
+        DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
+        TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
+        if (p.equals(Bukkit.getConsoleSender())) {
+            comp.addExtra(new TextComponent("Go to " + auth.getVerificationUri() + " and enter the code: " + auth.getUserCode()));
         } else {
-            p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
-            help(p);
-            return;
+            TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
+            button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
+            button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
+
+            comp.addExtra(button);
+            comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
+
         }
-        if (twitch.customCredentialsFound) {
-            // Try to log in using the provided client secret. Otherwise, proceed as normal using Implicit Grant Flow
-            twitch.linkToTwitch(p, plugin.config.getString("CUSTOM_ACCESS_TOKEN"), plugin.config.getString("CUSTOM_ACCESS_TOKEN"));
-        } else {
-            if (!ImplicitGrantFlow.server.isRunning()) {
-                CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(plugin, p, TwitchClient.getClientID());
-                future.thenAccept(token -> {
-                    twitch.linkToTwitch(p, TwitchClient.getClientID(), token);
-                });
-            }
-        }
-        if (!ChatPointsTTV.isUnitTest) {
-            plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
-                return twitch.customCredentialsFound ? "OAuth Keys" : "Browser Login";
-            }));
-        }
+
+        utils.sendMessage(p, comp);
     }
 
     private void reload(ChatPointsTTV plugin) {
@@ -290,7 +278,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void help(CommandSender p) {
-        p.sendMessage(ChatPointsTTV.msgPrefix + helpMsg);
+        utils.sendMessage(p, helpMsg);
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
@@ -302,7 +290,7 @@ public class CommandController implements TabExecutor {
             strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
         }
 
-        strChannels = !twitch.getListenedChannels().isEmpty() ? strChannels.substring(0, strChannels.length() - 2) : "None"; // Get a comma-separated list of channels. If empty, display "None"
+        strChannels = !twitch.getListenedChannels().isEmpty() && twitch.getListenedChannels() != null ? strChannels.substring(0, strChannels.length() - 2) : "None"; // Get a comma-separated list of channels. If empty or null, display "None"
 
         BaseComponent msg = new ComponentBuilder(
             "---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
@@ -318,6 +306,6 @@ public class CommandController implements TabExecutor {
 
         msg.addExtra(status);
 
-        p.sendMessage(ChatPointsTTV.msgPrefix + msg);
+        utils.sendMessage(p, msg);
     }
 }

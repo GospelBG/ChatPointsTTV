@@ -9,35 +9,27 @@ import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
-import com.github.twitch4j.pubsub.domain.ChannelPointsRedemption;
-import com.github.twitch4j.pubsub.domain.ChannelPointsReward;
-import com.github.twitch4j.pubsub.domain.ChannelPointsUser;
-import com.github.twitch4j.pubsub.events.RewardRedeemedEvent;
+import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class EventTest {
-    
-    
-    @SuppressWarnings("deprecation")
-    public static RewardRedeemedEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) { //TODO: Move away from PubSub
-        ChannelPointsRedemption redemption = new ChannelPointsRedemption();
-        ChannelPointsReward reward = new ChannelPointsReward();
-        ChannelPointsUser redeemer = new ChannelPointsUser();
-        redeemer.setDisplayName(chatter);
+    public static CustomRewardRedemptionAddEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) {
+        CustomRewardRedemptionAddEvent event = jsonToObject(
+            "{\"user_id\":\"" + TwitchUtils.getUserId(chatter) +
+            "\",\"user_login\":\"" + chatter.toLowerCase() +
+            "\",\"user_name\":\"" + chatter +
+            "\",\"broadcaster_user_id\":\"" + TwitchUtils.getUserId(channel) +
+            "\",\"broadcaster_user_login\":\"" + channel.toLowerCase() +
+            "\",\"broadcaster_user_name\":\"" + channel +
+            "\",\"user_input\":\"" + userInput.orElse("") +
+            "\",\"status\":\"unfulfilled" +
+            "\",\"reward\":{\"id\":\"0" + 
+            "\",\"title\":\"" + title +
+            "\",\"cost\":\"123123\"}}",
+            CustomRewardRedemptionAddEvent.class);
 
-        reward.setTitle(title);
-
-        redemption.setChannelId(TwitchUtils.getUserId(channel));
-        redemption.setUser(redeemer);
-        if (userInput.isPresent()) {
-            redemption.setUserInput(userInput.get());
-        }
-
-        redemption.setReward(reward);
-
-        return new RewardRedeemedEvent(Instant.now(), redemption);
+        return event;
     }
 
     public static ChannelFollowEvent FollowEvent(String channel, String chatter) {
@@ -82,10 +74,8 @@ public class EventTest {
             ",\"duration_months\":" + months + "}}",
             ChannelChatNotificationEvent.class);
 
-        ChatPointsTTV.getPlugin().log.info(plan.toString());
-
         return event;
-            }
+    }
 
     public static ChannelChatNotificationEvent ResubEvent(String channel, String chatter, SubscriptionPlan plan, int months) {
         ChannelChatNotificationEvent event = jsonToObject(
@@ -104,8 +94,8 @@ public class EventTest {
             "\",streak_months\":" + months + "}}",
             ChannelChatNotificationEvent.class);
 
-            return event;
-            }
+        return event;
+    }
 
     public static ChannelChatNotificationEvent SubGiftEvent(String channel, String chatter, SubscriptionPlan plan, int amount) {
         ChannelChatNotificationEvent event = jsonToObject(

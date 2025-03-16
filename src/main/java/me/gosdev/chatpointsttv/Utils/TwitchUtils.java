@@ -15,12 +15,13 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 
 public class TwitchUtils {
+    private static final TwitchClient twitch = ChatPointsTTV.getPlugin().getTwitch();
     public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
         String cursor = null;
         List<String> modsOutput = new ArrayList<>();
 
         do {
-            ModeratedChannelList moderatorList = ChatPointsTTV.getPlugin().getTwitch().getClient().getHelix().getModeratedChannels(
+            ModeratedChannelList moderatorList = twitch.getClient().getHelix().getModeratedChannels(
                     auth,
                     userId,
                     100,
@@ -64,21 +65,14 @@ public class TwitchUtils {
         }
     }
     public static String getUserId(String username) {
-        UserList resultList = ChatPointsTTV.getPlugin().getTwitch().getClient().getHelix().getUsers(TwitchClient.oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+        UserList resultList = twitch.getClient().getHelix().getUsers(ChatPointsTTV.getPlugin().getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
         if (resultList.getUsers().isEmpty()) {
             throw new NullPointerException("Couldn't fetch user: " + username);
         }
         return resultList.getUsers().get(0).getId();
     }
-    public static String getUsername(String userId) {
-        UserList resultList = ChatPointsTTV.getPlugin().getTwitch().getClient().getHelix().getUsers(TwitchClient.oauth.getAccessToken(), Arrays.asList(userId), null).execute();
-        if (resultList.getUsers().isEmpty()) {
-            throw new NullPointerException("Couldn't fetch user ID: " + userId);
-        }
-        return resultList.getUsers().get(0).getDisplayName();
-    }
     public static boolean isLive(String accessToken, String username) {
-        StreamList request = ChatPointsTTV.getPlugin().getTwitch().getClient().getHelix().getStreams(accessToken, null, null, null, null, null, null, Arrays.asList(username)).execute();
+        StreamList request = twitch.getClient().getHelix().getStreams(accessToken, null, null, null, null, null, null, Arrays.asList(username)).execute();
 
         return !request.getStreams().isEmpty();
     }
