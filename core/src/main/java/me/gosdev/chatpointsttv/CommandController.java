@@ -3,22 +3,17 @@ package me.gosdev.chatpointsttv;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
-import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
-import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
 import me.gosdev.chatpointsttv.Tests.TestCommand;
 import me.gosdev.chatpointsttv.Twitch.Auth.DeviceCodeGrantFlow;
-import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.Utils;
@@ -52,7 +47,7 @@ public class CommandController implements TabExecutor {
             switch (args[0]) {
                 case "link":
                     if (ChatPointsTTV.configOk) {
-                        link(plugin, sender, args.length == 2 ? args[1] : "default");
+                        link(plugin, sender);
                     } else {
                         utils.sendMessage(sender, "Invalid configuration. Please check your config file.");
                         break;
@@ -255,51 +250,24 @@ public class CommandController implements TabExecutor {
         return result;
     }
 
-    private void link(ChatPointsTTV plugin, CommandSender p, String method) {
+    private void link(ChatPointsTTV plugin, CommandSender p) {
         TwitchClient twitch = plugin.getTwitch();
 
-        if (method.equals("default")) {
-            twitch.customCredentialsFound = (plugin.config.getString("CUSTOM_CLIENT_ID") != null || plugin.config.getString("CUSTOM_CLIENT_SECRET") != null);
-            method = twitch.customCredentialsFound ? "key" : "code";
+        DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
+        TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
+        if (p.equals(Bukkit.getConsoleSender())) {
+            comp.addExtra(new TextComponent("Go to " + auth.getVerificationUri() + " and enter the code: " + auth.getUserCode()));
+        } else {
+            TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
+            button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
+            button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
+
+            comp.addExtra(button);
+            comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
+
         }
 
-        switch (method) {
-            case "code":
-                DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
-                TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
-                if (p.equals(Bukkit.getConsoleSender())) {
-                    comp.addExtra(new TextComponent("Go to " + auth.getVerificationUri() + " and enter the code: " + auth.getUserCode()));
-                } else {
-                    TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
-                    button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
-                    button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
-
-                    comp.addExtra(button);
-                    comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
-
-                }
-                utils.sendMessage(p, comp);
-
-                break;
-
-            case "browser":
-                if (!ImplicitGrantFlow.server.isRunning()) {
-                    CompletableFuture<String> future = ImplicitGrantFlow.getAccessToken(plugin, p, TwitchClient.getClientID());
-                    future.thenAccept(token -> {
-                        twitch.link(p, new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, token));
-                    });
-                }
-                
-
-            default:
-                utils.sendMessage(p, new TextComponent(ChatColor.RED + "Unknown command: /twitch link " + method));
-                help(p);
-                return;
-        }
-
-        plugin.metrics.addCustomChart(new SimplePie("authentication_method", () -> {
-            return twitch.customCredentialsFound ? "OAuth Keys" : "Browser Login";
-        }));
+        utils.sendMessage(p, comp);
     }
 
     private void reload(ChatPointsTTV plugin) {
