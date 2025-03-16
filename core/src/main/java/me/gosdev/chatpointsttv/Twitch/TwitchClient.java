@@ -96,7 +96,7 @@ public class TwitchClient {
         return channels;
     }
 
-    public void enableTwitch() throws ConfigurationException {
+    public void enable() throws ConfigurationException {
         String channel_allowedChars = "^[a-zA-Z0-9_]*$";
         Object cfg_channel = config.get("CHANNEL_USERNAME");
         channels = new HashMap<>();
@@ -262,7 +262,7 @@ public class TwitchClient {
             e.printStackTrace();
             p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Account linking failed!");
             accountConnected = true;
-            unlink(Bukkit.getConsoleSender());
+            stop(Bukkit.getConsoleSender());
         });
     }
     
@@ -292,7 +292,7 @@ public class TwitchClient {
         client.getChat().joinChannel(channel.getUserName());
     }
 
-    public void unlink(CommandSender p) {
+    public void stop(CommandSender p) {
         if (!accountConnected) {
             p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "There is no connected account."));
             return;

@@ -74,7 +74,7 @@ public class CommandController implements TabExecutor {
                             plugin.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        plugin.getTwitch().unlink(sender);
+                        plugin.getTwitch().stop(sender);
                     });
                     return true;
                     

@@ -144,7 +144,7 @@ public class ChatPointsTTV extends JavaPlugin {
             nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
             twitch = new TwitchClient();
-            twitch.enableTwitch(); 
+            twitch.enable(); 
         } catch (ConfigurationException e) {
             configOk = false;
             log.warning("An error occurred while reading config.yml. (if this is the first time running the plugin, you should set it up first)");
@@ -181,7 +181,7 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (twitch != null && twitch.isAccountConnected()) twitch.unlink(Bukkit.getConsoleSender());
+        if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
 
         ImplicitGrantFlow.server.stop();
     
