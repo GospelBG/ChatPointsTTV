@@ -157,7 +157,7 @@ public class TwitchClient {
                 }
             }
 
-            credential = identityProvider.getAdditionalCredentialInformation(credential).get();//new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"))).orElse(null);
+            credential = identityProvider.getAdditionalCredentialInformation(credential).get();
             link(Bukkit.getConsoleSender(), credential);
         }
     }
@@ -168,8 +168,6 @@ public class TwitchClient {
         } else {
             start(p, credential);
         }
-
-        credential = identityProvider.getAdditionalCredentialInformation(credential).get();
 
         ConfigurationSection account = accounts.createSection(credential.getUserId());
         account.set("access_token", credential.getAccessToken());
