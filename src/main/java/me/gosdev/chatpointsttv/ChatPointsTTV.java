@@ -3,8 +3,6 @@ package me.gosdev.chatpointsttv;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.naming.ConfigurationException;
 
@@ -24,7 +22,6 @@ import me.gosdev.chatpointsttv.Twitch.Auth.ImplicitGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
-import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -89,26 +86,6 @@ public class ChatPointsTTV extends JavaPlugin {
     public static Map<String, String> getRedemptionStrings() {
         return titleStrings;
     }
-    private static Utils utils;
-
-    public static Utils getUtils() {
-        if (utils != null) return  utils;
-        final Pattern pattern = Pattern.compile("1\\.\\d\\d?");
-        final Matcher matcher = pattern.matcher(Bukkit.getVersion());
-        matcher.find();
-        int version = Integer.parseInt(matcher.group().split("\\.")[1]);
-        try {
-            if (version >= 12) { 
-                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_12_R1").getDeclaredConstructor().newInstance();
-            } else {
-                utils = (Utils) Class.forName(ChatPointsTTV.class.getPackage().getName() + ".Utils.Utils_1_9_R1").getDeclaredConstructor().newInstance();
-            }
-            return utils;
-        } catch (Exception e) {
-            plugin.log.warning(e.toString());
-            return null;
-        }
-    }
 
     @Override
     public void onLoad() {
@@ -119,7 +96,6 @@ public class ChatPointsTTV extends JavaPlugin {
     public void onEnable() {
         plugin = this;
         PluginManager pm = Bukkit.getServer().getPluginManager();
-        utils = getUtils();
 
         metrics = new Metrics(this, 22873);
         
@@ -155,10 +131,10 @@ public class ChatPointsTTV extends JavaPlugin {
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
-        utils.sendMessage(Bukkit.getConsoleSender(), "ChatPointsTTV enabled!");
+        Bukkit.getConsoleSender().sendMessage("ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
-                utils.sendMessage(p, new TextComponent("ChatPointsTTV reloaded!"));
+                p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
             }
         }
         VersionCheck.check();
@@ -173,7 +149,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
                     btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
 
-                    utils.sendMessage(player.getPlayer(), new BaseComponent[] {new ComponentBuilder(msg).create()[0], btn});
+                    player.getPlayer().spigot().sendMessage(new BaseComponent[] {new ComponentBuilder(msg).create()[0], btn});
                 }
             }
         }, this);

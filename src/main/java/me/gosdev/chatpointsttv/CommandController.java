@@ -16,7 +16,6 @@ import me.gosdev.chatpointsttv.Tests.TestCommand;
 import me.gosdev.chatpointsttv.Twitch.Auth.DeviceCodeGrantFlow;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
-import me.gosdev.chatpointsttv.Utils.Utils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -25,7 +24,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
-    Utils utils = ChatPointsTTV.getUtils();
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch link [method]: " + ChatColor.RESET + "Use this command to link your Twitch account and enable the plugin.\n" +
@@ -49,7 +47,7 @@ public class CommandController implements TabExecutor {
                     if (ChatPointsTTV.configOk) {
                         link(plugin, sender);
                     } else {
-                        utils.sendMessage(sender, "Invalid configuration. Please check your config file.");
+                        sender.sendMessage("Invalid configuration. Please check your config file.");
                         break;
                     }
                     
@@ -79,20 +77,20 @@ public class CommandController implements TabExecutor {
 
                 case "test":
                     if (!plugin.getTwitch().isAccountConnected()) {
-                        utils.sendMessage(sender, ChatColor.RED + "You need to link your account first.");
+                        sender.sendMessage(ChatColor.RED + "You need to link your account first.");
                         return true;
                     }
                     TestCommand.test(sender, args);
                     return true;
 
                 default:
-                    utils.sendMessage(sender, ChatColor.RED + "Unknown command: /twitch " + args[0]);
+                    sender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
                     help(sender);
                     return true;
             }
         }
 
-        if (!ChatPointsTTV.configOk) ChatPointsTTV.getUtils().sendLogToPlayers(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
+        if (!ChatPointsTTV.configOk) sender.sendMessage(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
         return true;
     }
 
@@ -267,7 +265,7 @@ public class CommandController implements TabExecutor {
 
         }
 
-        utils.sendMessage(p, comp);
+        p.spigot().sendMessage(comp);
     }
 
     private void reload(ChatPointsTTV plugin) {
@@ -278,7 +276,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void help(CommandSender p) {
-        utils.sendMessage(p, helpMsg);
+        p.spigot().sendMessage(helpMsg);
     }
 
     private void status(CommandSender p, ChatPointsTTV plugin) {
@@ -306,6 +304,6 @@ public class CommandController implements TabExecutor {
 
         msg.addExtra(status);
 
-        utils.sendMessage(p, msg);
+        p.spigot().sendMessage(msg);
     }
 }
