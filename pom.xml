@@ -8,8 +8,8 @@
   <name>ChatPointsTTV</name>
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
   <build>
-    <directory>../target</directory>
-    <finalName>${project.parent.name}-${project.version}</finalName>
+    <directory>./target</directory>
+    <finalName>${project.name}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
