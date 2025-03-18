@@ -254,14 +254,14 @@ public class CommandController implements TabExecutor {
         DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
         TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
         if (p.equals(Bukkit.getConsoleSender())) {
-            comp.addExtra(new TextComponent("Go to " + auth.getVerificationUri() + " and enter the code: " + auth.getUserCode()));
+            comp.addExtra(new TextComponent("Go to https://twitch.tv/activate and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
         } else {
             TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
-            button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getCompleteUri()));
+            button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getVerificationUri()));
             button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
 
             comp.addExtra(button);
-            comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.RESET + auth.getVerificationUri() + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.RESET + auth.getUserCode()));
+            comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
 
         }
 
