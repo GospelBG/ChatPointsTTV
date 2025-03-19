@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.Tests;
+package me.gosdev.chatpointsttv.Twitch;
 
 import java.time.Instant;
 import java.util.Optional;
