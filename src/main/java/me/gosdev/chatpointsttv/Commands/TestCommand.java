@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.Tests;
+package me.gosdev.chatpointsttv.Commands;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -10,6 +10,7 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Twitch.EventTest;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {

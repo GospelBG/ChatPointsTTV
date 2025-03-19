@@ -1,5 +1,7 @@
 package me.gosdev.chatpointsttv.Commands;
 
+import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -35,4 +37,9 @@ public class LinkCommand {
         p.spigot().sendMessage(comp);
     }
 
+    public static void unlink(CommandSender p, Optional<String> channelField) {
+        channelField.ifPresent((String channel) -> {
+            
+        });
+    }
 }

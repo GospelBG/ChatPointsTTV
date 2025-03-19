@@ -33,6 +33,7 @@ import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
 import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
+import com.github.twitch4j.eventsub.EventSubSubscription;
 import com.github.twitch4j.eventsub.domain.chat.NoticeType;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
@@ -338,6 +339,13 @@ public class TwitchClient {
         } catch (IOException e) {
             plugin.log.severe("There was an issue saving account session credentials.");
         }
+    }
+
+    public void unlinkAccount(String userId) {
+        for (EventSubSubscription sub : eventSocket.getSubscriptions()) {
+            plugin.log.info(sub.toString());
+        }
+
     }
 
     public void stop(CommandSender p) {
