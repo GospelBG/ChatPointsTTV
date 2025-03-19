@@ -103,10 +103,6 @@ public class TwitchClient {
         return client;
     }
 
-    public String getConnectedUsername() {
-        return accountConnected ? user.getLogin() : "Not Linked";
-    }
-
     public HashMap<String, Channel> getListenedChannels() {
         return channels;
     }
