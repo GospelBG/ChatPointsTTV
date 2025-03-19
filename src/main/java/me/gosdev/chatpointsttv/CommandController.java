@@ -77,11 +77,25 @@ public class CommandController implements TabExecutor {
                     StatusCommand.status(sender, plugin);
                     return true;
 
-                case "test":
-                    if (!plugin.getTwitch().isAccountConnected()) {
-                        sender.sendMessage(ChatColor.RED + "You need to link your account first.");
+                case "stop":
+                    if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+                        sender.sendMessage(ChatColor.RED + "Twitch client is already stopped.");
                         return true;
                     }
+                    ChatPointsTTV.getPlugin().getTwitch().stop(sender);
+                    sender.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
+                    return true;
+
+                case "start":
+                    if (ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+                        sender.sendMessage(ChatColor.RED + "Twitch client is already started.");
+                        return true;
+                    }
+                    ChatPointsTTV.getPlugin().getTwitch().enable();
+                    sender.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
+                    return true;
+
+                case "test":
                     TestCommand.test(sender, args);
                     return true;
 
@@ -102,13 +116,22 @@ public class CommandController implements TabExecutor {
         ArrayList<String> result = new ArrayList<>();
 
         if (args.length == 1) {
-            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("link");
-            else available.add("unlink");
+            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) 
             available.add("reload");
-            available.add("status");
-            available.add("accounts");
-            if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("test");
             available.add("help");
+            if (ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+                available.add("link");
+                available.add("stop");
+                available.add("accounts");
+            } else {
+                available.add("start");
+            }
+            if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) {
+                available.add("test");
+                available.add("status");
+                available.add("accounts");
+                available.add("unlink");
+            }
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             available.add("browser");
