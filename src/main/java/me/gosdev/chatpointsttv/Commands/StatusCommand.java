@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class StatusCommand {
     public static void status(CommandSender p, ChatPointsTTV plugin) {
@@ -35,6 +36,21 @@ public class StatusCommand {
         status.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, twitch.isAccountConnected() ? "/twitch stop" : "/twitch start"));
 
         msg.addExtra(status);
+
+        if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) {
+            TextComponent accountsBtn = new TextComponent(ChatColor.YELLOW + "" + ChatColor.BOLD + "[✔]" + ChatColor.RESET + ChatColor.YELLOW + " Manage accounts" );
+            accountsBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to add/display accounts").create()));
+            accountsBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch accounts"));
+
+            TextComponent stopBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.RED + " Stop Twitch Client");
+            stopBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop all Twitch events.").create()));
+            stopBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch stop"));
+
+            msg.addExtra("\n\n");
+            msg.addExtra(accountsBtn);
+            msg.addExtra(ChatColor.GRAY + "  -  ");
+            msg.addExtra(stopBtn);
+        }
 
         p.spigot().sendMessage(msg);
     }
