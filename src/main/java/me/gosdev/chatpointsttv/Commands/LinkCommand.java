@@ -18,6 +18,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class LinkCommand {
     public static void link(ChatPointsTTV plugin, CommandSender p) {
+        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
         TwitchClient twitch = plugin.getTwitch();
 
         DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
@@ -38,6 +42,10 @@ public class LinkCommand {
     }
 
     public static void unlink(CommandSender p, Optional<String> channelField) {
+        if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) {
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
         if (channelField.isPresent()) {
             try {
                 ChatPointsTTV.getPlugin().getTwitch().unlinkAccount(channelField.get());

@@ -17,6 +17,11 @@ public class TestCommand {
     private static final EventManager eventManager = ChatPointsTTV.getPlugin().getTwitch().getClient().getEventManager();
 
     public static void test(CommandSender sender, String[] cmdInput) {
+        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted() ) {
+            sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+        
         if (cmdInput.length < 2) {
             sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> ...");
             return;

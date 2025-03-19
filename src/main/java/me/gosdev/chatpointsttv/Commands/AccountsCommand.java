@@ -14,6 +14,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class AccountsCommand {
     public static void displayAccounts(CommandSender p) {
+        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
         TextComponent msg = new TextComponent("---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
 
         for (Channel channel : ChatPointsTTV.getPlugin().getTwitch().getListenedChannels().values()) {
