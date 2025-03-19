@@ -11,8 +11,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Logger;
 
-import javax.naming.ConfigurationException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -63,7 +61,8 @@ public class TwitchClient {
     public static Boolean accountConnected = false;
     public OAuth2Credential oauth;
     public CredentialManager credentialManager;
-    
+
+    private boolean started;
     private User user;
     private List<String> chatBlacklist;
     private static ITwitchClient client;
@@ -108,7 +107,11 @@ public class TwitchClient {
         return channels;
     }
 
-    public void enable() throws ConfigurationException {
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void enable() {
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
             
@@ -138,6 +141,8 @@ public class TwitchClient {
             credential = identityProvider.getAdditionalCredentialInformation(credential).get();
             link(Bukkit.getConsoleSender(), credential);
         }
+
+        started = true;
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
@@ -175,6 +180,8 @@ public class TwitchClient {
                 });
             }
         }, credential.getExpiresIn() / 2, Double.valueOf(credential.getExpiresIn() / 1.25 * 20).longValue()));
+
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
     }
 
     private void start(CommandSender p, OAuth2Credential credential) {
@@ -281,8 +288,6 @@ public class TwitchClient {
                 log.warning("Failed to bind events.");
                 return;
             }
-
-            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
             accountConnected = true;
         });
 
@@ -340,6 +345,7 @@ public class TwitchClient {
         if (credential == null) {
             accounts.set(userId, null);
         } else {
+            plugin.log.info(userId);
             ConfigurationSection account = accounts.createSection(userId);
             account.set("access_token", credential.getAccessToken());
             account.set("refresh_token", credential.getRefreshToken());
@@ -396,6 +402,6 @@ public class TwitchClient {
         eventManager = null;
         accountConnected = false;
 
-        p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.GREEN + "Account disconnected!");
+        started = false;
     }
 }
