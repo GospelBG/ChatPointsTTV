@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.naming.ConfigurationException;
-
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -103,28 +101,22 @@ public class ChatPointsTTV extends JavaPlugin {
         reloadConfig();
         config = getConfig();
 
-        try {
-            config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
-                colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
-            });
+        config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
+            colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
+        });
 
-            config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
-                titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
-            });
+        config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
+            titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
+        });
 
-            TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
+        TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
 
-            shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
-            alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
-            nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
+        shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
+        alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
+        nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
-            twitch = new TwitchClient();
-            twitch.enable(); 
-        } catch (ConfigurationException e) {
-            configOk = false;
-            log.warning("An error occurred while reading config.yml. (if this is the first time running the plugin, you should set it up first)");
-            log.warning(e.getExplanation());
-        }
+        twitch = new TwitchClient();
+        twitch.enable(); 
 
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
