@@ -38,8 +38,16 @@ public class LinkCommand {
     }
 
     public static void unlink(CommandSender p, Optional<String> channelField) {
-        channelField.ifPresent((String channel) -> {
+        if (channelField.isPresent()) {
+            try {
+                ChatPointsTTV.getPlugin().getTwitch().unlinkAccount(channelField.get());
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
+            } catch (NullPointerException e) {
+                p.sendMessage(e.getMessage() + " " + channelField.get());
+            }
             
-        });
+        } else {
+            ChatPointsTTV.getPlugin().getTwitch().stop(p);
+        }
     }
 }

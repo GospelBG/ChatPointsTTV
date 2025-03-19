@@ -3,6 +3,7 @@ package me.gosdev.chatpointsttv;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -11,9 +12,11 @@ import org.bukkit.command.TabExecutor;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
+import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Commands.LinkCommand;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import me.gosdev.chatpointsttv.Commands.TestCommand;
+import me.gosdev.chatpointsttv.Utils.Channel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -62,8 +65,12 @@ public class CommandController implements TabExecutor {
                             plugin.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        plugin.getTwitch().stop(sender);
+                        LinkCommand.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                     });
+                    return true;
+
+                case "accounts":
+                    AccountsCommand.displayAccounts(sender);
                     return true;
                     
                 case "status":
@@ -99,13 +106,19 @@ public class CommandController implements TabExecutor {
             else available.add("unlink");
             available.add("reload");
             available.add("status");
+            available.add("accounts");
             if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) available.add("test");
             available.add("help");
 
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             available.add("browser");
             available.add("code");
-
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("unlink")) {
+            if (args[0].equalsIgnoreCase("unlink")) {
+                for (Channel channel : ChatPointsTTV.getPlugin().getTwitch().getListenedChannels().values()) {
+                    available.add(channel.getChannelUsername().toLowerCase());
+                }
+            }
         } else if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
             if (args.length == 2) {
                 available.add("channelpoints");
