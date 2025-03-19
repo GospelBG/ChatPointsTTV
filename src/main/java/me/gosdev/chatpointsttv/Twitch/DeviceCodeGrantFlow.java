@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.Twitch.Auth;
+package me.gosdev.chatpointsttv.Twitch;
 
 import org.bukkit.command.CommandSender;
 
@@ -6,8 +6,6 @@ import com.github.philippheuer.credentialmanager.authcontroller.DeviceFlowContro
 import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
 import com.github.philippheuer.credentialmanager.identityprovider.OAuth2IdentityProvider;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
-
-import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 
 public class DeviceCodeGrantFlow {
     public static DeviceFlowController flowController;
