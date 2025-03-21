@@ -161,7 +161,7 @@ public class TwitchClient {
         }
 
         if (accountConnected) {
-            subscribeToEvents(p, credential);
+            subscribeToEvents(credential);
         } else {
             start(p, credential);
         }
@@ -279,7 +279,7 @@ public class TwitchClient {
             eventManager.onEvent(EventSocketSubscriptionFailureEvent.class, e -> latch.countDown());
 
             // Join the twitch chat of this channel(s) and enable stream/follow events
-            subscribeToEvents(p, credential);
+            subscribeToEvents(credential);
 
             try {
                 client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
@@ -304,7 +304,7 @@ public class TwitchClient {
         } catch (InterruptedException e) {}
     }
     
-    private void subscribeToEvents(CommandSender p, OAuth2Credential credential) {
+    private void subscribeToEvents(OAuth2Credential credential) {
         String channel_id = credential.getUserId();
         Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Listening to " + credential.getUserName() + "'s events...");
 
