@@ -105,9 +105,9 @@ COLORS:
 # Viewer's username and their reward will be autommatically added to the message.
 
 STRINGS:
-  REDEEMED_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
-  FOLLOWED_STRING: "has started following"
-  CHEERED_STRING: "cheered" #..."100 bits"
+  CHANNEL_POINTS_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
+  FOLLOW_STRING: "has started following"
+  CHEER_STRING: "cheered" #..."100 bits"
   SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
   GIFT_STRING: "gifted" #..."5 subs"
-  RAIDED_STRING: "has raided {CHANNEL} with a viewer count of" # {CHANNEL} will be replaced with the raided channel name.
+  RAID_STRING: "has raided {CHANNEL} with a viewer count of" # {CHANNEL} will be replaced with the raided channel name.
