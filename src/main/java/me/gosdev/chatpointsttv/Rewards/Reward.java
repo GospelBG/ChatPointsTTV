@@ -6,7 +6,7 @@ import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class Reward {
-    rewardType type;
+    private final rewardType type;
     private final String event;
     private final List<String> cmds;
     private final String channel;

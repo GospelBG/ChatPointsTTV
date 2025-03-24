@@ -16,8 +16,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
+import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
-import me.gosdev.chatpointsttv.Twitch.TwitchEventHandler;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -31,12 +31,15 @@ public class ChatPointsTTV extends JavaPlugin {
     private static TwitchClient twitch;
     private CommandController cmdController;
 
-    private static final Map<String, ChatColor> colors = new HashMap<>();
-    private static final Map<String, String> titleStrings = new HashMap<>();
+    private static final Map<rewardType, String> titleStrings = new HashMap<>();
+    public static ChatColor action_color;
+    public static ChatColor user_color;
+    public static Boolean rewardBold;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
-    public static boolean configOk = true;
+    public static Boolean configOk = true;
     public static alert_mode alertMode;
+    public static Boolean logEvents;
 
     public final Logger log = getLogger();
     public FileConfiguration config;
@@ -76,12 +79,8 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin.config;
     }
 
-
-    public static Map<String, ChatColor> getChatColors() {
-        return colors;
-    }
-    public static Map<String, String> getRedemptionStrings() {
-        return titleStrings;
+    public static String getRedemptionString(rewardType type) {
+        return titleStrings.get(type);
     }
 
     @Override
@@ -101,18 +100,16 @@ public class ChatPointsTTV extends JavaPlugin {
         reloadConfig();
         config = getConfig();
 
-        config.getConfigurationSection("COLORS").getKeys(false).forEach(i -> {
-            colors.put(i, ChatColor.valueOf(config.getConfigurationSection("COLORS").getString(i)));
-        });
+        for (rewardType type : rewardType.values()) {
+            titleStrings.put(type, config.getConfigurationSection("STRINGS").getString(type.toString() + "_STRING"));
+        }
 
-        config.getConfigurationSection("STRINGS").getKeys(true).forEach(i -> {
-            titleStrings.put(i, config.getConfigurationSection("STRINGS").getString(i));
-        });
-
-        TwitchEventHandler.rewardBold = config.getBoolean("REWARD_NAME_BOLD");
-
+        logEvents = config.getBoolean("LOG_EVENTS", false);
+        rewardBold = config.getBoolean("REWARD_NAME_BOLD");
+        user_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
+        action_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("ACTION_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
-        alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS").toUpperCase());
+        alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
         twitch = new TwitchClient();
@@ -157,7 +154,6 @@ public class ChatPointsTTV extends JavaPlugin {
         twitch = null;
 
         Rewards.rewards = new HashMap<>();
-        TwitchEventHandler.rewardBold = null;
 
         HandlerList.unregisterAll(this);
     }
