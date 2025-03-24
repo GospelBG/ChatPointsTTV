@@ -1,5 +1,7 @@
 package me.gosdev.chatpointsttv.Twitch;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
@@ -24,7 +26,12 @@ public class TwitchEventHandler {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
-            Events.onEvent(rewardType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
+            List<String> replacedCmds = new ArrayList<>();
+            for (String cmd : reward.getCommands()) {
+                replacedCmds.add(cmd.replace("{TEXT}", event.getUserInput()));
+            }
+
+            Events.onEvent(rewardType.CHANNEL_POINTS, new Reward(reward.getType(), reward.getChannel(), reward.getEvent(), replacedCmds), event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
             return;
         }
     }
@@ -40,13 +47,13 @@ public class TwitchEventHandler {
 
     public void onCheer(ChannelChatMessageEvent event) {
         if (event.getCheer() == null) return;
-        int amount = event.getCheer().getBits();
+        Integer amount = event.getCheer().getBits();
 
         for (Reward reward : Rewards.getRewards(rewardType.CHEER)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             try {
                 if (amount >= Integer.parseInt(reward.getEvent())) {
-                    Events.onEvent(rewardType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount + " bits"));
+                    Events.onEvent(rewardType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                     return;
                 }
     
@@ -80,20 +87,19 @@ public class TwitchEventHandler {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                Events.onEvent(rewardType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(tier.toString()));
+                Events.onEvent(rewardType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(tier.name() + " sub"));
                 return;
             }
         }
     }
 
     public void onSubGift(ChannelChatNotificationEvent event) {
-        String tier = TwitchUtils.PlanToString(event.getCommunitySubGift().getSubTier());
-        int amount = event.getCommunitySubGift().getTotal();
+        Integer amount = event.getCommunitySubGift().getTotal();
 
         for (Reward reward : Rewards.getRewards(rewardType.GIFT)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             if (amount >= Integer.parseInt(reward.getEvent())) {
-                Events.onEvent(rewardType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount + " subs"));
+                Events.onEvent(rewardType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                 return;
             }
         }
@@ -106,7 +112,7 @@ public class TwitchEventHandler {
         for (Reward reward : Rewards.getRewards(rewardType.RAID)) {
             if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
-                Events.onEvent(rewardType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount + " viewers"));
+                Events.onEvent(rewardType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount.toString()));
                 return;
             }
         }
