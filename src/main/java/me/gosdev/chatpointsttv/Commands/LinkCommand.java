@@ -41,8 +41,12 @@ public class LinkCommand {
     }
 
     public static void unlink(CommandSender p, Optional<String> channelField) {
-        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
+            p.sendMessage(ChatColor.RED + "There are no accounts linked!");
             return;
         }
         if (channelField.isPresent()) {
