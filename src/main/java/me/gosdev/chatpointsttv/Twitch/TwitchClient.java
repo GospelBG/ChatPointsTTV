@@ -408,6 +408,11 @@ public class TwitchClient {
         saveCredential(channel.getChannelId(), null); // Remove stored credential
         identityProvider.revokeCredential(credentialManager.get(channel.getChannelId()));
         tokenRefreshTasks.get(channel.getChannelId()).cancel();
+        credentialManager.remove(channel.getChannelId());
+
+        if (credentialManager.size() == 0) {
+            accountConnected = false;
+        }
 
         ChatPointsTTV.log.info("Done!");
     }
@@ -421,6 +426,7 @@ public class TwitchClient {
             if (!linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
             client.getEventSocket().close();
             client.close();
+            credentialManager.clear();
             accountConnected = false;
         } catch (Exception e) {
             ChatPointsTTV.log.warning("Error while disabling ChatPointsTTV.");
