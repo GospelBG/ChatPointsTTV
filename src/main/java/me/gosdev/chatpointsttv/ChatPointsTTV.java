@@ -112,9 +112,6 @@ public class ChatPointsTTV extends JavaPlugin {
         alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
-        twitch = new TwitchClient();
-        twitch.enable(); 
-
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
@@ -125,6 +122,10 @@ public class ChatPointsTTV extends JavaPlugin {
                 p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
             }
         }
+        
+        twitch = new TwitchClient();
+        twitch.enable(); 
+
         VersionCheck.check();
 
         pm.registerEvents(new Listener() {
