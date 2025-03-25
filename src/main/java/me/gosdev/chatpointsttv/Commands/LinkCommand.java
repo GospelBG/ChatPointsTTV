@@ -23,21 +23,21 @@ public class LinkCommand {
             return;
         }
 
-        DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, ChatPointsTTV.getTwitch());
-        TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
-        if (p.equals(Bukkit.getConsoleSender())) {
-            comp.addExtra(new TextComponent("Go to https://twitch.tv/activate and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
-        } else {
-            TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
-            button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getVerificationUri()));
-            button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
-
-            comp.addExtra(button);
-            comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
-
-        }
-
-        p.spigot().sendMessage(comp);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, ChatPointsTTV.getTwitch());
+            TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
+            if (p.equals(Bukkit.getConsoleSender())) {
+                comp.addExtra(new TextComponent("Go to https://twitch.tv/activate and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
+            } else {
+                TextComponent button = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here]");
+                button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getVerificationUri()));
+                button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
+    
+                comp.addExtra(button);
+                comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
+            }
+            p.spigot().sendMessage(comp);    
+        });
     }
 
     public static void unlink(CommandSender p, Optional<String> channelField) {
