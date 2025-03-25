@@ -14,11 +14,14 @@ import me.gosdev.chatpointsttv.Twitch.EventTest;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
-    private static final EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
-
     public static void test(CommandSender sender, String[] cmdInput) {
-        if (!ChatPointsTTV.getTwitch().isStarted() ) {
+        if (ChatPointsTTV.getTwitch() == null || !ChatPointsTTV.getTwitch().isStarted() ) {
             sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+
+        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
+            sender.sendMessage(ChatColor.RED + "You must link a Twitch account in order to run test events!");
             return;
         }
         
@@ -27,6 +30,7 @@ public class TestCommand {
             return;
         }
 
+        EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
         EventSubEvent event;
 
         ArrayList<String> args =  new ArrayList<>();
