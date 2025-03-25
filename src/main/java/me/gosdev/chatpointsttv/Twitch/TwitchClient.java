@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.logging.Logger;
@@ -19,8 +20,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import com.github.philippheuer.credentialmanager.CredentialManager;
-import com.github.philippheuer.credentialmanager.CredentialManagerBuilder;
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
 import com.github.philippheuer.events4j.simple.SimpleEventHandler;
@@ -60,7 +59,7 @@ public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
     public static Boolean accountConnected = false;
     public OAuth2Credential oauth;
-    public CredentialManager credentialManager;
+    public HashMap<String, OAuth2Credential> credentialManager;
 
     private boolean started;
     private User user;
@@ -121,24 +120,20 @@ public class TwitchClient {
         accountsFile = new File(plugin.getDataFolder(), "twitch.yml");
         accounts = YamlConfiguration.loadConfiguration(accountsFile);
         identityProvider = new TwitchIdentityProvider(getClientID(), null, null);
-        credentialManager = CredentialManagerBuilder.builder().build();
-        credentialManager.registerIdentityProvider(identityProvider);
+        credentialManager = new HashMap<>();
         exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
         
         for (String userid : accounts.getKeys(false)) {
             ConfigurationSection account = accounts.getConfigurationSection(userid);
             OAuth2Credential credential = new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"), account.getString("refresh_token"), userid, null, null, null);
-            if (!identityProvider.isCredentialValid(credential).orElse(false)) {
-                // Try to refresh token
-                credential = identityProvider.refreshCredential(credential).orElse(null);
-                if (credential == null) { // Cannot refresh token (refresh expired or invalid)
-                    plugin.log.warning("Credentials for User ID: " + userid + " are expired. You will need to link your account again.");
-                    saveCredential(userid, null); // Remove invalid credentials from file
-                    continue;
-                }
+            // Try to refresh token
+            try {
+                credential = refreshCredentials(credential);
+            } catch (RuntimeException e) {
+                plugin.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
+                saveCredential(userid, null);
+                continue;
             }
-
-            credential = identityProvider.getAdditionalCredentialInformation(credential).get();
             link(Bukkit.getConsoleSender(), credential);
         }
 
@@ -146,40 +141,34 @@ public class TwitchClient {
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
+        saveCredential(credential.getUserId(), credential);
+        credentialManager.put(credential.getUserId(), credential);
+
         if (linkThread != null) {
             try {
                 linkThread.join();
             } catch (InterruptedException e) {}
         }
-        credential.updateCredential(identityProvider.getAdditionalCredentialInformation(credential).get());
+        
         for (Channel channel : channels.values()) {
             if (credential.getUserId().equals(channel.getChannelId())) {
-                saveCredential(credential.getUserId(), credential); // Due to the credential refreshing, we need to save it again
                 p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
                 return;
             }
         }
+
+        tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
+            @Override
+            public void run() {
+                refreshCredentials(credential);
+            }
+        }, 1200, credential.getExpiresIn() / 2 * 20));
 
         if (accountConnected) {
             subscribeToEvents(credential);
         } else {
             start(p, credential);
         }
-        
-        credentialManager.addCredential(TwitchIdentityProvider.PROVIDER_NAME, credential);
-        saveCredential(credential.getUserId(), credential);
-        
-        tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
-            @Override
-            public void run() {
-                identityProvider.refreshCredential(credential).ifPresent(newCred -> {
-                    credentialManager.getOAuth2CredentialByUserId(credential.getUserId()).ifPresent(cred -> {
-                        cred.updateCredential(newCred);
-                        saveCredential(newCred.getUserId(), newCred);
-                    });
-                });
-            }
-        }, credential.getExpiresIn() / 2, Double.valueOf(credential.getExpiresIn() / 1.25 * 20).longValue()));
 
         p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
     }
@@ -341,11 +330,20 @@ public class TwitchClient {
         client.getChat().joinChannel(credential.getUserName());
     }
 
+    public OAuth2Credential refreshCredentials(OAuth2Credential oldCredential) {
+        Optional<OAuth2Credential> refreshed = identityProvider.refreshCredential(oldCredential);
+
+        if (refreshed.isPresent()) {
+            saveCredential(oldCredential.getUserId(), refreshed.get());
+            return identityProvider.getAdditionalCredentialInformation(refreshed.get()).get();
+        }
+        throw new RuntimeException("Failed to refresh credentials.");
+    }
+
     public void saveCredential(String userId, OAuth2Credential credential) {
         if (credential == null) {
             accounts.set(userId, null);
         } else {
-            plugin.log.info(userId);
             ConfigurationSection account = accounts.createSection(userId);
             account.set("access_token", credential.getAccessToken());
             account.set("refresh_token", credential.getRefreshToken());
@@ -370,7 +368,7 @@ public class TwitchClient {
         client.getChat().leaveChannel(username);
 
         saveCredential(channel.getChannelId(), null); // Remove stored credential
-        identityProvider.revokeCredential(credentialManager.getOAuth2CredentialByUserId(channel.getChannelId()).get());
+        identityProvider.revokeCredential(credentialManager.get(channel.getChannelId()));
         tokenRefreshTasks.get(channel.getChannelId()).cancel();
 
         plugin.log.info("Done!");

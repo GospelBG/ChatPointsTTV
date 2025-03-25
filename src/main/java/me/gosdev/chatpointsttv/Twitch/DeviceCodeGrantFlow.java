@@ -15,7 +15,7 @@ public class DeviceCodeGrantFlow {
         flowController = new DeviceFlowController();
         DeviceAuthorization auth = flowController.startOAuth2DeviceAuthorizationGrantType(identityProvider, TwitchClient.scopes,  response -> {
             if (response.getCredential() != null) {
-                client.link(p, response.getCredential());
+                client.link(p, identityProvider.getAdditionalCredentialInformation(response.getCredential()).get());
             } else {
                 switch(response.getError()) {
                     case ACCESS_DENIED:
