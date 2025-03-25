@@ -23,14 +23,6 @@ public class AccountsCommand {
         if (p.equals(Bukkit.getConsoleSender())) {
 
         } else {
-            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
-                BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
-                deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
-                deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink " + channel.getChannelUsername()));
-                msg.addExtra(deleteButton);
-                msg.addExtra(new TextComponent("  " + channel.getChannelUsername() + "\n"));
-            }
-    
             TextComponent addBtn = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "\n[+]" + ChatColor.RESET + ChatColor.GREEN + " Add account");
             addBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to link another account").create()));
             addBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
@@ -38,14 +30,24 @@ public class AccountsCommand {
             TextComponent stopBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[❌]" + ChatColor.RESET + ChatColor.RED + " Remove all accounts");
             stopBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink all accounts").create()));
             stopBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink"));
-    
-            msg.addExtra(addBtn);
-            msg.addExtra(ChatColor.GRAY + "  -  ");
-            msg.addExtra(stopBtn);
-    
-    
+            
+            if (ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
+                msg.addExtra(ChatColor.GRAY + "  There are no connected accounts :(\n");
+                msg.addExtra(addBtn);
+            } else {
+                for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                    BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
+                    deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
+                    deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink " + channel.getChannelUsername()));
+                    msg.addExtra(deleteButton);
+                    msg.addExtra(new TextComponent("  " + channel.getChannelUsername() + "\n"));
+                }
+        
+                msg.addExtra(addBtn);
+                msg.addExtra(ChatColor.GRAY + "  -  ");
+                msg.addExtra(stopBtn);
+            }    
         }
         p.spigot().sendMessage(msg);
-
     }
 }
