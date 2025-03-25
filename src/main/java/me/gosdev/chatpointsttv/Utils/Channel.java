@@ -5,8 +5,8 @@ import java.util.List;
 import com.github.twitch4j.eventsub.EventSubSubscription;
 
 public class Channel {
-    private String channelName;
-    private String channelId;
+    private final String channelName;
+    private final String channelId;
     private boolean live;
     private List<EventSubSubscription> subs;
 

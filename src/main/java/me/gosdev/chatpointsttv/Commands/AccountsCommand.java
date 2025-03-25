@@ -15,7 +15,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class AccountsCommand {
     public static void displayAccounts(CommandSender p) {
-        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }
@@ -23,7 +23,7 @@ public class AccountsCommand {
         if (p.equals(Bukkit.getConsoleSender())) {
 
         } else {
-            for (Channel channel : ChatPointsTTV.getPlugin().getTwitch().getListenedChannels().values()) {
+            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                 BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
                 deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
                 deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink " + channel.getChannelUsername()));

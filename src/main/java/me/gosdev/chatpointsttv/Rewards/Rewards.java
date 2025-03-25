@@ -57,7 +57,7 @@ public class Rewards {
                 }
             }
         } else {
-            ChatPointsTTV.getPlugin().log.warning("Invalid config for " + type.toString() + " rewards");
+            ChatPointsTTV.log.warning("Invalid config for " + type.toString() + " rewards");
             return null; 
         }
         reward_list.sort(new RewardComparator());

@@ -20,8 +20,6 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class Events {
-    static ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-
     public static void setAlertMode(alert_mode alertMode) {
         ChatPointsTTV.alertMode = alertMode;
     }
@@ -50,8 +48,8 @@ public class Events {
 
     public static void onEvent(rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
         if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventString(type, chatter, channel, event));
-        if (plugin.getTwitch().ignoreOfflineStreamers) {
-            for (Channel ch : plugin.getTwitch().getListenedChannels().values()) {
+        if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
+            for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                 if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
             }
         }
@@ -68,7 +66,7 @@ public class Events {
             String[] parts = cmd.split(" ");
 
             if (parts.length <= 1) {
-                plugin.log.warning("Invalid command: " + parts[0]);
+                ChatPointsTTV.log.warning("Invalid command: " + parts[0]);
                 continue;
             }
             try {
@@ -79,7 +77,7 @@ public class Events {
                     case "RUN":
                         String text = "";
                         for (int i = 2; i < parts.length; i++) {
-                            plugin.log.info(parts[i]);                    
+                            ChatPointsTTV.log.info(parts[i]);                    
                             text += " " + parts[i];
                         }
                         text = text.trim();
@@ -89,14 +87,14 @@ public class Events {
                         giveAction(parts[1], Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null), Optional.ofNullable(parts.length > 3 ? parts[3] : null));
                         break;
                     case "TNT":
-                        tntAction(Integer.valueOf(parts[1]), Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null));
+                        tntAction(Integer.parseInt(parts[1]), Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null));
                         break;
                     default:
-                        plugin.log.warning("Invalid action: " + parts[0]);
+                        ChatPointsTTV.log.warning("Invalid action: " + parts[0]);
                         break;
                 }
             } catch (NumberFormatException e) {
-                plugin.log.warning("Invalid amount: " + parts[2]);
+                ChatPointsTTV.log.warning("Invalid amount: " + parts[2]);
             }
         }
     }
@@ -130,7 +128,7 @@ public class Events {
                 break;
 
             default:
-                plugin.log.warning("Invalid mode: " + action.toUpperCase());
+                ChatPointsTTV.log.warning("Invalid mode: " + action.toUpperCase());
                 break;
         }
     }
@@ -138,7 +136,7 @@ public class Events {
 
     public static void spawnAction(String entity, Optional<Integer> amount, Optional<String> player, String chatter) {
         if (!EnumUtils.isValidEnum(EntityType.class, entity.toUpperCase())) {
-            plugin.log.warning("Entity " + entity.toUpperCase() + " does not exist.");
+            ChatPointsTTV.log.warning("Entity " + entity.toUpperCase() + " does not exist.");
             return;
         } 
 
@@ -146,7 +144,7 @@ public class Events {
             if (player.isPresent()) { // Is targeting a player?
                 Player query = Bukkit.getPlayer(player.get());
                 if (query == null || !query.isOnline()) {
-                    plugin.log.warning("Couldn't find player " + player.get() + ".");
+                    ChatPointsTTV.log.warning("Couldn't find player " + player.get() + ".");
                     return;
                 } 
                 if (!p.getName().equalsIgnoreCase(player.get())) {
@@ -161,13 +159,13 @@ public class Events {
             if (ChatPointsTTV.nameSpawnedMobs) entityRunnable.entityName = chatter;
             
             entityRunnable.p = p;
-            entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, entityRunnable, 0, 0);
+            entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(ChatPointsTTV.getPlugin(), entityRunnable, 0, 0);
         }
     }
 
     public static void runAction(String runAs, String cmd, String chatter) {
         final String command = cmd.replace("/", "");
-        plugin.log.info("Running command: " + command);
+        ChatPointsTTV.log.info("Running command: " + command);
 
         if (runAs.equalsIgnoreCase("CONSOLE")) {
             new BukkitRunnable() {
@@ -175,31 +173,31 @@ public class Events {
                 public void run() {
                     Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), command);
                 }
-            }.runTask(plugin);
+            }.runTask(ChatPointsTTV.getPlugin());
         } else if (runAs.equalsIgnoreCase("TARGET")) {
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
+            for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
                 if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
                             Bukkit.dispatchCommand(p, command);
                         }
-                    }.runTask(plugin);
+                    }.runTask(ChatPointsTTV.getPlugin());
                     return;    
                 }
             }
-            plugin.log.warning("Couldn't find any target players!");
+            ChatPointsTTV.log.warning("Couldn't find any target players!");
         } else {
-            plugin.log.warning("Invalid parameter: " + runAs);
+            ChatPointsTTV.log.warning("Invalid parameter: " + runAs);
         }
     }
 
     public static void giveAction(String itemName, Optional<Integer> amount, Optional<String> player) {
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
+        for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
             if (player.isPresent()) { // Is targeting a player?
                 Player query = Bukkit.getPlayer(player.get());
                 if (query == null || !query.isOnline()) {
-                    plugin.log.warning("Couldn't find player " + player.get() + ".");
+                    ChatPointsTTV.log.warning("Couldn't find player " + player.get() + ".");
                     return;
                 }
                 if (!p.getName().equalsIgnoreCase(player.get())) {
@@ -209,7 +207,7 @@ public class Events {
 
             
             if (!EnumUtils.isValidEnum(Material.class, itemName)) {
-                plugin.log.warning("Item " + itemName + " does not exist.");
+                ChatPointsTTV.log.warning("Item " + itemName + " does not exist.");
                 return;
             }
             ItemStack item = new ItemStack(Material.valueOf(itemName), amount.orElse(1));
@@ -228,7 +226,7 @@ public class Events {
                 tntRunnable.explosionTime = explosionTime.get();
             }
             tntRunnable.p = p;
-            tntRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, tntRunnable, 0, 2);
+            tntRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(ChatPointsTTV.getPlugin(), tntRunnable, 0, 2);
         }
     }
 }

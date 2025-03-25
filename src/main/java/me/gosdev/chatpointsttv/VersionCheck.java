@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Logger;
 
 import org.bukkit.entity.Player;
 import org.json.JSONArray;
@@ -23,9 +22,6 @@ public class VersionCheck {
     private final static String download_url = "https://modrinth.com/plugin/chatpointsttv";
 
     public static void check() {
-        ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-        Logger log = plugin.log;
-
         try {
             StringBuilder result = new StringBuilder();
             HttpURLConnection conn = (HttpURLConnection) new URI(url).toURL().openConnection();
@@ -41,7 +37,7 @@ public class VersionCheck {
             String latest = json.getJSONObject(0).getString("version_number");
 
             if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latest.replaceAll("[^\\d.]", ""))) {
-                for (Player p: plugin.getServer().getOnlinePlayers()) {
+                for (Player p: ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                         ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version");
             
@@ -53,12 +49,12 @@ public class VersionCheck {
                         p.spigot().sendMessage(btn);
                     }
                 }
-                log.info("ChatPointsTTV v" + latest + " has been released! Download the latest version in " + download_url);
+                ChatPointsTTV.log.info("ChatPointsTTV v" + latest + " has been released! Download the latest version in " + download_url);
 
             }
 
         } catch (IOException | URISyntaxException e) {
-            log.warning("Couldn't fetch latest version." + e.toString());
+            ChatPointsTTV.log.warning("Couldn't fetch latest version." + e.toString());
         }
     }
 }

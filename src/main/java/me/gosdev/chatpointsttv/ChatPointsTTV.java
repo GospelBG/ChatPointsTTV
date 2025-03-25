@@ -41,7 +41,7 @@ public class ChatPointsTTV extends JavaPlugin {
     public static alert_mode alertMode;
     public static Boolean logEvents;
 
-    public final Logger log = getLogger();
+    public static final Logger log = Bukkit.getLogger();
     public FileConfiguration config;
     public Metrics metrics;
 
@@ -71,7 +71,7 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin;
     }
 
-    public TwitchClient getTwitch() {
+    public static TwitchClient getTwitch() {
         return twitch;
     }
 

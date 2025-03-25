@@ -15,7 +15,7 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 
 public class TwitchUtils {
-    private static final TwitchClient twitch = ChatPointsTTV.getPlugin().getTwitch();
+    private static final TwitchClient twitch = ChatPointsTTV.getTwitch();
     public static List<String> getModeratedChannelIDs(String auth, String userId) throws HystrixRuntimeException {
         String cursor = null;
         List<String> modsOutput = new ArrayList<>();
@@ -65,7 +65,7 @@ public class TwitchUtils {
         }
     }
     public static String getUserId(String username) {
-        UserList resultList = twitch.getClient().getHelix().getUsers(ChatPointsTTV.getPlugin().getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+        UserList resultList = twitch.getClient().getHelix().getUsers(ChatPointsTTV.getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
         if (resultList.getUsers().isEmpty()) {
             throw new NullPointerException("Couldn't fetch user: " + username);
         }

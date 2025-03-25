@@ -14,10 +14,10 @@ import me.gosdev.chatpointsttv.Twitch.EventTest;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
-    private static final EventManager eventManager = ChatPointsTTV.getPlugin().getTwitch().getClient().getEventManager();
+    private static final EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
 
     public static void test(CommandSender sender, String[] cmdInput) {
-        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted() ) {
+        if (!ChatPointsTTV.getTwitch().isStarted() ) {
             sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }

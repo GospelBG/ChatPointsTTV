@@ -9,7 +9,6 @@ import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Twitch.DeviceCodeGrantFlow;
-import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -19,13 +18,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class LinkCommand {
     public static void link(ChatPointsTTV plugin, CommandSender p) {
-        if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }
-        TwitchClient twitch = plugin.getTwitch();
 
-        DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, twitch);
+        DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, ChatPointsTTV.getTwitch());
         TextComponent comp = new TextComponent(ChatPointsTTV.msgPrefix);
         if (p.equals(Bukkit.getConsoleSender())) {
             comp.addExtra(new TextComponent("Go to https://twitch.tv/activate and enter the code: " + ChatColor.DARK_PURPLE + auth.getUserCode()));
@@ -43,21 +41,21 @@ public class LinkCommand {
     }
 
     public static void unlink(CommandSender p, Optional<String> channelField) {
-        if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) {
+        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }
         if (channelField.isPresent()) {
             try {
-                ChatPointsTTV.getPlugin().getTwitch().unlinkAccount(channelField.get());
+                ChatPointsTTV.getTwitch().unlinkAccount(channelField.get());
                 p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
             } catch (NullPointerException e) {
                 p.sendMessage(e.getMessage() + " " + channelField.get());
             }
         } else {
             try {
-                for (Channel channel : ChatPointsTTV.getPlugin().getTwitch().getListenedChannels().values()) {
-                    ChatPointsTTV.getPlugin().getTwitch().unlinkAccount(channel.getChannelUsername());
+                for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                    ChatPointsTTV.getTwitch().unlinkAccount(channel.getChannelUsername());
                 }
                 p.sendMessage(ChatPointsTTV.msgPrefix + "All accounts were unlinked successfully!");
             } catch (NullPointerException e) {

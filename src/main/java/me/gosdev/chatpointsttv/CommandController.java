@@ -62,7 +62,7 @@ public class CommandController implements TabExecutor {
                 case "unlink":
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
-                            plugin.getTwitch().linkThread.join();
+                            ChatPointsTTV.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
                         LinkCommand.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
@@ -78,20 +78,20 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "stop":
-                    if (!ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+                    if (!ChatPointsTTV.getTwitch().isStarted()) {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already stopped.");
                         return true;
                     }
-                    ChatPointsTTV.getPlugin().getTwitch().stop(sender);
+                    ChatPointsTTV.getTwitch().stop(sender);
                     sender.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
                     return true;
 
                 case "start":
-                    if (ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+                    if (ChatPointsTTV.getTwitch().isStarted()) {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already started.");
                         return true;
                     }
-                    ChatPointsTTV.getPlugin().getTwitch().enable();
+                    ChatPointsTTV.getTwitch().enable();
                     sender.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
                     return true;
 
@@ -116,17 +116,16 @@ public class CommandController implements TabExecutor {
         ArrayList<String> result = new ArrayList<>();
 
         if (args.length == 1) {
-            if (!ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) 
-            available.add("reload");
             available.add("help");
-            if (ChatPointsTTV.getPlugin().getTwitch().isStarted()) {
+            if (!ChatPointsTTV.getTwitch().isAccountConnected()) available.add("reload");
+            if (ChatPointsTTV.getTwitch().isStarted()) {
                 available.add("link");
                 available.add("stop");
                 available.add("accounts");
             } else {
                 available.add("start");
             }
-            if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected()) {
+            if (ChatPointsTTV.getTwitch().isAccountConnected()) {
                 available.add("test");
                 available.add("status");
                 available.add("accounts");
@@ -138,11 +137,11 @@ public class CommandController implements TabExecutor {
             available.add("code");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("unlink")) {
             if (args[0].equalsIgnoreCase("unlink")) {
-                for (Channel channel : ChatPointsTTV.getPlugin().getTwitch().getListenedChannels().values()) {
+                for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     available.add(channel.getChannelUsername().toLowerCase());
                 }
             }
-        } else if (ChatPointsTTV.getPlugin().getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
+        } else if (ChatPointsTTV.getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
             if (args.length == 2) {
                 available.add("channelpoints");
                 available.add("cheer");
@@ -280,7 +279,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void reload(ChatPointsTTV plugin) {
-        plugin.log.info("Reloading ChatPointsTTV...");
+        ChatPointsTTV.log.info("Reloading ChatPointsTTV...");
 
         plugin.onDisable();
         plugin.onEnable();

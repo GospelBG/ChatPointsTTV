@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -70,7 +69,6 @@ public class TwitchClient {
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-    private final Logger log = plugin.log;
     private final FileConfiguration config = plugin.getConfig();
     private FileConfiguration accounts;
     private File accountsFile;
@@ -130,7 +128,7 @@ public class TwitchClient {
             try {
                 credential = refreshCredentials(credential);
             } catch (RuntimeException e) {
-                plugin.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
+                ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
                 saveCredential(userid, null);
                 continue;
             }
@@ -274,7 +272,7 @@ public class TwitchClient {
                 client.getEventManager().getEventHandler(SimpleEventHandler.class).registerListener(eventHandler);
                 latch.await();
             } catch (InterruptedException e) {
-                log.warning("Failed to bind events.");
+                ChatPointsTTV.log.warning("Failed to bind events.");
                 return;
             }
             accountConnected = true;
@@ -352,7 +350,7 @@ public class TwitchClient {
         try {
             accounts.save(accountsFile);
         } catch (IOException e) {
-            plugin.log.severe("There was an issue saving account session credentials.");
+            ChatPointsTTV.log.severe("There was an issue saving account session credentials.");
         }
     }
 
@@ -371,7 +369,7 @@ public class TwitchClient {
         identityProvider.revokeCredential(credentialManager.get(channel.getChannelId()));
         tokenRefreshTasks.get(channel.getChannelId()).cancel();
 
-        plugin.log.info("Done!");
+        ChatPointsTTV.log.info("Done!");
     }
 
     public void stop(CommandSender p) {
@@ -385,7 +383,7 @@ public class TwitchClient {
             client.close();
             accountConnected = false;
         } catch (Exception e) {
-            log.warning("Error while disabling ChatPointsTTV.");
+            ChatPointsTTV.log.warning("Error while disabling ChatPointsTTV.");
             e.printStackTrace();
             return;
         }

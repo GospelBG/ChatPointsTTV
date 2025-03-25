@@ -19,8 +19,6 @@ import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class TwitchEventHandler {
-    ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
         for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
@@ -52,13 +50,13 @@ public class TwitchEventHandler {
         for (Reward reward : Rewards.getRewards(rewardType.CHEER)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             try {
-                if (amount >= Integer.parseInt(reward.getEvent())) {
+                if (amount >= Integer.valueOf(reward.getEvent())) {
                     Events.onEvent(rewardType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                     return;
                 }
     
             } catch (NumberFormatException e) {
-                plugin.log.warning("Invalid cheer amount: " + reward.getEvent());
+                ChatPointsTTV.log.warning("Invalid cheer amount: " + reward.getEvent());
                 return;
             }
         }
@@ -78,7 +76,7 @@ public class TwitchEventHandler {
                 else tier = event.getResub().getSubTier();
                 break;
             default:
-                plugin.log.warning("Couldn't fetch sub type!");
+                ChatPointsTTV.log.warning("Couldn't fetch sub type!");
                 return;
             
         }
@@ -98,7 +96,7 @@ public class TwitchEventHandler {
 
         for (Reward reward : Rewards.getRewards(rewardType.GIFT)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
-            if (amount >= Integer.parseInt(reward.getEvent())) {
+            if (amount >= Integer.valueOf(reward.getEvent())) {
                 Events.onEvent(rewardType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                 return;
             }

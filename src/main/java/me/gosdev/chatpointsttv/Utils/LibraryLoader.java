@@ -47,12 +47,12 @@ public class LibraryLoader {
         libraryManager = new BukkitLibraryManager(plugin);
         libraryManager.setLogLevel(LogLevel.DEBUG);
         libraryManager.addMavenCentral();
-        plugin.log.info("Loading libraries...");
+        ChatPointsTTV.log.info("Loading libraries...");
         for (Library lib : libraries) {
             try {
                 libraryManager.loadLibrary(lib);
             } catch (Exception e) {
-                plugin.log.severe("Failed to load library: " + lib.getArtifactId() + " v" + lib.getVersion() + " \n" + e.getMessage());
+                ChatPointsTTV.log.severe("Failed to load library: " + lib.getArtifactId() + " v" + lib.getVersion() + " \n" + e.getMessage());
             }
             
         }
