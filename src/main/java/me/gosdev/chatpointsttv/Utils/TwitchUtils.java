@@ -64,16 +64,31 @@ public class TwitchUtils {
                 return null;
         }
     }
-    public static String getUserId(String username) {
-        UserList resultList = twitch.getClient().getHelix().getUsers(ChatPointsTTV.getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
-        if (resultList.getUsers().isEmpty()) {
-            throw new NullPointerException("Couldn't fetch user: " + username);
+    public static String getUserId(String username) throws IllegalArgumentException {
+        try {
+            UserList resultList = twitch.getClient().getHelix().getUsers(ChatPointsTTV.getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+            if (resultList.getUsers().isEmpty()) {
+                throw new NullPointerException("Couldn't fetch user: " + username);
+            }
+            return resultList.getUsers().get(0).getId();
+        } catch (HystrixRuntimeException e) {
+            if (e.getFailureType().equals(HystrixRuntimeException.FailureType.COMMAND_EXCEPTION)) {
+                throw new IllegalArgumentException("Invalid username: " + username);
+            } else {
+                throw e;
+            }
         }
-        return resultList.getUsers().get(0).getId();
     }
-    public static boolean isLive(String accessToken, String username) {
-        StreamList request = twitch.getClient().getHelix().getStreams(accessToken, null, null, null, null, null, null, Arrays.asList(username)).execute();
-
-        return !request.getStreams().isEmpty();
+    public static Boolean isLive(String accessToken, String username) throws IllegalArgumentException {
+        try {
+            StreamList request = twitch.getClient().getHelix().getStreams(accessToken, null, null, null, null, null, null, Arrays.asList(username)).execute();
+            return !request.getStreams().isEmpty();
+        } catch (HystrixRuntimeException e) {
+            if (e.getFailureType().equals(HystrixRuntimeException.FailureType.COMMAND_EXCEPTION)) {
+                throw new IllegalArgumentException("Invalid username: " + username);
+            } else {
+                throw e;
+            }
+        }
     }
 }
