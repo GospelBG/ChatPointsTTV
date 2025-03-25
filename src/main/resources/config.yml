@@ -1,75 +1,11 @@
 # This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
-# For more information about how to use this file, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
-
-# Whether the plugin should automatically try to connect to the configured accounts.
-AUTO_LINK_CUSTOM: true
+# For more information about how to use the plugin's configuration files, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
 
 # Whether events should be ignored if the streamer is offline.
 IGNORE_OFFLINE_STREAMERS: false
 
 # Whether stream chat messages should show up on the in-game chat
 SHOW_CHAT: true
-
-# Uncomment the following line and add chat bot usernames (in lowercase) to this list to prevent their messages to display on the in-game chat.
-# CHAT_BLACKLIST:
-
-# Set up here your channel point rewards.
-# Add as many lines as needed. Replace [REWARD NAME] with your reward name, EXACTLY as it appears on Twitch.
-
-# REWARD_NAME:
-#    - ACTION
-
-# To add actions, follow this format:
-#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET USER]
-#     RUN {TARGET / CONSOLE} {COMMAND}
-#     GIVE {ITEM} [AMOUNT] [TARGET USER]
-#     TNT {AMOUNT} [EXPLOSION TIME IN TICKS]
-
-# Extra fields:
-#     {TEXT} Channel Points User Input
-#     {USER} Viewer's username
-#     {AMOUNT} Bits/Gifted Subs/Viewers amount.
-
-# To add a streamer-specific reward add the actions inside a list named as the desired channel.
-# To target all channels use "default" as the list key.
-# For more information, see examples in the README file.
-
-# Leave any reward class empty to disable it.
-CHANNEL_POINTS_REWARDS:
-  [REWARD NAME]:
-    - {ACTION 1}
-    - {ACTION 2}
-
-# Put the desired action after the colon as a list. You musn't add anything else.
-FOLLOW_REWARDS:
-  - {ACTION}
-  - {ACTION}
-
-# Follow the same format as Channel Point Rewards, replacing the name of the reward for the minimum ammount of bits that needs to be cheered.
-CHEER_REWARDS:
-  [BITS AMOUNT]:
-    - {ACTION}
-
-# Follow the same format as Channel Point Rewards, replacing the name of the reward for the desired sub tier: TWITCH_PRIME/TIER1/TIER2/TIER3.
-# Also you can enter an AMOUNT on GIFT_REWARDS to toggle actions for sub gifts.
-SUB_REWARDS:
-  [TWITCH_PRIME]:
-    - {ACTION}
-  [TIER1/2/3]:
-    - {ACTION}
-
-GIFT_REWARDS:
-  [AMOUNT]:
-    - {ACTION}
-
-RAID_REWARDS:
-  [VIEWER THRESHOLD]:
-    - {ACTION}
-
-# Add glow effect to spawned mobs
-MOB_GLOW: true
-# Set chatter's name to spawned mobs
-DISPLAY_NAME_ON_MOB: true
 
 # Whether events should be printed to the server console. (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
 LOG_EVENTS: true
@@ -100,14 +36,3 @@ REWARD_NAME_BOLD: true
 COLORS:
   USER_COLOR: GOLD
   ACTION_COLOR: YELLOW
-
-# Customize the on-screen text that is broadcasted to players.
-# Viewer's username and their reward will be autommatically added to the message.
-
-STRINGS:
-  CHANNEL_POINTS_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
-  FOLLOW_STRING: "has started following"
-  CHEER_STRING: "cheered" #..."100 bits"
-  SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
-  GIFT_STRING: "gifted" #..."5 subs"
-  RAID_STRING: "has raided {CHANNEL} with a viewer count of" # {CHANNEL} will be replaced with the raided channel name.

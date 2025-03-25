@@ -43,6 +43,8 @@ import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 import com.github.twitch4j.helix.domain.User;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.ChatPointsTTV.alert_mode;
+import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
@@ -69,13 +71,21 @@ public class TwitchClient {
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-    private final FileConfiguration config = plugin.getConfig();
-    private FileConfiguration accounts;
+    private static FileConfiguration twitchConfig;
     private File accountsFile;
+    private FileConfiguration accountsConfig;
+    private ConfigurationSection accounts;
     private TwitchIdentityProvider identityProvider;
     private ScheduledThreadPoolExecutor exec;
     private HashMap<String, BukkitTask> tokenRefreshTasks;
 
+    public Boolean overrideShouldMobsGlow;
+    public Boolean overrideNameSpawnedMobs;
+    public alert_mode overrideAlertMode;
+    public ChatColor override_msgActionColor;
+    public ChatColor override_msgUserColor;
+    public Boolean override_msgRewardBold;
+    
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
         Scopes.CHANNEL_READ_REDEMPTIONS,
@@ -93,11 +103,12 @@ public class TwitchClient {
         return ClientID;
     }
     
-    public Boolean isAccountConnected() {
-        return accountConnected;
-    }
     public ITwitchClient getClient() {
         return client;
+    }
+
+    public FileConfiguration getConfig() {
+        return twitchConfig;
     }
 
     public HashMap<String, Channel> getListenedChannels() {
@@ -108,31 +119,60 @@ public class TwitchClient {
         return started;
     }
 
+    public Boolean isAccountConnected() {
+        return accountConnected;
+    }
+
     public void enable() {
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
-            
-        chatBlacklist = config.getStringList("CHAT_BLACKLIST");
-        ignoreOfflineStreamers = plugin.config.getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+        File twitchConfigFile = new File(plugin.getDataFolder(), "twitch.yml");
+        
+        if (!twitchConfigFile.exists()) {
+            plugin.saveResource("twitch.yml", false);
+        }
+        twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
 
-        accountsFile = new File(plugin.getDataFolder(), "twitch.yml");
-        accounts = YamlConfiguration.loadConfiguration(accountsFile);
+        accountsFile = new File(plugin.getDataFolder(), "accounts.yml");
+        accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
+        accounts = accountsConfig.getConfigurationSection("twitch");
         identityProvider = new TwitchIdentityProvider(getClientID(), null, null);
         credentialManager = new HashMap<>();
         exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
+
+        chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
+        ignoreOfflineStreamers = plugin.getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+
+        // Configuration overrides
+        overrideShouldMobsGlow = (Boolean) twitchConfig.get("MOB_GLOW", null);
+        overrideNameSpawnedMobs = (Boolean)twitchConfig.get("DISPLAY_NAME_ON_MOB", null);
+        Events.setAlertMode(alert_mode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase()));
+        override_msgRewardBold = (Boolean) twitchConfig.get("REWARD_NAME_BOLD", null);
+        try {
+            override_msgActionColor = ChatColor.valueOf(twitchConfig.getString("COLORS.ACTION_COLOR", null).toUpperCase());
+        } catch (NullPointerException e) {
+            override_msgActionColor = null;
+        }
+        try {
+            override_msgUserColor = ChatColor.valueOf(twitchConfig.getString("COLORS.USER_COLOR", null).toUpperCase());
+        } catch (NullPointerException e) {
+            override_msgUserColor = null;
+        }
         
-        for (String userid : accounts.getKeys(false)) {
-            ConfigurationSection account = accounts.getConfigurationSection(userid);
-            OAuth2Credential credential = new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"), account.getString("refresh_token"), userid, null, null, null);
-            // Try to refresh token
-            try {
-                credential = refreshCredentials(credential);
-            } catch (RuntimeException e) {
-                ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
-                saveCredential(userid, null);
-                continue;
-            }
-            link(Bukkit.getConsoleSender(), credential);
+        if (accounts != null) {
+            for (String userid : accounts.getKeys(false)) {
+                ConfigurationSection account = accounts.getConfigurationSection(userid);
+                OAuth2Credential credential = new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"), account.getString("refresh_token"), userid, null, null, null);
+                // Try to refresh token
+                try {
+                    credential = refreshCredentials(credential);
+                } catch (RuntimeException e) {
+                    ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
+                    saveCredential(userid, null);
+                    continue;
+                }
+                link(Bukkit.getConsoleSender(), credential);
+            }    
         }
 
         started = true;
@@ -206,38 +246,38 @@ public class TwitchClient {
                     if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
                 }
             });            
-            if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
+            if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHANNEL_POINTS) != null) {
                 subs++;
                 eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
                     eventHandler.onChannelPointsRedemption(e);
                 });
             }
-            if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
+            if (Rewards.getRewards(twitchConfig, Rewards.rewardType.FOLLOW) != null) {
                 subs++;
                 eventManager.onEvent(ChannelFollowEvent.class, (ChannelFollowEvent e) -> {
                     eventHandler.onFollow(e);
                 });
             }
-            if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
+            if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHEER) != null) {
                 subs++;
                 eventManager.onEvent(ChannelChatMessageEvent.class, (ChannelChatMessageEvent e) -> {
                     eventHandler.onCheer(e);
                 }); 
             }
-            if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
+            if (Rewards.getRewards(twitchConfig, Rewards.rewardType.SUB) != null || Rewards.getRewards(twitchConfig, Rewards.rewardType.GIFT) != null) {
                 subs++;
                 eventManager.onEvent(ChannelChatNotificationEvent.class, (ChannelChatNotificationEvent e) -> {
                         if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
                         else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
                 });
             }
-            if (Rewards.getRewards(Rewards.rewardType.RAID) != null) {
+            if (Rewards.getRewards(twitchConfig, Rewards.rewardType.RAID) != null) {
                 subs++;
                 eventManager.onEvent(ChannelRaidEvent.class, (ChannelRaidEvent e) -> {
                         eventHandler.onRaid(e);
                 }); 
             }
-            if (config.getBoolean("SHOW_CHAT")) {
+            if (plugin.getConfig().getBoolean("SHOW_CHAT")) {
                 eventManager.onEvent(ChannelMessageEvent.class, event -> {
                     if (ignoreOfflineStreamers && !getListenedChannels().get(event.getChannel().getName().toLowerCase()).isLive()) return;
                     if (!chatBlacklist.contains(event.getUser().getName())) {
@@ -297,23 +337,23 @@ public class TwitchClient {
 
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
-        if (Rewards.getRewards(Rewards.rewardType.CHANNEL_POINTS) != null) {
+        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHANNEL_POINTS) != null) {
             subs.add(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(Rewards.rewardType.FOLLOW) != null) {
+        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.FOLLOW) != null) {
             subs.add(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(channel_id).broadcasterUserId(channel_id).build(), null));
         } 
 
-        if (Rewards.getRewards(Rewards.rewardType.CHEER) != null) {
+        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHEER) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(Rewards.rewardType.SUB) != null || Rewards.getRewards(Rewards.rewardType.GIFT) != null) {
+        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.SUB) != null || Rewards.getRewards(twitchConfig, Rewards.rewardType.GIFT) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(Rewards.rewardType.RAID) != null) {
+        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.RAID) != null) {
             subs.add(SubscriptionTypes.CHANNEL_RAID.prepareSubscription(b -> b.toBroadcasterUserId(channel_id).build(), null));
         }
 
@@ -348,7 +388,7 @@ public class TwitchClient {
         }
 
         try {
-            accounts.save(accountsFile);
+            accountsConfig.save(accountsFile);
         } catch (IOException e) {
             ChatPointsTTV.log.severe("There was an issue saving account session credentials.");
         }

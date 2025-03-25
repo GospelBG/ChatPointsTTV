@@ -23,9 +23,8 @@ public class Rewards {
 
     public static Map<rewardType, ArrayList<Reward>> rewards = new HashMap<>();
 
-    public static ArrayList<Reward> getRewards(rewardType type) {
+    public static ArrayList<Reward> getRewards(FileConfiguration config, rewardType type) {
         if (rewards.get(type) != null) return rewards.get(type); // Give stored dictionary if it was already fetched
-        FileConfiguration config = ChatPointsTTV.getPlugin().config;
 
         Object config_obj = config.get(type.toString().toUpperCase() + "_REWARDS");
         ArrayList<Reward> reward_list = new ArrayList<>();

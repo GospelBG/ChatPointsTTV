@@ -26,8 +26,8 @@ public class SpawnRunnable implements Runnable {
             if (explosionTime != null) tnt.setFuseTicks(explosionTime);
         } else {
             Entity e = p.getWorld().spawnEntity(p.getLocation(), entity);
-            e.setGlowing(ChatPointsTTV.shouldMobsGlow);
-            if (ChatPointsTTV.nameSpawnedMobs) {
+            e.setGlowing(ChatPointsTTV.getTwitch().overrideShouldMobsGlow != null ? ChatPointsTTV.getTwitch().overrideShouldMobsGlow : ChatPointsTTV.shouldMobsGlow);
+            if (entityName != null) {
                 e.setCustomName(entityName);
                 e.setCustomNameVisible(true);
             }

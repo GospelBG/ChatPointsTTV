@@ -20,7 +20,7 @@ import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class TwitchEventHandler {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
-        for (Reward reward : Rewards.getRewards(rewardType.CHANNEL_POINTS)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
@@ -35,7 +35,7 @@ public class TwitchEventHandler {
     }
 
     public void onFollow(ChannelFollowEvent event) {
-        for (Reward reward : Rewards.getRewards(rewardType.FOLLOW)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.FOLLOW)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             Events.onEvent(rewardType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty());
@@ -47,7 +47,7 @@ public class TwitchEventHandler {
         if (event.getCheer() == null) return;
         Integer amount = event.getCheer().getBits();
 
-        for (Reward reward : Rewards.getRewards(rewardType.CHEER)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.CHEER)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             try {
                 if (amount >= Integer.valueOf(reward.getEvent())) {
@@ -81,7 +81,7 @@ public class TwitchEventHandler {
             
         }
 
-        for (Reward reward : Rewards.getRewards(rewardType.SUB)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
@@ -94,7 +94,7 @@ public class TwitchEventHandler {
     public void onSubGift(ChannelChatNotificationEvent event) {
         Integer amount = event.getCommunitySubGift().getTotal();
 
-        for (Reward reward : Rewards.getRewards(rewardType.GIFT)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.GIFT)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
                 Events.onEvent(rewardType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
@@ -107,7 +107,7 @@ public class TwitchEventHandler {
         String raiderName = event.getFromBroadcasterUserName();
         Integer amount = event.getViewers();
 
-        for (Reward reward : Rewards.getRewards(rewardType.RAID)) {
+        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.RAID)) {
             if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
                 Events.onEvent(rewardType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount.toString()));

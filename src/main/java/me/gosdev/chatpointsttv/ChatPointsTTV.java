@@ -98,11 +98,7 @@ public class ChatPointsTTV extends JavaPlugin {
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         reloadConfig();
-        config = getConfig();
-
-        for (rewardType type : rewardType.values()) {
-            titleStrings.put(type, config.getConfigurationSection("STRINGS").getString(type.toString() + "_STRING"));
-        }
+        config = getConfig();      
 
         logEvents = config.getBoolean("LOG_EVENTS", false);
         rewardBold = config.getBoolean("REWARD_NAME_BOLD");
@@ -125,6 +121,15 @@ public class ChatPointsTTV extends JavaPlugin {
         
         twitch = new TwitchClient();
         twitch.enable(); 
+
+        try {
+            for (rewardType type : rewardType.values()) {
+                titleStrings.put(type, twitch.getConfig().getConfigurationSection("STRINGS").getString(type.toString() + "_STRING"));
+            }
+        } catch (NullPointerException e) {
+            log.severe("Error loading strings from config. Please check your config file.");
+            configOk = false;
+        }
 
         VersionCheck.check();
 

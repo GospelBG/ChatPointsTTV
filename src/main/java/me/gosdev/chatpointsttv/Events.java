@@ -100,10 +100,13 @@ public class Events {
     }
 
     public static void showIngameAlert(String user, String action, String rewardName) {
+        Boolean bold = ChatPointsTTV.getTwitch().override_msgRewardBold != null ? ChatPointsTTV.getTwitch().override_msgRewardBold : ChatPointsTTV.rewardBold;
+        ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
+        ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.action_color;
         if (ChatPointsTTV.alertMode.equals(ChatPointsTTV.alert_mode.NONE)) return;
-        ComponentBuilder builder = new ComponentBuilder(user).color(ChatPointsTTV.user_color).bold(ChatPointsTTV.rewardBold);
+        ComponentBuilder builder = new ComponentBuilder(user).color(userColor).bold(bold);
         builder.append(" " + action).color(ChatPointsTTV.action_color);
-        if (rewardName != null) builder.append(" " + rewardName).color(ChatPointsTTV.user_color);
+        if (rewardName != null) builder.append(" " + rewardName).color(userColor);
 
         switch (ChatPointsTTV.alertMode) {
             case CHAT:
@@ -115,7 +118,7 @@ public class Events {
             case TITLE:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    p.sendTitle(ChatPointsTTV.action_color + user, action + ChatPointsTTV.action_color + " " + (ChatPointsTTV.rewardBold ? ChatColor.BOLD : ChatColor.RESET) + rewardName, 10, 70, 20);
+                    p.sendTitle(userColor + user, action + actionColor + " " + (bold ? ChatColor.BOLD : "") + rewardName, 10, 70, 20);
                 };
                 break;
 
@@ -123,7 +126,7 @@ public class Events {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
                     p.spigot().sendMessage(builder.create());
-                    p.sendTitle(ChatPointsTTV.action_color + user, action + ChatPointsTTV.action_color + " " + (ChatPointsTTV.rewardBold ? ChatColor.BOLD : ChatColor.RESET) + rewardName, 10, 70, 20);
+                    p.sendTitle(userColor + user, action + actionColor + " " + (bold ? ChatColor.BOLD : "") + rewardName, 10, 70, 20);
                 }
                 break;
 
@@ -156,7 +159,9 @@ public class Events {
             entityRunnable.entity = EntityType.valueOf(entity.toUpperCase());
 
             entityRunnable.amount = amount.orElse(1);
-            if (ChatPointsTTV.nameSpawnedMobs) entityRunnable.entityName = chatter;
+            if (ChatPointsTTV.getTwitch().overrideNameSpawnedMobs != null ? ChatPointsTTV.getTwitch().overrideNameSpawnedMobs : ChatPointsTTV.nameSpawnedMobs) {
+                entityRunnable.entityName = chatter;
+            }
             
             entityRunnable.p = p;
             entityRunnable.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(ChatPointsTTV.getPlugin(), entityRunnable, 0, 0);
