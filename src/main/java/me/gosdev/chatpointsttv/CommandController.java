@@ -83,7 +83,6 @@ public class CommandController implements TabExecutor {
                         return true;
                     }
                     ChatPointsTTV.getTwitch().stop(sender);
-                    sender.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
                     return true;
 
                 case "start":
