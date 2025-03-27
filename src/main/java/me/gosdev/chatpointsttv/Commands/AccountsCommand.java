@@ -19,9 +19,12 @@ public class AccountsCommand {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }
-        TextComponent msg = new TextComponent("---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
+        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
         if (p.equals(Bukkit.getConsoleSender())) {
-
+            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                msg.addExtra(ChatColor.GRAY + "  -  " + channel.getChannelUsername() + "\n");
+            }
+            msg.addExtra(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
         } else {
             TextComponent addBtn = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "\n[+]" + ChatColor.RESET + ChatColor.GREEN + " Add account");
             addBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to link another account").create()));
