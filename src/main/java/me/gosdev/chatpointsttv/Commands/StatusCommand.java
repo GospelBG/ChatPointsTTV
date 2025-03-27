@@ -1,5 +1,6 @@
 package me.gosdev.chatpointsttv.Commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
@@ -44,10 +45,12 @@ public class StatusCommand {
             stopBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop all Twitch events.").create()));
             stopBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch stop"));
 
-            msg.addExtra("\n\n");
-            msg.addExtra(accountsBtn);
-            msg.addExtra(ChatColor.GRAY + "  -  ");
-            msg.addExtra(stopBtn);
+            if (!p.equals(Bukkit.getConsoleSender())) {
+                msg.addExtra("\n\n");
+                msg.addExtra(accountsBtn);
+                msg.addExtra(ChatColor.GRAY + "  -  ");
+                msg.addExtra(stopBtn);
+            }
         }
 
         p.spigot().sendMessage(msg);
