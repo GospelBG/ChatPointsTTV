@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.Utils;
+package me.gosdev.chatpointsttv.Twitch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import com.github.twitch4j.helix.domain.UserList;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 
 public class TwitchUtils {
     private static final TwitchClient twitch = ChatPointsTTV.getTwitch();

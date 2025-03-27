@@ -16,7 +16,6 @@ import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
-import me.gosdev.chatpointsttv.Utils.TwitchUtils;
 
 public class TwitchEventHandler {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {

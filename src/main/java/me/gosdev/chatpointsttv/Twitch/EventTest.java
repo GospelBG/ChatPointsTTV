@@ -11,8 +11,6 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
-import me.gosdev.chatpointsttv.Utils.TwitchUtils;
-
 public class EventTest {
     public static CustomRewardRedemptionAddEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) {
         CustomRewardRedemptionAddEvent event = jsonToObject(

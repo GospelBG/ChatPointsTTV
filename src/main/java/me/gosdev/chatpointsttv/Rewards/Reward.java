@@ -3,7 +3,7 @@ package me.gosdev.chatpointsttv.Rewards;
 import java.util.List;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
-import me.gosdev.chatpointsttv.Utils.TwitchUtils;
+import me.gosdev.chatpointsttv.Twitch.TwitchUtils;
 
 public class Reward {
     private final rewardType type;
