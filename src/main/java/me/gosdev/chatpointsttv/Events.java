@@ -48,6 +48,7 @@ public class Events {
 
     public static void onEvent(rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
         new Thread (()-> {
+            String errorStr = "There was an error running a " + type + " action: ";
             if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventString(type, chatter, channel, event));
             if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
@@ -67,7 +68,7 @@ public class Events {
                 String[] parts = cmd.split(" ");
     
                 if (parts.length <= 1) {
-                    ChatPointsTTV.log.warning("Invalid command: " + parts[0]);
+                    ChatPointsTTV.log.warning(errorStr + "Invalid command \"" + parts[0] + "\"");
                     continue;
                 }
                 try {
@@ -93,16 +94,14 @@ public class Events {
                         case "WAIT":
                             try {
                                 Thread.sleep((long) (Float.parseFloat(parts[1])*1000));
-                            } catch (InterruptedException e) {
-                                ChatPointsTTV.log.warning("Thread interrupted: " + e.getMessage());
-                            }
+                            } catch (InterruptedException e) {}
                             break;
                         default:
-                            ChatPointsTTV.log.warning("Invalid action: " + parts[0]);
+                            ChatPointsTTV.log.warning(errorStr + "Invalid action \"" + parts[0] + "\"");
                             break;
                     }
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.log.warning("Invalid amount: " + e.getMessage().substring(19, e.getMessage().length() - 1));
+                    ChatPointsTTV.log.warning(errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
                 }
             }    
         }).start();
