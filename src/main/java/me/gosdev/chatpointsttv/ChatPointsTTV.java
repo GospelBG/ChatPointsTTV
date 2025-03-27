@@ -112,7 +112,6 @@ public class ChatPointsTTV extends JavaPlugin {
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
-        Bukkit.getConsoleSender().sendMessage("ChatPointsTTV enabled!");
         for (Player p: plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
