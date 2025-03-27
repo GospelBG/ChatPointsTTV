@@ -405,8 +405,6 @@ public class TwitchClient {
         if (credentialManager.size() == 0) {
             accountConnected = false;
         }
-
-        ChatPointsTTV.log.info("Done!");
     }
 
     public void stop(CommandSender p) {
