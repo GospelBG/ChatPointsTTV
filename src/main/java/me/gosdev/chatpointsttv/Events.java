@@ -47,56 +47,65 @@ public class Events {
     }
 
     public static void onEvent(rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
-        if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventString(type, chatter, channel, event));
-        if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
-            for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
-                if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
-            }
-        }
-        if (ChatPointsTTV.alertMode.equals(alert_mode.ALL) || ChatPointsTTV.alertMode.equals(alert_mode.TITLE)) {
-            showIngameAlert(chatter, ChatPointsTTV.getRedemptionString(type), event.orElse(null));
-        }
-
-        for (String cmd : reward.getCommands()) {
-            cmd = cmd.replace("{USER}", chatter);
-            if (type.equals(rewardType.CHEER) || type.equals(rewardType.GIFT) || type.equals(rewardType.RAID)) {
-                cmd = cmd.replace("{AMOUNT}", event.get());
-            }
-            
-            String[] parts = cmd.split(" ");
-
-            if (parts.length <= 1) {
-                ChatPointsTTV.log.warning("Invalid command: " + parts[0]);
-                continue;
-            }
-            try {
-                switch (parts[0].toUpperCase()) {
-                    case "SPAWN":
-                        spawnAction(parts[1], Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null), Optional.ofNullable(parts.length > 3 ? parts[3] : null), chatter);
-                        break;
-                    case "RUN":
-                        String text = "";
-                        for (int i = 2; i < parts.length; i++) {
-                            ChatPointsTTV.log.info(parts[i]);                    
-                            text += " " + parts[i];
-                        }
-                        text = text.trim();
-                        runAction(parts[1], text, channel);
-                        break;
-                    case "GIVE":
-                        giveAction(parts[1], Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null), Optional.ofNullable(parts.length > 3 ? parts[3] : null));
-                        break;
-                    case "TNT":
-                        tntAction(Integer.parseInt(parts[1]), Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null));
-                        break;
-                    default:
-                        ChatPointsTTV.log.warning("Invalid action: " + parts[0]);
-                        break;
+        new Thread (()-> {
+            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventString(type, chatter, channel, event));
+            if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
+                for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                    if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
                 }
-            } catch (NumberFormatException e) {
-                ChatPointsTTV.log.warning("Invalid amount: " + parts[2]);
             }
-        }
+            if (ChatPointsTTV.alertMode.equals(alert_mode.ALL) || ChatPointsTTV.alertMode.equals(alert_mode.TITLE)) {
+                showIngameAlert(chatter, ChatPointsTTV.getRedemptionString(type), event.orElse(null));
+            }
+    
+            for (String cmd : reward.getCommands()) {
+                cmd = cmd.replace("{USER}", chatter);
+                if (type.equals(rewardType.CHEER) || type.equals(rewardType.GIFT) || type.equals(rewardType.RAID)) {
+                    cmd = cmd.replace("{AMOUNT}", event.get());
+                }
+                
+                String[] parts = cmd.split(" ");
+    
+                if (parts.length <= 1) {
+                    ChatPointsTTV.log.warning("Invalid command: " + parts[0]);
+                    continue;
+                }
+                try {
+                    switch (parts[0].toUpperCase()) {
+                        case "SPAWN":
+                            spawnAction(parts[1], Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null), Optional.ofNullable(parts.length > 3 ? parts[3] : null), chatter);
+                            break;
+                        case "RUN":
+                            String text = "";
+                            for (int i = 2; i < parts.length; i++) {
+                                ChatPointsTTV.log.info(parts[i]);                    
+                                text += " " + parts[i];
+                            }
+                            text = text.trim();
+                            runAction(parts[1], text, channel);
+                            break;
+                        case "GIVE":
+                            giveAction(parts[1], Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null), Optional.ofNullable(parts.length > 3 ? parts[3] : null));
+                            break;
+                        case "TNT":
+                            tntAction(Integer.parseInt(parts[1]), Optional.ofNullable(parts.length > 2 ? Integer.valueOf(parts[2]) : null));
+                            break;
+                        case "WAIT":
+                            try {
+                                Thread.sleep((long) (Float.parseFloat(parts[1])*1000));
+                            } catch (InterruptedException e) {
+                                ChatPointsTTV.log.warning("Thread interrupted: " + e.getMessage());
+                            }
+                            break;
+                        default:
+                            ChatPointsTTV.log.warning("Invalid action: " + parts[0]);
+                            break;
+                    }
+                } catch (NumberFormatException e) {
+                    ChatPointsTTV.log.warning("Invalid amount: " + e.getMessage().substring(19, e.getMessage().length() - 1));
+                }
+            }    
+        }).start();
     }
 
     public static void showIngameAlert(String user, String action, String rewardName) {
