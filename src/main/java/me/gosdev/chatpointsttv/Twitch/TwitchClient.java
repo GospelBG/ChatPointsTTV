@@ -438,6 +438,8 @@ public class TwitchClient {
             accountConnected = false;
     
             started = false;    
+
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
         });
     }
 }
