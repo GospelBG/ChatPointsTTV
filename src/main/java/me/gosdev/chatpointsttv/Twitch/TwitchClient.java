@@ -181,6 +181,8 @@ public class TwitchClient {
         saveCredential(credential.getUserId(), credential);
         credentialManager.put(credential.getUserId(), credential);
 
+        Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: "+ credential.getUserName());
+
         if (linkThread != null) {
             try {
                 linkThread.join();
@@ -202,12 +204,10 @@ public class TwitchClient {
         }, 1200, credential.getExpiresIn() / 2 * 20));
 
         if (accountConnected) {
-            subscribeToEvents(credential);
+            subscribeToEvents(p, credential);
         } else {
             start(p, credential);
         }
-
-        p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
     }
 
     private void start(CommandSender p, OAuth2Credential credential) {
@@ -224,8 +224,6 @@ public class TwitchClient {
             
             oauth = credential;
             user = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
-
-            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logged in as: "+ user.getDisplayName());
             
             eventHandler = new TwitchEventHandler();
 
@@ -293,7 +291,8 @@ public class TwitchClient {
             }
 
             // Join the twitch chat of this channel(s) and enable stream/follow events
-            subscribeToEvents(credential);
+            subscribeToEvents(p, credential);
+            
             accountConnected = true;
         });
 
