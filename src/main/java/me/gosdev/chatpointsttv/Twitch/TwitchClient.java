@@ -181,6 +181,13 @@ public class TwitchClient {
         linkThread = new Thread(() -> {
             saveCredential(credential.getUserId(), credential);
             credentialManager.put(credential.getUserId(), credential);
+
+            for (Channel channel : channels.values()) {
+                if (credential.getUserId().equals(channel.getChannelId())) {
+                    p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
+                    return;
+                }
+            }
     
             Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: "+ credential.getUserName());
     
@@ -188,14 +195,7 @@ public class TwitchClient {
                 try {
                     linkThread.join();
                 } catch (InterruptedException e) {}
-            }
-            
-            for (Channel channel : channels.values()) {
-                if (credential.getUserId().equals(channel.getChannelId())) {
-                    p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
-                    return;
-                }
-            }
+            }            
     
             tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
                 @Override
@@ -403,36 +403,34 @@ public class TwitchClient {
     }
 
     public void stop(CommandSender p) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if (!accountConnected) {
-                p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "There is no connected account."));
-                return;
-            }
-            try {
-                if (!linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
-                client.getEventSocket().close();
-                client.close();
-                credentialManager.clear();
-                accountConnected = false;
-            } catch (Exception e) {
-                ChatPointsTTV.log.warning("Error while disabling ChatPointsTTV.");
-                e.printStackTrace();
-                return;
-            }
-            
-            for (BukkitTask task : tokenRefreshTasks.values()) {
-                task.cancel();
-            }
-    
-            client = null;
-            eventHandler = null;
-            eventSocket = null;
-            eventManager = null;
+        if (!accountConnected) {
+            p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "There is no connected account."));
+            return;
+        }
+        try {
+            if (!linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
+            client.getEventSocket().close();
+            client.close();
+            credentialManager.clear();
             accountConnected = false;
-    
-            started = false;    
+        } catch (Exception e) {
+            ChatPointsTTV.log.warning("Error while disabling ChatPointsTTV.");
+            e.printStackTrace();
+            return;
+        }
+        
+        for (BukkitTask task : tokenRefreshTasks.values()) {
+            task.cancel();
+        }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
-        });
+        client = null;
+        eventHandler = null;
+        eventSocket = null;
+        eventManager = null;
+        accountConnected = false;
+
+        started = false;    
+
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
     }
 }
