@@ -148,7 +148,7 @@ public class TwitchClient {
         Events.setAlertMode(alert_mode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase()));
         override_msgRewardBold = (Boolean) twitchConfig.get("REWARD_NAME_BOLD", null);
         try {
-            override_msgActionColor = ChatColor.valueOf(twitchConfig.getString("COLORS.ACTION_COLOR", null).toUpperCase());
+            override_msgActionColor = ChatColor.valueOf(twitchConfig.getString("COLORS.EVENT_COLOR", null).toUpperCase());
         } catch (NullPointerException e) {
             override_msgActionColor = null;
         }

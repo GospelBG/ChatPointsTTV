@@ -282,7 +282,7 @@ INGAME_ALERTS: all
 REWARD_NAME_BOLD: true
 COLORS:
   USER_COLOR: GOLD
-  ACTION_COLOR: YELLOW
+  EVENT_COLOR: YELLOW
 
 # Customize the on-screen text that is broadcasted to players.
 # Viewer's username and their reward will be autommatically added to the message.

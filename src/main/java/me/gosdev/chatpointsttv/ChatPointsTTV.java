@@ -103,7 +103,7 @@ public class ChatPointsTTV extends JavaPlugin {
         logEvents = config.getBoolean("LOG_EVENTS", false);
         rewardBold = config.getBoolean("REWARD_NAME_BOLD");
         user_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
-        action_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("ACTION_COLOR", ChatColor.LIGHT_PURPLE.name()));
+        action_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
         alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
