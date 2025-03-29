@@ -5,10 +5,10 @@
 # See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
 
 # Actions format:
-#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET USER]
+#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
 #     RUN {TARGET / CONSOLE} {COMMAND}
-#     GIVE {ITEM} [AMOUNT] [TARGET USER]
-#     TNT {AMOUNT} [EXPLOSION TIME IN TICKS]
+#     GIVE {ITEM} [AMOUNT] [TARGET PLAYER]
+#     TNT {AMOUNT} [EXPLOSION TIME IN TICKS] [TARGET PLAYER]
 #
 #  {} = Required
 #  [] = Optional
