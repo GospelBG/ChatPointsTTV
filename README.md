@@ -76,7 +76,6 @@ You need to follow this format: AMOUNT: {ACTION}, replacing AMOUNT with the mini
 * **Display Name on Mob**: Whether the spawned mobs should have the name of the user who triggered the action.
 * **Log Events**: Determines whether all events will be logged. `true` means that all channel point rewards, cheers, subscriptions and gifts will be logged into the console. `false` means that they won't be logged.
 * **In-game Alerts Mode***: How will the game notify of an event. Valid options: `chat`, `title`, `all`, `none`. Choosing `none`  will disable In-game alerts.
-* **Reward Name Bold**: Determines whether the reward name is displayed in bold letters in the title banner to people with the `chatpointsttv.broadcast` permission.
 * **Colors**: Allows you to customize every color of the title messages. Set the wanted strings to any Minecraft Color Name (`RED`, `GOLD`, `DARK_PURPLE`...).  
 You can leave this section unmodified, as there are default colors set up in the original file
 * **Strings**: Allows you to customize all title texts displayed to people with the `chatpointsttv.broadcast` permission. You may want to translate these strings to your language for a better experience. Don't add spaces before or after the double quotes as the plugin already does this for you. English strings are set up in the file by default.
@@ -279,7 +278,6 @@ INGAME_ALERTS: all
 # Misc:
 #   MAGIC
 
-REWARD_NAME_BOLD: true
 COLORS:
   USER_COLOR: GOLD
   EVENT_COLOR: YELLOW

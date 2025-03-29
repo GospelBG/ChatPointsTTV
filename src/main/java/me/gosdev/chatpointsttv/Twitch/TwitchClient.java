@@ -83,7 +83,6 @@ public class TwitchClient {
     public alert_mode overrideAlertMode;
     public ChatColor override_msgActionColor;
     public ChatColor override_msgUserColor;
-    public Boolean override_msgRewardBold;
     
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
@@ -146,7 +145,6 @@ public class TwitchClient {
         overrideShouldMobsGlow = (Boolean) twitchConfig.get("MOB_GLOW", null);
         overrideNameSpawnedMobs = (Boolean)twitchConfig.get("DISPLAY_NAME_ON_MOB", null);
         Events.setAlertMode(alert_mode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase()));
-        override_msgRewardBold = (Boolean) twitchConfig.get("REWARD_NAME_BOLD", null);
         try {
             override_msgActionColor = ChatColor.valueOf(twitchConfig.getString("COLORS.EVENT_COLOR", null).toUpperCase());
         } catch (NullPointerException e) {

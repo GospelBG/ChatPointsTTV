@@ -81,7 +81,5 @@ STRINGS:
 # In-game event alerts mode.
 # INGAME_ALERTS: chat
 
-# REWARD_NAME_BOLD: true
-# COLORS:
 #   USER_COLOR: GOLD
 #   EVENT_COLOR: YELLOW
