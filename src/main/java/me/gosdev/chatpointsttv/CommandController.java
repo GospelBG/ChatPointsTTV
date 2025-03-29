@@ -116,7 +116,7 @@ public class CommandController implements TabExecutor {
 
         if (args.length == 1) {
             available.add("help");
-            if (!ChatPointsTTV.getTwitch().isAccountConnected()) available.add("reload");
+            available.add("reload");
             if (ChatPointsTTV.getTwitch().isStarted()) {
                 available.add("link");
                 available.add("stop");
