@@ -23,7 +23,7 @@ public class DeviceCodeGrantFlow {
                         break;
                         
                     case EXPIRED_TOKEN:
-                        p.sendMessage("Authorization token has expired. Please try again.");
+                        p.sendMessage("Device code has expired. Please try again.");
                         break;
                         
                     default:
