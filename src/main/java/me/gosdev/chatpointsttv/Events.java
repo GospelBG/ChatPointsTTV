@@ -8,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV.alert_mode;
 import me.gosdev.chatpointsttv.EventActions.Action;
 import me.gosdev.chatpointsttv.EventActions.GiveAction;
 import me.gosdev.chatpointsttv.EventActions.RunCmdAction;
@@ -20,32 +19,38 @@ import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class Events {
-    public static void setAlertMode(alert_mode alertMode) {
-        ChatPointsTTV.alertMode = alertMode;
-    }
+    public static String getEventMessage(Platforms platform, rewardType type, String chatter, String channel, Optional<String> event) {
+        String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.name().toLowerCase());
 
-    public static String getEventMessage(rewardType type, String chatter, String channel, Optional<String> event) {
-        String str = ChatPointsTTV.strings.get("str_twitch_"+type.name().toLowerCase());
-
-        //ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
-        //ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.event_color;
-
-        str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null));
+        str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), platform);
 
         return str;
     }
 
-    public static void onEvent(rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
+    public static void onEvent(Platforms platform, rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
         new Thread (()-> {
+            String eventMsg = getEventMessage(platform, type, chatter, channel, event);
             String errorStr = "There was an error running a " + type + " action: ";
-            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventMessage(type, chatter, channel, event));
+            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(eventMsg);
             if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
                 }
             }
 
-            showIngameAlert(chatter, channel, type, event.orElse(null));
+            Boolean shouldGlow;
+            Boolean nameSpawnedMobs;
+            AlertMode alertMode;
+
+            if (platform.equals(Platforms.TWITCH)) {
+                shouldGlow = ChatPointsTTV.getTwitch().shouldMobsGlow;
+                nameSpawnedMobs = ChatPointsTTV.getTwitch().nameSpawnedMobs;
+                alertMode = ChatPointsTTV.getTwitch().alertMode;
+            } else {
+                shouldGlow = ChatPointsTTV.shouldMobsGlow;
+                nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
+                alertMode = ChatPointsTTV.alertMode;
+            }
     
             for (String cmd : reward.getCommands()) {
                 cmd = cmd.replace("{USER}", chatter);
@@ -75,7 +80,7 @@ public class Events {
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
                             }
-                            action = new SpawnAction(EntityType.valueOf(parts[1]), chatter, Optional.ofNullable(amount), Optional.ofNullable(target));
+                            action = new SpawnAction(EntityType.valueOf(parts[1]), nameSpawnedMobs ? chatter : null, Optional.ofNullable(amount), target, shouldGlow);
                             break;
                         case "RUN":
                             String text = "";
@@ -130,40 +135,36 @@ public class Events {
                 } catch (NumberFormatException e) {
                     ChatPointsTTV.log.warning(errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
                 }
+            }
+
+        if (!alertMode.equals(AlertMode.NONE)) {
+            String chatMessage = eventMsg;
+
+            String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
+            String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+    
+            switch (alertMode) {
+                case CHAT:
+                    broadcastMessage(chatMessage);
+                    break;
+    
+                case TITLE:
+                    showTitle(title, subtitle);
+                    break;
+    
+                case ALL:
+                    broadcastMessage(chatMessage);
+                    showTitle(title, subtitle);
+                    break;
+    
+                default:
+                    ChatPointsTTV.log.warning("Invalid mode: " + ChatPointsTTV.alertMode);
+                    break;
             }    
-        }).start();
-    }
-
-    public static void showIngameAlert(String user, String channel, rewardType type, String event) {
-        if (ChatPointsTTV.alertMode.equals(ChatPointsTTV.alert_mode.NONE)) return;
-
-        //ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
-        //ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.event_color;
-
-        String chatMessage = getEventMessage(type, user, channel, Optional.ofNullable(event));
-
-        String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), user, channel, event);
-        String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), user, channel, event);
-
-        switch (ChatPointsTTV.alertMode) {
-            case CHAT:
-                broadcastMessage(chatMessage);
-                break;
-
-            case TITLE:
-                showTitle(title, subtitle);
-                break;
-
-            case ALL:
-                broadcastMessage(chatMessage);
-                showTitle(title, subtitle);
-                break;
-
-            default:
-                ChatPointsTTV.log.warning("Invalid mode: " + ChatPointsTTV.alertMode);
-                break;
         }
+    }).start();
     }
+
 
     public static void showTitle(String title, String subtitle) {
         for (Player p : Bukkit.getOnlinePlayers()) {

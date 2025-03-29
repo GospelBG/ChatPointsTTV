@@ -15,14 +15,14 @@ public class SpawnAction extends Action {
     private Integer amount;
     private String name;
     private Player player;
+    private boolean shouldGlow;
 
-    private Boolean useCustomName = ChatPointsTTV.getTwitch().overrideNameSpawnedMobs != null ? ChatPointsTTV.getTwitch().overrideNameSpawnedMobs : ChatPointsTTV.nameSpawnedMobs;
-
-    public SpawnAction(EntityType entity, String chatter, Optional<Integer> amount, Optional<Player> target) {
+    public SpawnAction(EntityType entity, String chatter, Optional<Integer> amount, Player target, Boolean shouldGlow) {
         this.entity = entity;
         this.name = chatter;
         this.amount = amount.orElse(1);
-        this.player = target.orElse(null);
+        this.player = target;
+        this.shouldGlow = shouldGlow;
     }
 
     @Override 
@@ -38,8 +38,8 @@ public class SpawnAction extends Action {
         
                 Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> { // Entities should only be spawned synchronously
                     Entity e = p.getWorld().spawnEntity(p.getLocation(), entity);
-                    e.setGlowing(ChatPointsTTV.getTwitch().overrideShouldMobsGlow != null ? ChatPointsTTV.getTwitch().overrideShouldMobsGlow : ChatPointsTTV.shouldMobsGlow);
-                    if (useCustomName) {
+                    e.setGlowing(shouldGlow);
+                    if (name != null) {
                         e.setCustomName(name);
                         e.setCustomNameVisible(true);
                     }

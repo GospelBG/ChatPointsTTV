@@ -34,12 +34,12 @@ public class ChatPointsTTV extends JavaPlugin {
 
     private static final HashMap<rewardType, String> titleStrings = new HashMap<>();
     public static final HashMap<String, String> strings = new HashMap<>();
-    public static ChatColor event_color;
-    public static ChatColor user_color;
+    public static ChatColor eventColor;
+    public static ChatColor userColor;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
     public static Boolean configOk = true;
-    public static alert_mode alertMode;
+    public static AlertMode alertMode;
     public static Boolean logEvents;
 
     public static final Logger log = Bukkit.getLogger();
@@ -59,13 +59,6 @@ public class ChatPointsTTV extends JavaPlugin {
         private permissions(String label) {
             this.permission_id = label;
         }
-    }
-
-    public static enum alert_mode {
-        NONE,
-        CHAT,
-        TITLE,
-        ALL
     }
 
     public static ChatPointsTTV getPlugin() {
@@ -102,10 +95,10 @@ public class ChatPointsTTV extends JavaPlugin {
         config = getConfig();
 
         logEvents = config.getBoolean("LOG_EVENTS", false);
-        user_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
-        event_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
+        userColor = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
+        eventColor = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
-        alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
+        alertMode = AlertMode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
         File stringsFile = new File(plugin.getDataFolder(), "localization.yml");

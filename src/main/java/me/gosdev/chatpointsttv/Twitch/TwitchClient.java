@@ -42,9 +42,8 @@ import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccess
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 import com.github.twitch4j.helix.domain.User;
 
+import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.ChatPointsTTV.alert_mode;
-import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Rewards.Rewards;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
@@ -78,11 +77,11 @@ public class TwitchClient {
     private ScheduledThreadPoolExecutor exec;
     private HashMap<String, BukkitTask> tokenRefreshTasks;
 
-    public Boolean overrideShouldMobsGlow;
-    public Boolean overrideNameSpawnedMobs;
-    public alert_mode overrideAlertMode;
-    public ChatColor override_msgActionColor;
-    public ChatColor override_msgUserColor;
+    public Boolean shouldMobsGlow;
+    public Boolean nameSpawnedMobs;
+    public AlertMode alertMode;
+    public ChatColor eventColor;
+    public ChatColor userColor;
     
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
@@ -142,18 +141,19 @@ public class TwitchClient {
         ignoreOfflineStreamers = plugin.getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
 
         // Configuration overrides
-        overrideShouldMobsGlow = (Boolean) twitchConfig.get("MOB_GLOW", null);
-        overrideNameSpawnedMobs = (Boolean)twitchConfig.get("DISPLAY_NAME_ON_MOB", null);
-        Events.setAlertMode(alert_mode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase()));
+        shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
+        nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
+        alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
+
         try {
-            override_msgActionColor = ChatColor.valueOf(twitchConfig.getString("COLORS.EVENT_COLOR", null).toUpperCase());
+            eventColor = ChatColor.valueOf(twitchConfig.getString("COLORS.EVENT_COLOR", ChatPointsTTV.eventColor.name()).toUpperCase());
         } catch (NullPointerException e) {
-            override_msgActionColor = null;
+            eventColor = null;
         }
         try {
-            override_msgUserColor = ChatColor.valueOf(twitchConfig.getString("COLORS.USER_COLOR", null).toUpperCase());
+            userColor = ChatColor.valueOf(twitchConfig.getString("COLORS.USER_COLOR", ChatPointsTTV.userColor.name()).toUpperCase());
         } catch (NullPointerException e) {
-            override_msgUserColor = null;
+            userColor = null;
         }
         
         if (accounts != null) {
