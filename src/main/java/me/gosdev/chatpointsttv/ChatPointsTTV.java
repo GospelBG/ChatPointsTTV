@@ -1,12 +1,13 @@
 package me.gosdev.chatpointsttv;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -31,8 +32,9 @@ public class ChatPointsTTV extends JavaPlugin {
     private static TwitchClient twitch;
     private CommandController cmdController;
 
-    private static final Map<rewardType, String> titleStrings = new HashMap<>();
-    public static ChatColor action_color;
+    private static final HashMap<rewardType, String> titleStrings = new HashMap<>();
+    public static final HashMap<String, String> strings = new HashMap<>();
+    public static ChatColor event_color;
     public static ChatColor user_color;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
@@ -97,20 +99,30 @@ public class ChatPointsTTV extends JavaPlugin {
         // Get the latest config after saving the default if missing
         this.saveDefaultConfig();
         reloadConfig();
-        config = getConfig();      
+        config = getConfig();
 
         logEvents = config.getBoolean("LOG_EVENTS", false);
         user_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
-        action_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
+        event_color = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
         alertMode = alert_mode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
+
+        File stringsFile = new File(plugin.getDataFolder(), "localization.yml");
+        if (!stringsFile.exists()) {
+            plugin.saveResource("localization.yml", false);
+        }
+        
+        FileConfiguration stringsYaml = YamlConfiguration.loadConfiguration(stringsFile);
+        for (String key : YamlConfiguration.loadConfiguration(plugin.getTextResource("localization.yml")).getKeys(true)) {
+            strings.put(key, stringsYaml.getString(key));
+        }
 
         cmdController = new CommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
-        for (Player p: plugin.getServer().getOnlinePlayers()) {
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
             }

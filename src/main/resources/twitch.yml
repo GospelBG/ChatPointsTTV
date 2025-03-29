@@ -57,17 +57,6 @@ RAID_REWARDS:
 # Add chat bot and other unwanted chatter usernames (in lowercase) to this list to prevent their messages displaying on the in-game chat.
 CHAT_BLACKLIST: []
 
-# Customize the on-screen text that is broadcasted to players.
-# Viewer's username and their reward will be autommatically added to the message.
-
-STRINGS:
-  CHANNEL_POINTS_STRING: "has redeemed" # Whitespaces on the start and end of the string are added automatically.
-  FOLLOW_STRING: "has started following"
-  CHEER_STRING: "cheered {AMOUNT} bits" #..."100 bits"
-  SUB_STRING: "has subscribed with a" #..."Tier 1/2/3/Prime"
-  GIFT_STRING: "gifted {AMOUNT} subs" #..."5 subs"
-  RAID_STRING: "has raided {CHANNEL} with a viewer count of" # {CHANNEL} will be replaced with the raided channel name.
-
 # OVERRIDEN CONFIGURATION:
 # Uncomment and change the values to override the default configuration for Twitch events.
 # If it is left commented, the default value in config.yml will be used.

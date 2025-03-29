@@ -17,32 +17,22 @@ import me.gosdev.chatpointsttv.EventActions.TntAction;
 import me.gosdev.chatpointsttv.Rewards.Reward;
 import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Utils.Channel;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ComponentBuilder;
+import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class Events {
     public static void setAlertMode(alert_mode alertMode) {
         ChatPointsTTV.alertMode = alertMode;
     }
 
-    public static String getEventString(rewardType type, String chatter, String channel, Optional<String> event) {
-        String str = chatter + " " + ChatPointsTTV.getRedemptionString(type) + " ";
+    public static String getEventMessage(rewardType type, String chatter, String channel, Optional<String> event) {
+        String str = ChatPointsTTV.strings.get("str_twitch_"+type.name().toLowerCase());
 
-        if (event.isPresent()) {
-            comp.addExtra(new ComponentBuilder(event.get()).color(actionColor).bold(bold).create()[0]);
-        }
+        //ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
+        //ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.event_color;
 
-        if (type != rewardType.FOLLOW && type != rewardType.RAID) {
-            comp.addExtra(" to ");
-        }
+        str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null));
 
-        if (str.contains("{CHANNEL}")) {
-            comp.addExtra(str.replaceAll("\\{CHANNEL\\}", channel));
-        }
-
-        str = str.replaceAll("\\{AMOUNT\\}", event.get());
-
-        return comp;
+        return str;
     }
 
     public static void onEvent(rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
@@ -55,7 +45,7 @@ public class Events {
                 }
             }
 
-            showIngameAlert(chatter, ChatPointsTTV.getRedemptionString(type), event.orElse(null));
+            showIngameAlert(chatter, channel, type, event.orElse(null));
     
             for (String cmd : reward.getCommands()) {
                 cmd = cmd.replace("{USER}", chatter);
@@ -75,13 +65,15 @@ public class Events {
                     Player target = null;
                     switch (parts[0].toUpperCase()) {
                         case "SPAWN":
-                            target = Bukkit.getPlayer(parts[3]);
                             if (!EnumUtils.isValidEnum(EntityType.class, parts[1].toUpperCase())) {
                                 ChatPointsTTV.log.warning(errorStr + "Entity " + parts[1].toUpperCase() + " does not exist.");
                                 continue;
                             }
                             if (parts.length > 2) {
                                 amount = Integer.valueOf(parts[2]);
+                            }
+                            if (parts.length > 3) {
+                                target = Bukkit.getPlayer(parts[3]);
                             }
                             action = new SpawnAction(EntityType.valueOf(parts[1]), chatter, Optional.ofNullable(amount), Optional.ofNullable(target));
                             break;
@@ -94,7 +86,7 @@ public class Events {
                             action = new RunCmdAction(parts[1], text);
                             break;
                         case "GIVE":
-                            if (!EnumUtils.isValidEnum(Material.class, parts[1])) {
+                            if (!EnumUtils.isValidEnum(Material.class, parts[1].toUpperCase())) {
                                 ChatPointsTTV.log.warning(errorStr + "Item " + parts[1] + " does not exist.");
                                 continue;
                             }
@@ -103,12 +95,12 @@ public class Events {
                             }
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
-                                if (!target.isOnline()) {
+                                if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
                                 }
                                 continue;
                             }
-                            action = new GiveAction(Material.valueOf(parts[1]), Optional.ofNullable(amount), Optional.ofNullable(target));
+                            action = new GiveAction(Material.valueOf(parts[1].toUpperCase()), Optional.ofNullable(amount), Optional.ofNullable(target));
                             break;
                         case "TNT":
                             Integer fuseTime = null;
@@ -142,41 +134,48 @@ public class Events {
         }).start();
     }
 
-    public static void showIngameAlert(String user, String action, String rewardName) {
+    public static void showIngameAlert(String user, String channel, rewardType type, String event) {
         if (ChatPointsTTV.alertMode.equals(ChatPointsTTV.alert_mode.NONE)) return;
 
-        Boolean bold = ChatPointsTTV.getTwitch().override_msgRewardBold != null ? ChatPointsTTV.getTwitch().override_msgRewardBold : ChatPointsTTV.rewardBold;
-        ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
-        ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.action_color;
-        ComponentBuilder builder = new ComponentBuilder(user).color(userColor).bold(bold);
-        builder.append(" " + action).color(ChatPointsTTV.action_color);
-        if (rewardName != null) builder.append(" " + rewardName).color(userColor);
+        //ChatColor userColor = ChatPointsTTV.getTwitch().override_msgUserColor != null ? ChatPointsTTV.getTwitch().override_msgUserColor : ChatPointsTTV.user_color;
+        //ChatColor actionColor = ChatPointsTTV.getTwitch().override_msgActionColor != null ? ChatPointsTTV.getTwitch().override_msgActionColor : ChatPointsTTV.event_color;
+
+        String chatMessage = getEventMessage(type, user, channel, Optional.ofNullable(event));
+
+        String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), user, channel, event);
+        String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), user, channel, event);
 
         switch (ChatPointsTTV.alertMode) {
             case CHAT:
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    p.spigot().sendMessage(builder.create());
-                }
+                broadcastMessage(chatMessage);
                 break;
+
             case TITLE:
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    p.sendTitle(userColor + user, action + actionColor + " " + (bold ? ChatColor.BOLD : "") + rewardName, 10, 70, 20);
-                };
+                showTitle(title, subtitle);
                 break;
 
             case ALL:
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
-                    p.spigot().sendMessage(builder.create());
-                    p.sendTitle(userColor + user, action + actionColor + " " + (bold ? ChatColor.BOLD : "") + rewardName, 10, 70, 20);
-                }
+                broadcastMessage(chatMessage);
+                showTitle(title, subtitle);
                 break;
 
             default:
-                ChatPointsTTV.log.warning("Invalid mode: " + action.toUpperCase());
+                ChatPointsTTV.log.warning("Invalid mode: " + ChatPointsTTV.alertMode);
                 break;
+        }
+    }
+
+    public static void showTitle(String title, String subtitle) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
+            p.sendTitle(title, subtitle, 10, 70, 20);
+        }
+    }
+
+    public static void broadcastMessage(String msg) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
+            p.sendMessage(msg);
         }
     }
 }
