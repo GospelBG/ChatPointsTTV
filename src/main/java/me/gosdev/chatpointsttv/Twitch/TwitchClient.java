@@ -189,12 +189,6 @@ public class TwitchClient {
     
             Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: "+ credential.getUserName());
     
-            if (linkThread != null) {
-                try {
-                    linkThread.join();
-                } catch (InterruptedException e) {}
-            }            
-    
             tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
                 @Override
                 public void run() {
@@ -217,7 +211,7 @@ public class TwitchClient {
             stop(Bukkit.getConsoleSender());
         });
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, linkThread);
+        linkThread.start();
     }
 
     private void start(CommandSender p, OAuth2Credential credential) {
