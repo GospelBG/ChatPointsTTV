@@ -11,11 +11,11 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
 public class SpawnAction extends Action {
-    private EntityType entity;
-    private Integer amount;
-    private String name;
-    private Player player;
-    private boolean shouldGlow;
+    private final EntityType entity;
+    private final Integer amount;
+    private final String name;
+    private final Player player;
+    private final boolean shouldGlow;
 
     public SpawnAction(EntityType entity, String chatter, Optional<Integer> amount, Player target, Boolean shouldGlow) {
         this.entity = entity;
