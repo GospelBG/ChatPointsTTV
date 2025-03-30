@@ -123,6 +123,11 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
     **Example**: `GIVE DIAMOND 1 GospelBG`
     *This action will give the established amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
 
+- Giving Effects  
+    **Format:**: `EFFECT {EFFECT NAME} {STRENGTH} {DURATION IN SECONDS} [TARGET PLAYER]`
+    **Example**: `EFFECT JUMP_BOOST 2 60 GospelBG`
+    *This action gives the set potion effect to all players with the `chatpointsttv.target` permission or a specific player (when the `[TARGET USER] field is used`)*
+
 - Explosions  
     **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`  
     **Example**: `TNT 1 0`
@@ -131,7 +136,7 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 - Delay between actions  
     **Format**: `WAIT <SECONDS>`
     **Example**: `WAIT 2.5`
-    *This action will make the plugin wait the specified amount of seconds before runnning the next action.*
+    *This action will make the plugin wait the specified amount of seconds before runnning the next action.*  
 
 > [!TIP]
 > Argument names surrounded by <> means that it is a required argument.

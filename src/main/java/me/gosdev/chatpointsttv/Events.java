@@ -7,8 +7,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import me.gosdev.chatpointsttv.EventActions.Action;
+import me.gosdev.chatpointsttv.EventActions.EffectAction;
 import me.gosdev.chatpointsttv.EventActions.GiveAction;
 import me.gosdev.chatpointsttv.EventActions.RunCmdAction;
 import me.gosdev.chatpointsttv.EventActions.SpawnAction;
@@ -133,6 +135,25 @@ public class Events {
                             }
                             action = new GiveAction(Material.valueOf(parts[1].toUpperCase()), Optional.ofNullable(amount), Optional.ofNullable(target));
                             break;
+
+                        case "EFFECT":
+                            PotionEffectType effect = PotionEffectType.getByName(parts[1]);
+                            Integer strength = Integer.valueOf(parts[2]);
+                            Integer duration = Integer.valueOf(parts[3]);
+                            if (effect == null) {
+                                ChatPointsTTV.log.warning(errorStr + "Potion effect " + parts[1] + " does not exist.");
+                                continue;
+                            }
+                            if (parts.length > 4) {
+                                target = Bukkit.getPlayer(parts[4]);
+                                if (target == null || !target.isOnline()) {
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
+                                }
+                            }
+
+                            action = new EffectAction(effect, strength, duration, target);
+                            break;
+
                         case "TNT":
                             Integer fuseTime = null;
                             target = null;
