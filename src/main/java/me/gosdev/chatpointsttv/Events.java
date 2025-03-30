@@ -51,8 +51,34 @@ public class Events {
                 nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
                 alertMode = ChatPointsTTV.alertMode;
             }
+
+            if (!alertMode.equals(AlertMode.NONE)) { // In-game alert
+                String chatMessage = eventMsg;
     
-            for (String cmd : reward.getCommands()) {
+                String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
+                String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+        
+                switch (alertMode) {
+                    case CHAT:
+                        broadcastMessage(chatMessage);
+                        break;
+        
+                    case TITLE:
+                        showTitle(title, subtitle);
+                        break;
+        
+                    case ALL:
+                        broadcastMessage(chatMessage);
+                        showTitle(title, subtitle);
+                        break;
+        
+                    default:
+                        ChatPointsTTV.log.warning("Invalid mode: " + ChatPointsTTV.alertMode);
+                        break;
+                }    
+            }
+    
+            for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
                 if (type.equals(rewardType.CHEER) || type.equals(rewardType.GIFT) || type.equals(rewardType.RAID)) {
                     cmd = cmd.replace("{AMOUNT}", event.get());
@@ -136,32 +162,6 @@ public class Events {
                     ChatPointsTTV.log.warning(errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
                 }
             }
-
-        if (!alertMode.equals(AlertMode.NONE)) {
-            String chatMessage = eventMsg;
-
-            String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
-            String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
-    
-            switch (alertMode) {
-                case CHAT:
-                    broadcastMessage(chatMessage);
-                    break;
-    
-                case TITLE:
-                    showTitle(title, subtitle);
-                    break;
-    
-                case ALL:
-                    broadcastMessage(chatMessage);
-                    showTitle(title, subtitle);
-                    break;
-    
-                default:
-                    ChatPointsTTV.log.warning("Invalid mode: " + ChatPointsTTV.alertMode);
-                    break;
-            }    
-        }
     }).start();
     }
 
