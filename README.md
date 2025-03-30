@@ -128,6 +128,11 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
     **Example**: `TNT 1 0`
     *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*  
 
+- Delay between actions  
+    **Format**: `WAIT <SECONDS>`
+    **Example**: `WAIT 2.5`
+    *This action will make the plugin wait the specified amount of seconds before runnning the next action.*
+
 > [!TIP]
 > Argument names surrounded by <> means that it is a required argument.
 > Arguments surrounded by [] are optional.
