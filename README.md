@@ -123,7 +123,7 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
     **Example**: `GIVE DIAMOND 1 GospelBG`
     *This action will give the established amount of the set items to all players with the `chatpointsttv.target` permission. The example action will give all players (with the "target" permission) a diamond.*  
 
-- Explosions
+- Explosions  
     **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`  
     **Example**: `TNT 1 0`
     *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*  
