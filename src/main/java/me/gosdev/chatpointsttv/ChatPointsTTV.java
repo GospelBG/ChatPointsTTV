@@ -124,14 +124,16 @@ public class ChatPointsTTV extends JavaPlugin {
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
                 if (!VersionCheck.runningLatest) {
-                    ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version\n");
-        
-                    BaseComponent updBtn = formatted.create()[0];
+                    TextComponent updPrompt = new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + VersionCheck.latestVersion + " has been released!\n" + ChatColor.YELLOW + "Click ");
+                    
+                    TextComponent updBtn = new TextComponent(ChatColor.YELLOW + "" + ChatColor.UNDERLINE + "here");
                     updBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                     updBtn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, VersionCheck.download_url));
+
+                    updPrompt.addExtra(updBtn);
+                    updPrompt.addExtra("" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version\n");
     
-                    player.getPlayer().spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + VersionCheck.latestVersion + " has been released!"));
-                    player.getPlayer().spigot().sendMessage(updBtn);
+                    player.getPlayer().spigot().sendMessage(updPrompt);
                 }
 
                 if (!twitch.isStarted()) return;
