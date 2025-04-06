@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
   <artifactId>chatpointsttv</artifactId>
-  <version>${revision}</version>
+  <version>3.0.0-PRERELEASE</version>
   <packaging>jar</packaging>
   <name>ChatPointsTTV</name>
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
@@ -46,7 +46,6 @@
   </build>
 
   <properties>
-    <revision>2.4.1</revision>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
   </properties>
