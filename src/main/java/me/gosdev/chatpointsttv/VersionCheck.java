@@ -19,8 +19,11 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class VersionCheck {
     private final static String url = "https://api.modrinth.com/v2/project/nN0gRvoO/version";
-    private final static String download_url = "https://modrinth.com/plugin/chatpointsttv";
 
+    public final static String download_url = "https://modrinth.com/plugin/chatpointsttv";
+    public static String latestVersion;
+    public static Boolean runningLatest = false;
+    
     public static void check() {
         try {
             StringBuilder result = new StringBuilder();
@@ -34,9 +37,10 @@ public class VersionCheck {
             conn.disconnect();
 
             JSONArray json = new JSONArray(result.toString());
-            String latest = json.getJSONObject(0).getString("version_number");
+            latestVersion = json.getJSONObject(0).getString("version_number");
 
-            if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latest.replaceAll("[^\\d.]", ""))) {
+            if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latestVersion.replaceAll("[^\\d.]", ""))) {
+                runningLatest = false;
                 for (Player p: ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
                     if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                         ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version");
@@ -45,11 +49,11 @@ public class VersionCheck {
                         btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
                         btn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, download_url));
 
-                        p.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + latest + " has been released!"));
+                        p.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + latestVersion + " has been released!"));
                         p.spigot().sendMessage(btn);
                     }
                 }
-                ChatPointsTTV.log.info("ChatPointsTTV v" + latest + " has been released! Download the latest version in " + download_url);
+                ChatPointsTTV.log.info(ChatColor.YELLOW + "ChatPointsTTV v" + latestVersion + " has been released! Download the latest version in " + download_url);
 
             }
 

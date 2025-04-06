@@ -122,8 +122,19 @@ public class ChatPointsTTV extends JavaPlugin {
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
-                if (!twitch.isStarted()) return;
                 if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
+                if (!VersionCheck.runningLatest) {
+                    ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version\n");
+        
+                    BaseComponent updBtn = formatted.create()[0];
+                    updBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
+                    updBtn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, VersionCheck.download_url));
+    
+                    player.getPlayer().spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + VersionCheck.latestVersion + " has been released!"));
+                    player.getPlayer().spigot().sendMessage(updBtn);
+                }
+
+                if (!twitch.isStarted()) return;
                 if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !TwitchClient.accountConnected) {
                     String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
