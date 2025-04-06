@@ -17,7 +17,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Rewards.Rewards;
-import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import net.md_5.bungee.api.ChatColor;
@@ -32,13 +31,11 @@ public class ChatPointsTTV extends JavaPlugin {
     private static TwitchClient twitch;
     private CommandController cmdController;
 
-    private static final HashMap<rewardType, String> titleStrings = new HashMap<>();
     public static final HashMap<String, String> strings = new HashMap<>();
     public static ChatColor eventColor;
     public static ChatColor userColor;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
-    public static Boolean configOk = true;
     public static AlertMode alertMode;
     public static Boolean logEvents;
 
@@ -73,10 +70,6 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin.config;
     }
 
-    public static String getRedemptionString(rewardType type) {
-        return titleStrings.get(type);
-    }
-
     @Override
     public void onLoad() {
         LibraryLoader.LoadLibraries(this);
@@ -95,8 +88,8 @@ public class ChatPointsTTV extends JavaPlugin {
         config = getConfig();
 
         logEvents = config.getBoolean("LOG_EVENTS", false);
-        userColor = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("USER_COLOR", ChatColor.WHITE.name()));
-        eventColor = ChatColor.valueOf(config.getConfigurationSection("COLORS").getString("EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
+        userColor = ChatColor.valueOf(config.getString("COLORS.USER_COLOR", ChatColor.WHITE.name()));
+        eventColor = ChatColor.valueOf(config.getString("COLORS.EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
         alertMode = AlertMode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
@@ -122,23 +115,27 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         twitch = new TwitchClient();
-        twitch.enable(); 
-
-        try {
-            for (rewardType type : rewardType.values()) {
-                titleStrings.put(type, twitch.getConfig().getConfigurationSection("STRINGS").getString(type.toString() + "_STRING"));
-            }
-        } catch (NullPointerException e) {
-            log.severe("Error loading strings from config. Please check your config file.");
-            configOk = false;
-        }
+        if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
 
         VersionCheck.check();
 
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
-                if (twitch != null && !twitch.linkThread.isAlive() && !TwitchClient.accountConnected && player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) {
+                if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
+                if (!VersionCheck.runningLatest) {
+                    ComponentBuilder formatted = new ComponentBuilder(ChatColor.YELLOW + "Click " + ChatColor.UNDERLINE + "here" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version\n");
+        
+                    BaseComponent updBtn = formatted.create()[0];
+                    updBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
+                    updBtn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, VersionCheck.download_url));
+    
+                    player.getPlayer().spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + VersionCheck.latestVersion + " has been released!"));
+                    player.getPlayer().spigot().sendMessage(updBtn);
+                }
+
+                if (!twitch.isStarted()) return;
+                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !TwitchClient.accountConnected) {
                     String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
 
@@ -157,7 +154,6 @@ public class ChatPointsTTV extends JavaPlugin {
     
         // Erase variables
         config = null;
-        configOk = true;
         plugin = null;
         twitch = null;
 

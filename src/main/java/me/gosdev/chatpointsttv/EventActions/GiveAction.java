@@ -10,9 +10,9 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
 public class GiveAction extends Action {
-    private final Material item;
-    private final int amount;
-    private final Player target;
+    private Material item;
+    private int amount;
+    private Player target;
 
     public GiveAction(Material item, Optional<Integer> amount, Optional<Player> target) {
         this.item = item;

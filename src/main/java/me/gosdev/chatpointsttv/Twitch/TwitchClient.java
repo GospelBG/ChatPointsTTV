@@ -40,7 +40,6 @@ import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
-import com.github.twitch4j.helix.domain.User;
 
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
@@ -51,7 +50,6 @@ import me.gosdev.chatpointsttv.Utils.Scopes;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchClient {
     public Thread linkThread;
@@ -61,7 +59,6 @@ public class TwitchClient {
     public HashMap<String, OAuth2Credential> credentialManager;
 
     private boolean started;
-    private User user;
     private List<String> chatBlacklist;
     private static ITwitchClient client;
     private static HashMap<String, Channel> channels;
@@ -87,7 +84,6 @@ public class TwitchClient {
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
         Scopes.CHANNEL_READ_REDEMPTIONS,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
-        Scopes.USER_READ_MODERATED_CHANNELS,
         Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
         Scopes.USER_READ_CHAT,
@@ -124,15 +120,18 @@ public class TwitchClient {
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
         File twitchConfigFile = new File(plugin.getDataFolder(), "twitch.yml");
-        
         if (!twitchConfigFile.exists()) {
-            plugin.saveResource("twitch.yml", false);
+            plugin.saveResource(twitchConfigFile.getName(), false);
         }
         twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
 
         accountsFile = new File(plugin.getDataFolder(), "accounts.yml");
         accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
+        if (!accountsConfig.contains("twitch")) {
+            accountsConfig.createSection("twitch");
+        }
         accounts = accountsConfig.getConfigurationSection("twitch");
+
         identityProvider = new TwitchIdentityProvider(getClientID(), null, null);
         credentialManager = new HashMap<>();
         exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
@@ -169,7 +168,7 @@ public class TwitchClient {
                     continue;
                 }
                 link(Bukkit.getConsoleSender(), credential);
-            }    
+            }
         }
 
         started = true;
@@ -186,8 +185,8 @@ public class TwitchClient {
                     return;
                 }
             }
-    
-            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: "+ credential.getUserName());
+
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
     
             tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
                 @Override
@@ -197,9 +196,9 @@ public class TwitchClient {
             }, 1200, credential.getExpiresIn() / 2 * 20));
     
             if (accountConnected) {
-                subscribeToEvents(p, credential);
+                subscribeToEvents(credential);
             } else {
-                start(p, credential);
+                start(credential);
             }
 
             p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
@@ -214,7 +213,7 @@ public class TwitchClient {
         linkThread.start();
     }
 
-    private void start(CommandSender p, OAuth2Credential credential) {
+    private void start(OAuth2Credential credential) {
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
             .withDefaultAuthToken(credential)
@@ -226,8 +225,7 @@ public class TwitchClient {
             .build();
         
         oauth = credential;
-        user = client.getHelix().getUsers(credential.getAccessToken(), null, null).execute().getUsers().get(0);
-        
+
         eventHandler = new TwitchEventHandler();
 
         eventSocket = client.getEventSocket();
@@ -294,12 +292,12 @@ public class TwitchClient {
         }
 
         // Join the twitch chat of this channel(s) and enable stream/follow events
-        subscribeToEvents(p, credential);
+        subscribeToEvents(credential);
         
         accountConnected = true;
     }
     
-    private void subscribeToEvents(CommandSender p, OAuth2Credential credential) {
+    private void subscribeToEvents(OAuth2Credential credential) {
         String channel_id = credential.getUserId();
         Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Listening to " + credential.getUserName() + "'s events...");
 
@@ -389,24 +387,20 @@ public class TwitchClient {
         tokenRefreshTasks.get(channel.getChannelId()).cancel();
         credentialManager.remove(channel.getChannelId());
 
-        if (credentialManager.size() == 0) {
+        if (credentialManager.isEmpty()) {
             accountConnected = false;
         }
     }
 
     public void stop(CommandSender p) {
-        if (!accountConnected) {
-            p.sendMessage(ChatPointsTTV.msgPrefix + new TextComponent(ChatColor.RED + "There is no connected account."));
-            return;
-        }
         try {
-            if (!linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
-            client.getEventSocket().close();
-            client.close();
-            credentialManager.clear();
-            accountConnected = false;
+            if (linkThread != null && !linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
+            if (client != null) {
+                eventSocket.close();
+                client.close();
+            }
         } catch (Exception e) {
-            ChatPointsTTV.log.warning("Error while disabling ChatPointsTTV.");
+            ChatPointsTTV.log.warning("There was an error while disabling the Twitch client.");
             e.printStackTrace();
             return;
         }
@@ -419,10 +413,12 @@ public class TwitchClient {
         eventHandler = null;
         eventSocket = null;
         eventManager = null;
-        accountConnected = false;
+        channels.clear();
+        credentialManager.clear();
 
+        accountConnected = false;
         started = false;    
 
-        p.sendMessage(ChatPointsTTV.msgPrefix + "Events were successfully stopped!");
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has been successfully stopped!");
     }
 }

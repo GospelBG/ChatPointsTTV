@@ -25,31 +25,47 @@ public class StatusCommand {
 
         BaseComponent msg = new ComponentBuilder(
             "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV status" + ChatColor.RESET + " ----------\n" + 
-            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" +plugin.getDescription().getVersion() + "\n" +
+            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" + 
             "\n"
         ).create()[0];
 
-        BaseComponent status = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "Connection status: " + (ChatPointsTTV.getTwitch().isAccountConnected() ? ChatColor.GREEN + "" + ChatColor.BOLD + "ACTIVE" : ChatColor.RED + "" + ChatColor.BOLD + "DISCONNECTED")).create()[0];
-        status.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to toggle connection").create()));
-        status.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, ChatPointsTTV.getTwitch().isAccountConnected() ? "/twitch stop" : "/twitch start"));
+        String currentState;
+        if (ChatPointsTTV.getTwitch().isStarted()) {
+            if (ChatPointsTTV.getTwitch().isAccountConnected()) {
+                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
+            } else {
+                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
+            }
+        } else {
+            currentState = ChatColor.RED + "" + ChatColor.BOLD + "STOPPED";
+        }
 
+        BaseComponent status = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "Connection status: " + currentState).create()[0];
         msg.addExtra(status);
 
-        if (ChatPointsTTV.getTwitch().isAccountConnected()) {
-            TextComponent accountsBtn = new TextComponent(ChatColor.YELLOW + "" + ChatColor.BOLD + "[✔]" + ChatColor.RESET + ChatColor.YELLOW + " Manage accounts" );
-            accountsBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to add/remove accounts").create()));
-            accountsBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch accounts"));
-
-            TextComponent stopBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.RED + " Stop Twitch Client");
-            stopBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop all Twitch events.").create()));
-            stopBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch stop"));
-
-            if (!p.equals(Bukkit.getConsoleSender())) {
+        if (!p.equals(Bukkit.getConsoleSender())) {
+            if (ChatPointsTTV.getTwitch().isStarted()) {
+                TextComponent accountsBtn = new TextComponent(ChatColor.YELLOW + "" + ChatColor.BOLD + "[✔]" + ChatColor.RESET + ChatColor.YELLOW + " Manage accounts" );
+                accountsBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to add/remove accounts").create()));
+                accountsBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch accounts"));
+    
+                TextComponent stopBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.RED + " Stop Twitch Client");
+                stopBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop all Twitch events.").create()));
+                stopBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch stop"));
+    
                 msg.addExtra("\n\n");
                 msg.addExtra(accountsBtn);
                 msg.addExtra(ChatColor.GRAY + "  -  ");
                 msg.addExtra(stopBtn);
+    
+            } else {
+                TextComponent startBtn = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.GREEN + " Start Twitch Client");
+                startBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to start the Twitch client.").create()));
+                startBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch start"));
+
+                msg.addExtra("\n\n");
+                msg.addExtra(startBtn);
             }
         }
 

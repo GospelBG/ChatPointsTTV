@@ -45,13 +45,7 @@ public class CommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    if (ChatPointsTTV.configOk) {
-                        LinkCommand.link(plugin, sender);
-                    } else {
-                        sender.sendMessage("Invalid configuration. Please check your config file.");
-                        break;
-                    }
-                    
+                    LinkCommand.link(plugin, sender);                    
                     return true;
 
                 case "reload":
@@ -107,9 +101,6 @@ public class CommandController implements TabExecutor {
                     return true;
             }
         }
-
-        if (!ChatPointsTTV.configOk) sender.sendMessage(ChatColor.RED + "Config file has errors or has been left at default. Please set it up correctly and reload the plugin.");
-        return true;
     }
 
     @Override
@@ -120,6 +111,7 @@ public class CommandController implements TabExecutor {
         if (args.length == 1) {
             available.add("help");
             available.add("reload");
+            available.add("status");
             if (ChatPointsTTV.getTwitch().isStarted()) {
                 available.add("link");
                 available.add("stop");
@@ -129,11 +121,9 @@ public class CommandController implements TabExecutor {
             }
             if (ChatPointsTTV.getTwitch().isAccountConnected()) {
                 available.add("test");
-                available.add("status");
                 available.add("accounts");
                 available.add("unlink");
             }
-
         } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
             available.add("browser");
             available.add("code");

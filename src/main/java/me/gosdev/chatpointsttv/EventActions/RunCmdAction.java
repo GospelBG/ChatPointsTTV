@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 
 public class RunCmdAction extends Action {
-    private String target;
-    private  String command;
+    private final String target;
+    private final String command;
 
     public RunCmdAction (String sender, String command) {
         this.target = sender;
@@ -29,7 +29,7 @@ public class RunCmdAction extends Action {
             return;
         } else {
             sender = Bukkit.getPlayer(target);
-            if (sender == null || !Bukkit.getOnlinePlayers().contains(sender)) {
+            if (sender == null || !Bukkit.getOnlinePlayers().contains((Player) sender)) {
                 throw new RuntimeException("Couldn't find player " + target + ".");
             }
         }

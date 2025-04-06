@@ -430,7 +430,7 @@ public enum Scopes {
 
 
 
-    private String key;
+    private final String key;
 
     Scopes(String key) {
         this.key = key;
