@@ -1,0 +1,34 @@
+# This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
+# For more information about how to use the plugin's configuration files, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
+
+# If true, the plugin will automatically start the Twitch client.
+ENABLE_TWITCH: true
+
+# Whether events should be ignored if the streamer is offline.
+IGNORE_OFFLINE_STREAMERS: false
+
+# Whether stream chat messages should show up on the in-game chat
+SHOW_CHAT: true
+
+# Whether events should be printed to the server console. (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
+LOG_EVENTS: true
+
+# In-game event alerts mode.
+#     none: Disables in-game alerts
+#     chat: Displays a message in the chat
+#     title: Shows a title splash message
+#     all: Uses both "chat" and "title" alerts
+INGAME_ALERTS: chat
+
+# GLOBAL CONFIGURATION:
+
+# Adds glow effect to spawned mobs
+MOB_GLOW: true
+
+# Sets chatter's name to spawned mobs
+DISPLAY_NAME_ON_MOB: true
+
+#  Use Bukkit API color codes (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)
+COLORS:
+  USER_COLOR: GOLD
+  EVENT_COLOR: YELLOW

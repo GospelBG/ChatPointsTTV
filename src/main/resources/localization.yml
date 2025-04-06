@@ -1,0 +1,21 @@
+# This file is used to store all messages printed by the plugin.
+# It may be used for localization or customization.
+# In need of a reset, delete this file and it will be regenerated automatically in the next server start.
+
+# Events
+str_twitch_channel_points: "{USERNAME} has redeemed {EVENT} in {CHANNEL}"
+str_twitch_cheer: "{USERNAME} has cheered {EVENT} bits in {CHANNEL}"
+str_twitch_follow: "{USERNAME} has followed {CHANNEL}"
+str_twitch_raid: "{USERNAME} has raided {CHANNEL} with {EVENT} viewers"
+str_twitch_sub: "{USERNAME} has subscribed to {CHANNEL} with a {EVENT} sub" # Event = Sub Tier
+str_twitch_gift: "{USERNAME} has gifted {EVENT} subs to {CHANNEL}"
+
+# In-game title messages
+title: "{USERNAME}"
+
+sub_twitch_channel_points: "has redeemed {EVENT}!"
+sub_twitch_cheer: "has cheered {EVENT} bits!"
+sub_twitch_follow: "has started following!"
+sub_twitch_raid: "has raided {EVENT} viewers!"
+sub_twitch_sub: "has subscribed with {EVENT}!" # Event = Sub Tier
+sub_twitch_gift: "has gifted {EVENT} subs!"
