@@ -175,6 +175,12 @@ public class TwitchClient {
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
+        if (linkThread != null) {
+            try {
+                linkThread.join();
+            } catch (InterruptedException e) {}
+        }
+        
         linkThread = new Thread(() -> {
             saveCredential(credential.getUserId(), credential);
             credentialManager.put(credential.getUserId(), credential);
