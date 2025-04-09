@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.bukkit.Bukkit;
 import org.json.JSONArray;
 
 import net.md_5.bungee.api.ChatColor;
@@ -34,7 +35,7 @@ public class VersionCheck {
 
             if (!ChatPointsTTV.getPlugin().getDescription().getVersion().equals(latestVersion)) {
                 runningLatest = false;
-                ChatPointsTTV.log.info(ChatColor.YELLOW + "ChatPointsTTV v" + latestVersion + " has been released! Download the latest version in " + download_url);
+                Bukkit.getConsoleSender().sendMessage(ChatColor.YELLOW + "ChatPointsTTV v" + latestVersion + " has been released! Download the latest version in " + download_url);
             }
 
         } catch (IOException | URISyntaxException e) {
