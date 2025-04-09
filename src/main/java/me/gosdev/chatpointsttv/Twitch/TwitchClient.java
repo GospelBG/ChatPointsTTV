@@ -157,17 +157,14 @@ public class TwitchClient {
         
         if (accounts != null) {
             for (String userid : accounts.getKeys(false)) {
-                ConfigurationSection account = accounts.getConfigurationSection(userid);
-                OAuth2Credential credential = new OAuth2Credential(TwitchIdentityProvider.PROVIDER_NAME, account.getString("access_token"), account.getString("refresh_token"), userid, null, null, null);
                 // Try to refresh token
                 try {
-                    credential = refreshCredentials(credential);
+                    link(Bukkit.getConsoleSender(), refreshCredentials(userid));
                 } catch (RuntimeException e) {
                     ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
                     saveCredential(userid, null);
-                    continue;
                 }
-                link(Bukkit.getConsoleSender(), credential);
+                
             }
         }
 
@@ -197,9 +194,9 @@ public class TwitchClient {
             tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
                 @Override
                 public void run() {
-                    refreshCredentials(credential);
+                    refreshCredentials(credential.getUserId());
                 }
-            }, 1200, credential.getExpiresIn() / 2 * 20));
+            }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
     
             if (accountConnected) {
                 subscribeToEvents(credential);
@@ -220,17 +217,16 @@ public class TwitchClient {
     }
 
     private void start(OAuth2Credential credential) {
+        oauth = credential;
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
-            .withDefaultAuthToken(credential)
+            .withDefaultAuthToken(oauth)
             .withEnableChat(true)
             .withEnableHelix(true)
             .withEnableEventSocket(true)
             .withDefaultEventHandler(SimpleEventHandler.class)
             .withScheduledThreadPoolExecutor(exec)
-            .build();
-        
-        oauth = credential;
+            .build();        
 
         eventHandler = new TwitchEventHandler();
 
@@ -351,14 +347,31 @@ public class TwitchClient {
         }
     }
 
-    public OAuth2Credential refreshCredentials(OAuth2Credential oldCredential) {
-        Optional<OAuth2Credential> refreshed = identityProvider.refreshCredential(oldCredential);
-
-        if (refreshed.isPresent()) {
-            saveCredential(oldCredential.getUserId(), refreshed.get());
-            return identityProvider.getAdditionalCredentialInformation(refreshed.get()).get();
+    public OAuth2Credential refreshCredentials(String userId) {
+        OAuth2Credential oldCredential;
+        if (!credentialManager.containsKey(userId)) {
+            if (!accounts.contains(userId) || !accounts.contains(userId + ".access_token") || !accounts.contains(userId + ".refresh_token")) {
+                throw new NullPointerException("Couldn't retrieve credentials for user: " + userId);
+            }
+            oldCredential = new OAuth2Credential(identityProvider.getProviderName(), accounts.getString(userId + ".access_token"), accounts.getString(userId + ".refresh_token"), userId, null, null, null);
+        } else {
+            oldCredential = credentialManager.get(userId);
         }
-        throw new RuntimeException("Failed to refresh credentials.");
+
+        Optional<OAuth2Credential> refreshed = identityProvider.refreshCredential(oldCredential);
+        if (refreshed.isPresent()) {
+            OAuth2Credential fullCredential = identityProvider.getAdditionalCredentialInformation(refreshed.get()).get();
+            saveCredential(fullCredential.getUserId(), fullCredential);
+            credentialManager.put(fullCredential.getUserId(), fullCredential);
+
+            if (oauth != null && oauth.getUserId().equals(fullCredential.getUserId())) {
+                oauth.updateCredential(fullCredential);
+            }
+
+            return fullCredential;
+        } else {
+            throw new RuntimeException("Failed to refresh credentials.");
+        }
     }
 
     public void saveCredential(String userId, OAuth2Credential credential) {
