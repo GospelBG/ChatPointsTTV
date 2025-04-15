@@ -31,7 +31,7 @@ These are the only official download mirrors. Any downloads besides of these lin
     - the target player(s) (`chatpointsttv.target`).
     - people you want the reward messages broadcasted to (`chatpointsttv.broadcast`).  
 
-    · See [Permissions](#permissions) for more information.
+    · See [Permissions](#permissions) for more information.  
     · A permissions plugin, such as [LuckPerms](https://luckperms.net/) is recommended.
 
 4. Start your server and link your accounts  
@@ -125,7 +125,7 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
 
 - Explosions  
     **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS] [TARGET USER]`  
-    **Example**: `TNT 1 0 GospelBG`
+    **Example**: `TNT 1 0 GospelBG`  
     *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly in GospelBG's position.*  
 
 > [!TIP]
