@@ -30,7 +30,7 @@ public class SpawnAction extends Action {
         for (int i = 0; i < amount; i++) {
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (player != null) { // Is targeting a specific player?
-                    if (player.isOnline()) {
+                    if (!player.isOnline()) {
                         ChatPointsTTV.log.warning("Couldn't find player " + player.getDisplayName() + ".");
                         return;
                     }
