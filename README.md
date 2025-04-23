@@ -138,6 +138,11 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
     **Example**: `DELETE RANDOM`  
     *This action will remove either all items, the one in the player's main hand (or offhand, if not holding anything) or their whole inventory. The example action delete a random item from the inventory of every targetted player.*  
 
+- Shuffling a player's inventory  
+    **FORMAT**: `SHUFFLE <"ALL" / TARGET USER>`  
+    **Example**: `SHUFFLE ALL`  
+    *This action shuffles item positions inside a player's inventory. The example shuffles all targetted players inventories.*  
+
 - Delay between actions  
     **Format**: `WAIT <SECONDS>`
     **Example**: `WAIT 2.5`

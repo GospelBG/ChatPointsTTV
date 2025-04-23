@@ -15,16 +15,17 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-import me.gosdev.chatpointsttv.AlertMode;
-import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Actions.BaseAction;
 import me.gosdev.chatpointsttv.Actions.DeleteItemsAction;
 import me.gosdev.chatpointsttv.Actions.EffectAction;
 import me.gosdev.chatpointsttv.Actions.GiveAction;
+import me.gosdev.chatpointsttv.Actions.InvShuffleAction;
 import me.gosdev.chatpointsttv.Actions.RunCmdAction;
 import me.gosdev.chatpointsttv.Actions.SpawnAction;
 import me.gosdev.chatpointsttv.Actions.TntAction;
+import me.gosdev.chatpointsttv.AlertMode;
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
@@ -179,6 +180,14 @@ public class Events {
                             }
 
                             action = new DeleteItemsAction(DeleteItemsAction.Type.valueOf(parts[1].toUpperCase()), target);
+                            break;
+
+                        case "SHUFFLE":
+                            if (parts[1].equalsIgnoreCase("ALL")) {
+                                target = Bukkit.getPlayer(parts[1]);
+                            }
+                            
+                            action = new InvShuffleAction(target);
                             break;
 
                         case "TNT":
