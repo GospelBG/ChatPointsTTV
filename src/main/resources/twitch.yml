@@ -27,33 +27,33 @@
 # To target all channels use "default" as the list key.
 # For more information, see examples in the README file.
 
-# Leave any reward class empty to disable it.
-CHANNEL_POINTS_REWARDS:
+# Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
+# CHANNEL_POINTS_REWARDS:
 #  [REWARD NAME]:
 #    - {ACTION 1}
 #    - {ACTION 2}
 
 # For follows, put the desired action after the colon as a list. You shouldn't add anything else.
-FOLLOW_REWARDS:
+# FOLLOW_REWARDS:
 #   - {ACTION}
 #   - {ACTION}
 
-CHEER_REWARDS:
+# CHEER_REWARDS:
 #  [MINIMUM BITS AMOUNT]:
 #    - {ACTION}
 
 # Subscription tier values: TWITCH_PRIME/TIER1/TIER2/TIER3.
-SUB_REWARDS:
+# SUB_REWARDS:
 #  [TWITCH_PRIME]:
 #    - {ACTION}
 #  [TIER1/2/3]:
 #    - {ACTION}
 
-GIFT_REWARDS:
+# GIFT_REWARDS:
 #  [MINIMUM AMOUNT]:
 #    - {ACTION}
 
-RAID_REWARDS:
+# RAID_REWARDS:
 #  [VIEWER THRESHOLD]:
 #    - {ACTION}
 
