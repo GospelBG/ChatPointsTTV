@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
@@ -41,8 +41,13 @@ public class DeleteItemsAction extends BaseAction {
                         }
                         break;
     
+                    case HAND:
+                        if (p.getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+                            p.getInventory().setItemInOffHand(null);
+                        } else {
                             p.getInventory().setItemInMainHand(null);
                         }
+                        break;
     
                     case RANDOM:
                         ArrayList<Integer> populatedSlots = new ArrayList<>();
