@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 
 import me.gosdev.chatpointsttv.EventActions.Action;
 import me.gosdev.chatpointsttv.EventActions.DeleteItemsAction;
