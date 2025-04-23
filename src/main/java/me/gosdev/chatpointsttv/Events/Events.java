@@ -1,28 +1,38 @@
-package me.gosdev.chatpointsttv;
+package me.gosdev.chatpointsttv.Events;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
-import me.gosdev.chatpointsttv.EventActions.Action;
-import me.gosdev.chatpointsttv.EventActions.DeleteItemsAction;
-import me.gosdev.chatpointsttv.EventActions.EffectAction;
-import me.gosdev.chatpointsttv.EventActions.GiveAction;
-import me.gosdev.chatpointsttv.EventActions.RunCmdAction;
-import me.gosdev.chatpointsttv.EventActions.SpawnAction;
-import me.gosdev.chatpointsttv.EventActions.TntAction;
-import me.gosdev.chatpointsttv.Rewards.Reward;
-import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.AlertMode;
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.Actions.BaseAction;
+import me.gosdev.chatpointsttv.Actions.DeleteItemsAction;
+import me.gosdev.chatpointsttv.Actions.EffectAction;
+import me.gosdev.chatpointsttv.Actions.GiveAction;
+import me.gosdev.chatpointsttv.Actions.RunCmdAction;
+import me.gosdev.chatpointsttv.Actions.SpawnAction;
+import me.gosdev.chatpointsttv.Actions.TntAction;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class Events {
-    public static String getEventMessage(Platforms platform, rewardType type, String chatter, String channel, Optional<String> event) {
+    public static final String EVERYONE = "*";
+    public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
+
+    public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event) {
         String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.name().toLowerCase());
 
         str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), platform);
@@ -30,7 +40,7 @@ public class Events {
         return str;
     }
 
-    public static void onEvent(Platforms platform, rewardType type, Reward reward, String chatter, String channel, Optional<String> event) {
+    public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event) {
         new Thread (()-> {
             String eventMsg = getEventMessage(platform, type, chatter, channel, event);
             String errorStr = "There was an error running a " + type + " action: ";
@@ -80,10 +90,10 @@ public class Events {
                         break;
                 }    
             }
-    
+        
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
-                if (type.equals(rewardType.CHEER) || type.equals(rewardType.GIFT) || type.equals(rewardType.RAID)) {
+                if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID)) {
                     cmd = cmd.replace("{AMOUNT}", event.get());
                 }
                 
@@ -94,7 +104,7 @@ public class Events {
                     continue;
                 }
                 try {
-                    Action action;
+                    BaseAction action;
                     Integer amount = null;
                     Player target = null;
                     switch (parts[0].toUpperCase()) {
@@ -200,7 +210,7 @@ public class Events {
                     ChatPointsTTV.log.warning(errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
                 }
             }
-    }).start();
+        }).start();
     }
 
 
@@ -216,5 +226,67 @@ public class Events {
             if (!p.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) continue;
             p.sendMessage(msg);
         }
+    }
+
+    public static ArrayList<Event> getActions(FileConfiguration config, EventType type) {
+        if (actions.get(type) != null) return actions.get(type); // Give stored dictionary if it was already fetched
+
+        String key = type.toString().toUpperCase() + "_REWARDS";
+        ArrayList<Event> action_list = new ArrayList<>();
+
+        if (!config.contains(key)) return null; // No configured rewards for this type
+
+        if (type.equals(EventType.FOLLOW)) {
+            if (config.isConfigurationSection(key)) { // Streamer-specific?
+                Set<String> keys = (config.getConfigurationSection(key)).getKeys(false);
+                for (String channel : keys) {
+                    action_list.add(new Event(type, channel.equals("default") ? EVERYONE : channel, null, config.getConfigurationSection(key).getStringList(channel)));
+                }
+            } else if (config.isList(key)) {
+                action_list.add(new Event(type, EVERYONE, null, config.getStringList(key)));
+            } else {
+                ChatPointsTTV.log.severe("ChatPointsTTV: Follow actions must be entered as a list (or a configuration section, if targeting specific streamers). Read the docs for more information.");
+                return null;
+            }
+        } else {
+            if (config.isConfigurationSection(key)) {
+                ConfigurationSection section = config.getConfigurationSection(key);
+                Set<String> keys = section.getKeys(false);
+                    for (String subkey : keys) {
+                        if (!section.isConfigurationSection(subkey) && !section.isList(subkey)) {
+                            ChatPointsTTV.log.severe("ChatPointsTTV: Invalid configuration for " + type.toString().toLowerCase() + " (" + subkey + ") actions. Read the docs for more information.");
+                            continue;
+                        }
+                        if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID)) {
+                            try {
+                                Integer.valueOf(subkey);
+                            } catch (NumberFormatException e) {
+                                ChatPointsTTV.log.severe("ChatPointsTTV: \"" + subkey +  "\" must be a number.");
+                                continue;
+                            }
+                        }
+
+                        ConfigurationSection channelSection = section.getConfigurationSection(subkey);
+                        if (channelSection == null) {
+                            // No channel specified
+                            action_list.add(new Event(type, EVERYONE, subkey, section.getStringList(subkey)));
+                        } else {
+                            // Streamer specific event
+                            Set<String> channelKeys = channelSection.getKeys(false);
+                            for (String channel : channelKeys) {
+                                action_list.add(new Event(type, channel.equals("default") ? EVERYONE : channel, subkey, channelSection.getStringList(channel)));
+                            }
+                        }
+                    }
+            } else {
+                ChatPointsTTV.log.severe("ChatPointsTTV: Invalid configuration for " + type.toString().toLowerCase() + " actions. Read the docs for more information.");
+                return null;
+            }
+        }
+
+        action_list.sort(new EventComparator());
+        actions.put(type, action_list);
+
+        return actions.get(type);
     }
 }

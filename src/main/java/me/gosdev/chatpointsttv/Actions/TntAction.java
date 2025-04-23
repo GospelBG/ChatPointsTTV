@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 
 import java.util.Optional;
 
@@ -10,7 +10,7 @@ import org.bukkit.entity.TNTPrimed;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
-public class TntAction extends Action {
+public class TntAction extends BaseAction {
     private int amount;
     private Optional<Integer> explosionTime;
     private Player target;

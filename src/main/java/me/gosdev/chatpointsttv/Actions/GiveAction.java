@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 
 import java.util.Optional;
 
@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
-public class GiveAction extends Action {
+public class GiveAction extends BaseAction {
     private Material item;
     private int amount;
     private Player target;

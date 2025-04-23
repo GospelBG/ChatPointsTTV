@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
-public class DeleteItemsAction extends Action {
+public class DeleteItemsAction extends BaseAction {
     public static enum Type {
         ALL,
         RANDOM,

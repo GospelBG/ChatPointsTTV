@@ -43,7 +43,8 @@ import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
 
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Rewards.Rewards;
+import me.gosdev.chatpointsttv.Events.EventType;
+import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.Scopes;
@@ -244,28 +245,28 @@ public class TwitchClient {
                 if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
             }
         });            
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHANNEL_POINTS) != null) {
+        if (Events.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
             eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
                 eventHandler.onChannelPointsRedemption(e);
             });
         }
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.FOLLOW) != null) {
+        if (Events.getActions(twitchConfig, EventType.FOLLOW) != null) {
             eventManager.onEvent(ChannelFollowEvent.class, (ChannelFollowEvent e) -> {
                 eventHandler.onFollow(e);
             });
         }
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHEER) != null) {
+        if (Events.getActions(twitchConfig, EventType.CHEER) != null) {
             eventManager.onEvent(ChannelChatMessageEvent.class, (ChannelChatMessageEvent e) -> {
                 eventHandler.onCheer(e);
             }); 
         }
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.SUB) != null || Rewards.getRewards(twitchConfig, Rewards.rewardType.GIFT) != null) {
+        if (Events.getActions(twitchConfig, EventType.SUB) != null || Events.getActions(twitchConfig, EventType.GIFT) != null) {
             eventManager.onEvent(ChannelChatNotificationEvent.class, (ChannelChatNotificationEvent e) -> {
                     if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
                     else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
             });
         }
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.RAID) != null) {
+        if (Events.getActions(twitchConfig, EventType.RAID) != null) {
             eventManager.onEvent(ChannelRaidEvent.class, (ChannelRaidEvent e) -> {
                     eventHandler.onRaid(e);
             }); 
@@ -305,23 +306,23 @@ public class TwitchClient {
 
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHANNEL_POINTS) != null) {
+        if (Events.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
             subs.add(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.FOLLOW) != null) {
+        if (Events.getActions(twitchConfig, EventType.FOLLOW) != null) {
             subs.add(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(channel_id).broadcasterUserId(channel_id).build(), null));
         } 
 
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.CHEER) != null) {
+        if (Events.getActions(twitchConfig, EventType.CHEER) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.SUB) != null || Rewards.getRewards(twitchConfig, Rewards.rewardType.GIFT) != null) {
+        if (Events.getActions(twitchConfig, EventType.SUB) != null || Events.getActions(twitchConfig, EventType.GIFT) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Rewards.getRewards(twitchConfig, Rewards.rewardType.RAID) != null) {
+        if (Events.getActions(twitchConfig, EventType.RAID) != null) {
             subs.add(SubscriptionTypes.CHANNEL_RAID.prepareSubscription(b -> b.toBroadcasterUserId(channel_id).build(), null));
         }
 

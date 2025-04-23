@@ -12,33 +12,32 @@ import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Events;
 import me.gosdev.chatpointsttv.Platforms;
-import me.gosdev.chatpointsttv.Rewards.Reward;
-import me.gosdev.chatpointsttv.Rewards.Rewards;
-import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
+import me.gosdev.chatpointsttv.Events.Event;
+import me.gosdev.chatpointsttv.Events.Events;
+import me.gosdev.chatpointsttv.Events.EventType;
 
 public class TwitchEventHandler {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.CHANNEL_POINTS)) {
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
 
             List<String> replacedCmds = new ArrayList<>();
             for (String cmd : reward.getCommands()) {
                 replacedCmds.add(cmd.replace("{TEXT}", event.getUserInput()));
             }
 
-            Events.onEvent(Platforms.TWITCH, rewardType.CHANNEL_POINTS, new Reward(reward.getType(), reward.getChannel(), reward.getEvent(), replacedCmds), event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
+            Events.onEvent(Platforms.TWITCH, EventType.CHANNEL_POINTS, new Event(reward.getType(), reward.getChannel(), reward.getEvent(), replacedCmds), event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
             return;
         }
     }
 
     public void onFollow(ChannelFollowEvent event) {
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.FOLLOW)) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.FOLLOW)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
 
-            Events.onEvent(Platforms.TWITCH, rewardType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty());
+            Events.onEvent(Platforms.TWITCH, EventType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty());
             return;    
         }
     }
@@ -47,11 +46,11 @@ public class TwitchEventHandler {
         if (event.getCheer() == null) return;
         Integer amount = event.getCheer().getBits();
 
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.CHEER)) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.CHEER)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
             try {
                 if (amount >= Integer.valueOf(reward.getEvent())) {
-                    Events.onEvent(Platforms.TWITCH, rewardType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
+                    Events.onEvent(Platforms.TWITCH, EventType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                     return;
                 }
     
@@ -81,11 +80,11 @@ public class TwitchEventHandler {
             
         }
 
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.SUB)) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.SUB)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                Events.onEvent(Platforms.TWITCH, rewardType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(tier.name() + " sub"));
+                Events.onEvent(Platforms.TWITCH, EventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(tier.name() + " sub"));
                 return;
             }
         }
@@ -94,10 +93,10 @@ public class TwitchEventHandler {
     public void onSubGift(ChannelChatNotificationEvent event) {
         Integer amount = event.getCommunitySubGift().getTotal();
 
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.GIFT)) {
-            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.GIFT)) {
+            if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
-                Events.onEvent(Platforms.TWITCH, rewardType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
+                Events.onEvent(Platforms.TWITCH, EventType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
                 return;
             }
         }
@@ -107,10 +106,10 @@ public class TwitchEventHandler {
         String raiderName = event.getFromBroadcasterUserName();
         Integer amount = event.getViewers();
 
-        for (Reward reward : Rewards.getRewards(ChatPointsTTV.getTwitch().getConfig(), rewardType.RAID)) {
-            if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Rewards.EVERYONE)) continue;
+        for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.RAID)) {
+            if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
-                Events.onEvent(Platforms.TWITCH, rewardType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount.toString()));
+                Events.onEvent(Platforms.TWITCH, EventType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount.toString()));
                 return;
             }
         }

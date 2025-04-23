@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 
-public class RunCmdAction extends Action {
+public class RunCmdAction extends BaseAction {
     private final String target;
     private final String command;
 

@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.gosdev.chatpointsttv.Rewards.Rewards;
+import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import net.md_5.bungee.api.ChatColor;
@@ -44,7 +44,6 @@ public class ChatPointsTTV extends JavaPlugin {
     public Metrics metrics;
 
     public final static String msgPrefix = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "[ChatPointsTTV] " + ChatColor.WHITE + "" + ChatColor.RESET;
-
 
     public static enum permissions {
         BROADCAST("chatpointsttv.broadcast"),
@@ -159,7 +158,7 @@ public class ChatPointsTTV extends JavaPlugin {
         plugin = null;
         twitch = null;
 
-        Rewards.rewards = new HashMap<>();
+        Events.actions = new HashMap<>();
 
         HandlerList.unregisterAll(this);
     }

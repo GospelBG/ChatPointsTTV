@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 
 import java.util.Optional;
 
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
-public class SpawnAction extends Action {
+public class SpawnAction extends BaseAction {
     private EntityType entity;
     private Integer amount;
     private String name;

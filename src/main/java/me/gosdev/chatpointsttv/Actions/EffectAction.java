@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.EventActions;
+package me.gosdev.chatpointsttv.Actions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 
-public class EffectAction extends Action {
+public class EffectAction extends BaseAction {
 
     private final PotionEffect effect;
     private final Player target;

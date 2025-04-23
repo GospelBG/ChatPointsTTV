@@ -1,24 +1,23 @@
-package me.gosdev.chatpointsttv.Rewards;
+package me.gosdev.chatpointsttv.Events;
 
 import java.util.List;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Rewards.Rewards.rewardType;
 import me.gosdev.chatpointsttv.Twitch.TwitchUtils;
 
-public class Reward {
-    private final rewardType type;
+public class Event {
+    private final EventType type;
     private final String event;
     private final List<String> cmds;
     private final String channel;
     private String channelId;
 
-    public Reward (rewardType type, String channel, String event, List<String> cmds) {
+    public Event (EventType type, String channel, String event, List<String> cmds) {
         this.type = type;
         this.channel = channel;
 
         try {
-            channelId = channel.equals(Rewards.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
+            channelId = channel.equals(Events.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
         } catch (NullPointerException e) {
             ChatPointsTTV.log.warning(e.getMessage());
             channelId = null;
@@ -34,7 +33,7 @@ public class Reward {
     public List<String> getCommands() {
         return cmds;
     }
-    public rewardType getType() {
+    public EventType getType() {
         return type;
     }
     public String getChannel() {
