@@ -36,7 +36,7 @@ public class SpawnAction extends BaseAction {
                     }
                 } else if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
         
-                Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> { // Entities should only be spawned synchronously
+                Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), () -> { // Entities should only be spawned synchronously
                     Entity e = p.getWorld().spawnEntity(p.getLocation(), entity);
                     e.setGlowing(shouldGlow);
                     if (name != null) {

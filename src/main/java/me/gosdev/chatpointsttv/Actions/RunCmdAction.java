@@ -23,7 +23,9 @@ public class RunCmdAction extends BaseAction {
         } else if (target.equalsIgnoreCase("TARGET")) {
             for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
                 if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
-                    Bukkit.dispatchCommand(p, command);
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), () -> { // Commands should only be dispatched synchronously.
+                        Bukkit.dispatchCommand(p, command);
+                    });
                 }
             }
             return;
@@ -34,7 +36,7 @@ public class RunCmdAction extends BaseAction {
             }
         }
 
-        Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> { // Commands should only be dispatched synchronously.
+        Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), () -> { // Commands should only be dispatched synchronously.
             Bukkit.dispatchCommand(sender, command);
         });
     }
