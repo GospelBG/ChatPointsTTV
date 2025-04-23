@@ -386,7 +386,7 @@ public class TwitchClient {
         try {
             accountsConfig.save(accountsFile);
         } catch (IOException e) {
-            ChatPointsTTV.log.severe("There was an issue saving account session credentials.");
+            ChatPointsTTV.log.severe("ChatPointsTTV: There was an issue saving account session credentials.");
         }
     }
 

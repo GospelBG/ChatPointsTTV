@@ -52,7 +52,7 @@ public class LibraryLoader {
             try {
                 libraryManager.loadLibrary(lib);
             } catch (Exception e) {
-                ChatPointsTTV.log.severe("Failed to load library: " + lib.getArtifactId() + " v" + lib.getVersion() + " \n" + e.getMessage());
+                ChatPointsTTV.log.severe("ChatPointsTTV: Failed to load library: " + lib.getArtifactId() + " v" + lib.getVersion() + " \n" + e.getMessage());
             }
             
         }
