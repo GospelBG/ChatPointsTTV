@@ -1,7 +1,6 @@
 package me.gosdev.chatpointsttv.EventActions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -48,61 +47,17 @@ public class DeleteItemsAction extends Action {
                     break;
 
                 case RANDOM:
-                    ArrayList<ItemStack> validItems = new ArrayList<>();
-
-                    // Add main inventory items
-                    for (ItemStack item : p.getInventory().getContents()) {
-                        if (item != null) {
-                            validItems.add(item);
+                    ArrayList<Integer> populatedSlots = new ArrayList<>();
+                    for (int i = 0; i < p.getInventory().getSize(); i++) {
+                        if (p.getInventory().getContents()[i] != null) {
+                            populatedSlots.add(i);
                         }
                     }
 
-                    // Add armor items
-                    for (ItemStack armorItem : p.getInventory().getArmorContents()) {
-                        if (armorItem != null) {
-                            validItems.add(armorItem);
-                        }
-                    }
+                    if (populatedSlots.isEmpty()) return; // Empty inventory
 
-                    // Add offhand item
-                    ItemStack offHandItem = p.getInventory().getItemInOffHand();
-                    if (offHandItem != null) {
-                        validItems.add(offHandItem);
-                    }
-
-                    if (!validItems.isEmpty()) {
-                        Random random = new Random();
-                        ItemStack randomItem = validItems.get(random.nextInt(validItems.size()));
-                        Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> {
-                            if (randomItem.equals(p.getInventory().getItemInOffHand())) {
-                                p.getInventory().setItemInOffHand(null);
-                            } else {
-                                ItemStack[] newArmor = new ItemStack[4];
-                                for (int i = 0; i >= 4; i++) {
-                                    if (randomItem.equals(p.getInventory().getArmorContents()[i])) { // Always true (TODO)
-                                        ChatPointsTTV.log.info(randomItem.toString() + " = " + p.getInventory().getArmorContents()[i].toString());
-                                        newArmor[i] = null;
-                                    } else {
-                                        newArmor[i] = p.getInventory().getArmorContents()[i];
-                                    }
-                                }
-
-                                if (!Arrays.equals(p.getInventory().getArmorContents(), newArmor)) { // Always true (TODO)
-                                    p.getInventory().setArmorContents(newArmor);
-                                    return;
-                                }
-                                
-                                ItemStack[] armorContents = p.getInventory().getArmorContents();
-                                for (int i = 0; i < armorContents.length; i++) {
-                                    if (randomItem.equals(armorContents[i])) {
-                                        armorContents[i] = null;
-                                        break;
-                                    }
-                                }
-                                p.getInventory().setArmorContents(armorContents);
-                            }
-                        });
-                    }
+                    int deletedItem = populatedSlots.get(new Random().nextInt(populatedSlots.size()));
+                    p.getInventory().setItem(deletedItem, null);
                     break;
             }
         }
