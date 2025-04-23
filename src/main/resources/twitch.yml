@@ -44,7 +44,7 @@
 
 # Subscription tier values: TWITCH_PRIME/TIER1/TIER2/TIER3.
 # SUB_REWARDS:
-#  [TWITCH_PRIME]:
+#  TWITCH_PRIME:
 #    - {ACTION}
 #  [TIER1/2/3]:
 #    - {ACTION}
