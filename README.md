@@ -132,10 +132,11 @@ This plugin is controlled by the `/twitch` command followed by one of the follow
     **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS]`  
     **Example**: `TNT 1 0`
     *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly to all players.*  
-- Explosions  
-    **FORMAT**: `TNT <AMOUNT> [FUSE TIME IN TICKS] [TARGET USER]`  
-    **Example**: `TNT 1 0 GospelBG`  
-    *This action will spawn a TNT to all players with the `chatpointsttv.target` permission that will explode after the specified fuse time. The example action will spawn a TNT that will explode instantly in GospelBG's position.*  
+
+- Deleting Items  
+    **FORMAT**: `DELETE <"ALL" / "HAND" / "RANDOM"> [TARGET USER]`  
+    **Example**: `DELETE RANDOM`  
+    *This action will remove either all items, the one in the player's main hand (or offhand, if not holding anything) or their whole inventory. The example action delete a random item from the inventory of every targetted player.*  
 
 - Delay between actions  
     **Format**: `WAIT <SECONDS>`
