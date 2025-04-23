@@ -33,33 +33,33 @@ public class DeleteItemsAction extends BaseAction {
                     continue;
                 }
             } else if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
-
-            switch (type) {
-                case ALL:
-                    for (ItemStack item : p.getInventory().getContents()) {
-                        Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> p.getInventory().remove(item));
-                    }                    
-                    break;
-
-                case HAND:
-                    Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> p.getInventory().removeItem(p.getInventory().getItemInMainHand()));
-                    Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () ->p.getInventory().removeItem(p.getInventory().getItemInOffHand()));
-                    break;
-
-                case RANDOM:
-                    ArrayList<Integer> populatedSlots = new ArrayList<>();
-                    for (int i = 0; i < p.getInventory().getSize(); i++) {
-                        if (p.getInventory().getContents()[i] != null) {
-                            populatedSlots.add(i);
+            Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> {
+                switch (type) {
+                    case ALL:
+                        for (int i = 0; i < p.getInventory().getSize(); i++) {
+                            p.getInventory().setItem(i, null);
                         }
-                    }
-
-                    if (populatedSlots.isEmpty()) return; // Empty inventory
-
-                    int deletedItem = populatedSlots.get(new Random().nextInt(populatedSlots.size()));
-                    p.getInventory().setItem(deletedItem, null);
-                    break;
-            }
+                        break;
+    
+                            p.getInventory().setItemInMainHand(null);
+                        }
+    
+                    case RANDOM:
+                        ArrayList<Integer> populatedSlots = new ArrayList<>();
+                        for (int i = 0; i < p.getInventory().getSize(); i++) {
+                            if (p.getInventory().getContents()[i] != null) {
+                                populatedSlots.add(i);
+                            }
+                        }
+    
+                        if (populatedSlots.isEmpty()) return; // Empty inventory
+    
+                        int deletedItem = populatedSlots.get(new Random().nextInt(populatedSlots.size()));
+                        p.getInventory().setItem(deletedItem, null);
+                        break;
+                }
+    
+            });
         }
     }
 }
