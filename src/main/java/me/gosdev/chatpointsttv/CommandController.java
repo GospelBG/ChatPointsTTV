@@ -232,13 +232,6 @@ public class CommandController implements TabExecutor {
                         break;
 
                     case 5:
-                        for (SubscriptionPlan plan : EnumSet.allOf(SubscriptionPlan.class)) {
-                            if (plan.equals(SubscriptionPlan.NONE)) continue;
-                            result.add(plan.name());
-                        }
-                        break;
-
-                    case 6:
                         result.add("<Amount>");
                         break;
                 }

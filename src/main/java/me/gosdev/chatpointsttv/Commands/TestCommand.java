@@ -157,29 +157,24 @@ public class TestCommand {
                     break;
     
                 case "subgift":
-                    if (args.size() < 6) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <tier> <amount>");
+                    if (args.size() < 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <amount>");
                         return;
                     }
     
                     String giftChatter = args.get(2);
                     String giftChannel = args.get(3);
-                    SubscriptionPlan giftTier;
                     int giftAmount;
     
                     try {
-                        giftAmount = Integer.parseInt(args.get(5));
-                        giftTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
+                        giftAmount = Integer.parseInt(args.get(4));
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args.get(5));
-                        return;
-                    } catch (IllegalArgumentException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args.get(4));
                         return;
                     }
                     
                     try {
-                        event = EventTest.SubGiftEvent(giftChannel, giftChatter, giftTier, giftAmount);
+                        event = EventTest.SubGiftEvent(giftChannel, giftChatter, giftAmount);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;

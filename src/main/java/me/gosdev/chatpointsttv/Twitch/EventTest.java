@@ -95,7 +95,7 @@ public class EventTest {
         return event;
     }
 
-    public static ChannelChatNotificationEvent SubGiftEvent(String channel, String chatter, SubscriptionPlan plan, int amount) {
+    public static ChannelChatNotificationEvent SubGiftEvent(String channel, String chatter, int amount) {
         ChannelChatNotificationEvent event = jsonToObject(
             "{\"chatter_user_id\":\"" + TwitchUtils.getUserId(chatter) +
             "\",\"chatter_user_login\":\"" + chatter.toLowerCase() +
@@ -104,7 +104,7 @@ public class EventTest {
             "\",\"broadcaster_user_login\":\"" + channel.toLowerCase() +
             "\",\"broadcaster_user_name\":\"" + channel +
             "\",\"notice_type\": \"community_sub_gift" +
-            "\",\"community_sub_gift\":{\"sub_tier\":\"" + plan + 
+            "\",\"community_sub_gift\":{\"sub_tier\":\"1000" + 
             "\",\"total\":" + amount + "}}",
             ChannelChatNotificationEvent.class);
 
