@@ -13,8 +13,6 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
-import me.gosdev.chatpointsttv.ChatPointsTTV;
-
 public class EventTest {
     public static CustomRewardRedemptionAddEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) {
         JSONObject json = new JSONObject();
@@ -35,7 +33,7 @@ public class EventTest {
         reward.put("cost", "123");
 
         json.put("reward", reward);
-        ChatPointsTTV.log.info(json.toString());
+
         CustomRewardRedemptionAddEvent event = jsonToObject(json.toString(), CustomRewardRedemptionAddEvent.class);
         return event;
     }
