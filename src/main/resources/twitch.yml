@@ -15,6 +15,8 @@
 #
 #     TNT {AMOUNT} [EXPLOSION TIME IN TICKS] [TARGET PLAYER]
 #
+#     CUSTOM_MSG {MESSAGE}
+#
 #  {} = Required
 #  [] = Optional
 

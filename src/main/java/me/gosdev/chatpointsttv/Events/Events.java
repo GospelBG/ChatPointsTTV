@@ -43,9 +43,8 @@ public class Events {
 
     public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event) {
         new Thread (()-> {
-            String eventMsg = getEventMessage(platform, type, chatter, channel, event);
             String errorStr = "There was an error running a " + type + " action: ";
-            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(eventMsg);
+            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event));
             if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
@@ -67,14 +66,24 @@ public class Events {
             }
 
             if (!alertMode.equals(AlertMode.NONE)) { // In-game alert
-                String chatMessage = eventMsg;
-    
-                String title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
-                String subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+                String title;
+                String subtitle;
+                if (reward.getCustomMsg() != null) {
+                    String[] splitted = reward.getCustomMsg().replace("{USER}", chatter).replace("{AMOUNT}", event.orElse("")).split("\\\\n", 2);
+                    title = splitted[0];
+                    if (splitted.length == 2) {
+                        subtitle = splitted[1];
+                    } else {
+                        subtitle = "";
+                    }
+                } else {
+                    title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
+                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+                }    
         
                 switch (alertMode) {
                     case CHAT:
-                        broadcastMessage(chatMessage);
+                        broadcastMessage(title + " " + subtitle);
                         break;
         
                     case TITLE:
@@ -82,7 +91,7 @@ public class Events {
                         break;
         
                     case ALL:
-                        broadcastMessage(chatMessage);
+                        broadcastMessage(title + " " + subtitle);
                         showTitle(title, subtitle);
                         break;
         

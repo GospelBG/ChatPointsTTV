@@ -12,10 +12,10 @@ import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Events.Event;
-import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Events.EventType;
+import me.gosdev.chatpointsttv.Events.Events;
+import me.gosdev.chatpointsttv.Platforms;
 
 public class TwitchEventHandler {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
@@ -28,7 +28,9 @@ public class TwitchEventHandler {
                 replacedCmds.add(cmd.replace("{TEXT}", event.getUserInput()));
             }
 
-            Events.onEvent(Platforms.TWITCH, EventType.CHANNEL_POINTS, new Event(reward.getType(), reward.getChannel(), reward.getEvent(), replacedCmds), event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
+            reward.setCommands(replacedCmds);
+
+            Events.onEvent(Platforms.TWITCH, EventType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
             return;
         }
     }
