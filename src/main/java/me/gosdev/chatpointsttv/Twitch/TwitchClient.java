@@ -21,7 +21,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.github.philippheuer.credentialmanager.domain.OAuth2Credential;
 import com.github.philippheuer.events4j.core.EventManager;
-import com.github.philippheuer.events4j.simple.SimpleEventHandler;
 import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
@@ -225,7 +224,6 @@ public class TwitchClient {
             .withEnableChat(true)
             .withEnableHelix(true)
             .withEnableEventSocket(true)
-            .withDefaultEventHandler(SimpleEventHandler.class)
             .withScheduledThreadPoolExecutor(exec)
             .build();        
 
