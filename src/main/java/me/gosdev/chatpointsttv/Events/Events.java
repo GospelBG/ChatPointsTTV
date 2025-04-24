@@ -137,6 +137,12 @@ public class Events {
                                 text += " " + parts[i];
                             }
                             text = text.trim();
+
+                            if (text == null || text.isBlank()) {
+                                ChatPointsTTV.log.warning(errorStr + "Trying to run a blank command.");
+                                continue;
+                            }
+
                             action = new RunCmdAction(parts[1], text);
                             break;
                         case "GIVE":
