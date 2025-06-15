@@ -14,7 +14,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
@@ -26,7 +25,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class ChatPointsTTV extends JavaPlugin {
+public class ChatPointsTTV extends CPTTVLoader {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
     private CommandController cmdController;
@@ -67,11 +66,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public static FileConfiguration getPluginConfig() {
         return plugin.config;
-    }
-
-    @Override
-    public void onLoad() {
-        LibraryLoader.LoadLibraries(this);
     }
 
     @Override

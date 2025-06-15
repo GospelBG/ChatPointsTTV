@@ -68,11 +68,10 @@
       <version>3.1.0</version>
       <scope>compile</scope>
     </dependency>
-
     <dependency>
-      <groupId>com.alessiodp.libby</groupId>
-      <artifactId>libby-bukkit</artifactId>
-      <version>877bdfb</version> <!-- There's an issue with the latest version on Maven Central, so we need to use a build from the latest commit -->
+      <groupId>io.github.revxrsal</groupId>
+      <artifactId>zapper.api</artifactId>
+      <version>1.0.3</version>
       <scope>compile</scope>
     </dependency>
 
@@ -85,13 +84,13 @@
     <dependency>
       <groupId>com.github.twitch4j</groupId>
       <artifactId>twitch4j</artifactId>
-      <version>1.23.0</version>
+      <version>1.25.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20240303</version>
+      <version>20250517</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
