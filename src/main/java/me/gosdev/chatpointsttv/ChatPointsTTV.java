@@ -14,10 +14,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
-import me.gosdev.chatpointsttv.Utils.LibraryLoader;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -25,7 +25,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class ChatPointsTTV extends CPTTVLoader {
+public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
     private CommandController cmdController;
