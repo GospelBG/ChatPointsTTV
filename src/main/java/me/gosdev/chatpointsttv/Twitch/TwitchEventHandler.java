@@ -16,6 +16,7 @@ import me.gosdev.chatpointsttv.Events.Event;
 import me.gosdev.chatpointsttv.Events.EventType;
 import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.Utils.FollowerLog;
 
 public class TwitchEventHandler {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
@@ -36,6 +37,10 @@ public class TwitchEventHandler {
     }
 
     public void onFollow(ChannelFollowEvent event) {
+        if (FollowerLog.isEnabled) {
+            if (FollowerLog.wasFollowing(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId())) return;
+            FollowerLog.addFollower(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId());
+        }
         for (Event reward : Events.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.FOLLOW)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
 

@@ -18,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Events.Events;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
+import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -146,7 +147,8 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
-    
+        FollowerLog.stop();
+        
         // Erase variables
         config = null;
         plugin = null;

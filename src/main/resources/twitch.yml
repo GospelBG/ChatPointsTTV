@@ -37,6 +37,9 @@
 #    - {ACTION 1}
 #    - {ACTION 2}
 
+# If enabled, follow events from people who had already been following the channel will be ignored.
+FOLLOW_SPAM_PROTECTION: true
+
 # For follows, put the desired action after the colon as a list. You shouldn't add anything else.
 # FOLLOW_REWARDS:
 #   - {ACTION}

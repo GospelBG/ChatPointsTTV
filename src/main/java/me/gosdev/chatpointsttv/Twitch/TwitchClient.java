@@ -39,13 +39,17 @@ import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
+import com.github.twitch4j.helix.domain.InboundFollow;
+import com.github.twitch4j.helix.domain.InboundFollowers;
 
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events.EventType;
 import me.gosdev.chatpointsttv.Events.Events;
+import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
+import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -155,6 +159,10 @@ public class TwitchClient {
             userColor = null;
         }
         
+        if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+            FollowerLog.start();
+        }
+
         if (accounts != null) {
             for (String userid : accounts.getKeys(false)) {
                 // Try to refresh token
@@ -164,10 +172,8 @@ public class TwitchClient {
                     ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
                     saveCredential(userid, null);
                 }
-                
             }
         }
-
         started = true;
     }
 
@@ -205,6 +211,20 @@ public class TwitchClient {
             }
 
             p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
+
+            if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                List<String> followerIDs = new ArrayList<>();
+                String cursor = null;
+                while (true) { 
+                    InboundFollowers request = client.getHelix().getChannelFollowers(credential.getAccessToken(), credential.getUserId(), null, null, cursor).execute();
+                    cursor = request.getPagination().getCursor();
+                    for (InboundFollow follower : request.getFollows()) {
+                        followerIDs.add(follower.getUserId());
+                    }
+                    if (cursor == null) break;
+                }
+                FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
+            }
         });
         linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
             linkThread.interrupt();
