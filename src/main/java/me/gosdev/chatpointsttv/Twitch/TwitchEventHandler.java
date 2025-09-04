@@ -91,7 +91,7 @@ public class TwitchEventHandler {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(Events.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                Events.onEvent(Platforms.TWITCH, EventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(tier.name() + " sub"));
+                Events.onEvent(Platforms.TWITCH, EventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(event.getSub().getDurationMonths().toString()));
                 return;
             }
         }

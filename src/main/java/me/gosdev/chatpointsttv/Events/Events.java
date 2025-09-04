@@ -103,7 +103,7 @@ public class Events {
         
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
-                if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID)) {
+                if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID) || type.equals(EventType.SUB)) {
                     cmd = cmd.replace("{AMOUNT}", event.get());
                 }
                 
