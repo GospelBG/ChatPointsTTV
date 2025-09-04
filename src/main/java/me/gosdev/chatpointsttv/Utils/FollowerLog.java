@@ -17,7 +17,7 @@ public class FollowerLog {
 
     public static void start() {
         if (isEnabled) return;
-        followersFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "followers.yml");
+        followersFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "followers");
         followersYaml = YamlConfiguration.loadConfiguration(followersFile);
         for (Platforms p : Platforms.values()) {
             if (followersYaml.getConfigurationSection(p.name().toLowerCase()) == null) {
@@ -63,7 +63,7 @@ public class FollowerLog {
         try {
             followersYaml.save(followersFile);
         } catch (IOException e) {
-            ChatPointsTTV.log.severe("Failed to save followers.yml: " + e.getMessage());
+            ChatPointsTTV.log.severe("Failed to save followers file: " + e.getMessage());
         }
     }
 }

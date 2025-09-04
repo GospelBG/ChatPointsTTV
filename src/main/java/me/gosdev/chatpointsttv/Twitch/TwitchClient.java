@@ -129,7 +129,7 @@ public class TwitchClient {
         }
         twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
 
-        accountsFile = new File(plugin.getDataFolder(), "accounts.yml");
+        accountsFile = new File(plugin.getDataFolder(), "accounts");
         accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
         if (!accountsConfig.contains("twitch")) {
             accountsConfig.createSection("twitch");
