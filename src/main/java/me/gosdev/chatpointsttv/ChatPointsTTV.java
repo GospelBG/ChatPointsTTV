@@ -88,13 +88,13 @@ public class ChatPointsTTV extends JavaPlugin {
         alertMode = AlertMode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
 
-        File stringsFile = new File(plugin.getDataFolder(), "localization.yml");
+        File stringsFile = new File(plugin.getDataFolder(), "locales.yml");
         if (!stringsFile.exists()) {
-            plugin.saveResource("localization.yml", false);
+            plugin.saveResource("locales.yml", false);
         }
         
         FileConfiguration stringsYaml = YamlConfiguration.loadConfiguration(stringsFile);
-        for (String key : YamlConfiguration.loadConfiguration(plugin.getTextResource("localization.yml")).getKeys(true)) {
+        for (String key : YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml")).getKeys(true)) {
             strings.put(key, stringsYaml.getString(key));
         }
 
