@@ -37,7 +37,11 @@ public class AccountsCommand {
             unlinkBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink"));  
 
             footer = addBtn;
-            if (!ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) footer.addExtra(new TextComponent(ChatColor.GRAY + "  -  " + unlinkBtn));
+            if (!ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
+                footer.addExtra(new TextComponent(ChatColor.GRAY + "  -  "));
+                footer.addExtra(unlinkBtn);
+            }
+            footer.addExtra("\n");
 
             for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                 BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
