@@ -22,6 +22,7 @@ public class LinkCommand {
             p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
         }
+        p.sendMessage(ChatColor.GRAY + "Please wait...");
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             DeviceAuthorization auth = DeviceCodeGrantFlow.link(p, ChatPointsTTV.getTwitch());
