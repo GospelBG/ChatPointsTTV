@@ -49,7 +49,7 @@ public class EventTest {
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
 
-        json.put("followed_at", Instant.now().toString());
+        json.put("followed_at", Instant.ofEpochMilli(0).toString());
 
         ChannelFollowEvent event = jsonToObject(json.toString(), ChannelFollowEvent.class);
         return event;

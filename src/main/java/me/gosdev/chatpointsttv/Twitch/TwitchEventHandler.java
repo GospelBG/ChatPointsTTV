@@ -1,5 +1,6 @@
 package me.gosdev.chatpointsttv.Twitch;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class TwitchEventHandler {
     }
 
     public void onFollow(ChannelFollowEvent event) {
-        if (FollowerLog.isEnabled) {
+        if (FollowerLog.isEnabled && !event.getFollowedAt().equals(Instant.ofEpochMilli(0))) { // Test events always have epoch time of 0
             if (FollowerLog.wasFollowing(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId())) return;
             FollowerLog.addFollower(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId());
         }
