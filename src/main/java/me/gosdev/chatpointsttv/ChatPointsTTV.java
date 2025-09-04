@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.gosdev.chatpointsttv.Events.Events;
+import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
@@ -154,7 +154,7 @@ public class ChatPointsTTV extends JavaPlugin {
         plugin = null;
         twitch = null;
 
-        Events.actions = new HashMap<>();
+        CPTTV_EventHandler.actions = new HashMap<>();
 
         HandlerList.unregisterAll(this);
     }

@@ -13,8 +13,8 @@ public class EventComparator implements Comparator<Event> {
             if (difference == 0) throw new NumberFormatException(); // If value matches compare target channel (go straight to catch)
             return difference;
         } catch (NumberFormatException e) {
-            if (o1.getChannel().equals(Events.EVERYONE) && !o2.getChannel().equals(Events.EVERYONE)) return 1;
-            if (o2.getChannel().equals(Events.EVERYONE) && !o1.getChannel().equals(Events.EVERYONE)) return -1;
+            if (o1.getChannel().equals(CPTTV_EventHandler.EVERYONE) && !o2.getChannel().equals(CPTTV_EventHandler.EVERYONE)) return 1;
+            if (o2.getChannel().equals(CPTTV_EventHandler.EVERYONE) && !o1.getChannel().equals(CPTTV_EventHandler.EVERYONE)) return -1;
             return 0;
         }
 

@@ -19,7 +19,7 @@ public class Event {
         this.channel = channel;
 
         try {
-            channelId = channel.equals(Events.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
+            channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
         } catch (NullPointerException e) {
             ChatPointsTTV.log.warning(e.getMessage());
             channelId = null;

@@ -45,7 +45,7 @@ import com.github.twitch4j.helix.domain.InboundFollowers;
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events.EventType;
-import me.gosdev.chatpointsttv.Events.Events;
+import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
@@ -66,7 +66,7 @@ public class TwitchClient {
     private List<String> chatBlacklist;
     private static ITwitchClient client;
     private static HashMap<String, Channel> channels;
-    private static TwitchEventHandler eventHandler;
+    private static TwitchEvents eventHandler;
     private static IEventSubSocket eventSocket;
     private static EventManager eventManager;
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
@@ -247,7 +247,7 @@ public class TwitchClient {
             .withScheduledThreadPoolExecutor(exec)
             .build();        
 
-        eventHandler = new TwitchEventHandler();
+        eventHandler = new TwitchEvents();
 
         eventSocket = client.getEventSocket();
         eventManager = client.getEventManager();
@@ -263,28 +263,28 @@ public class TwitchClient {
                 if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
             }
         });            
-        if (Events.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
             eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
                 eventHandler.onChannelPointsRedemption(e);
             });
         }
-        if (Events.getActions(twitchConfig, EventType.FOLLOW) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.FOLLOW) != null) {
             eventManager.onEvent(ChannelFollowEvent.class, (ChannelFollowEvent e) -> {
                 eventHandler.onFollow(e);
             });
         }
-        if (Events.getActions(twitchConfig, EventType.CHEER) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.CHEER) != null) {
             eventManager.onEvent(ChannelChatMessageEvent.class, (ChannelChatMessageEvent e) -> {
                 eventHandler.onCheer(e);
             }); 
         }
-        if (Events.getActions(twitchConfig, EventType.SUB) != null || Events.getActions(twitchConfig, EventType.GIFT) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.SUB) != null || CPTTV_EventHandler.getActions(twitchConfig, EventType.GIFT) != null) {
             eventManager.onEvent(ChannelChatNotificationEvent.class, (ChannelChatNotificationEvent e) -> {
                     if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
                     else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
             });
         }
-        if (Events.getActions(twitchConfig, EventType.RAID) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.RAID) != null) {
             eventManager.onEvent(ChannelRaidEvent.class, (ChannelRaidEvent e) -> {
                     eventHandler.onRaid(e);
             }); 
@@ -324,23 +324,23 @@ public class TwitchClient {
 
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
-        if (Events.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.CHANNEL_POINTS) != null) {
             subs.add(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Events.getActions(twitchConfig, EventType.FOLLOW) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.FOLLOW) != null) {
             subs.add(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(channel_id).broadcasterUserId(channel_id).build(), null));
         } 
 
-        if (Events.getActions(twitchConfig, EventType.CHEER) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.CHEER) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Events.getActions(twitchConfig, EventType.SUB) != null || Events.getActions(twitchConfig, EventType.GIFT) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.SUB) != null || CPTTV_EventHandler.getActions(twitchConfig, EventType.GIFT) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (Events.getActions(twitchConfig, EventType.RAID) != null) {
+        if (CPTTV_EventHandler.getActions(twitchConfig, EventType.RAID) != null) {
             subs.add(SubscriptionTypes.CHANNEL_RAID.prepareSubscription(b -> b.toBroadcasterUserId(channel_id).build(), null));
         }
 

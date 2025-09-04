@@ -29,7 +29,7 @@ import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
-public class Events {
+public class CPTTV_EventHandler {
     public static final String EVERYONE = "*";
     public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
