@@ -30,6 +30,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
     private CommandController cmdController;
+    private boolean firstRun = false;
 
     public static final HashMap<String, String> strings = new HashMap<>();
     public static ChatColor eventColor;
@@ -77,6 +78,8 @@ public class ChatPointsTTV extends JavaPlugin {
         metrics = new Metrics(this, 22873);
         
         // Get the latest config after saving the default if missing
+        if (!plugin.getDataFolder().exists()) firstRun = true;
+
         this.saveDefaultConfig();
         reloadConfig();
         config = getConfig();
@@ -111,12 +114,27 @@ public class ChatPointsTTV extends JavaPlugin {
         twitch = new TwitchClient();
         if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
 
+        if (firstRun) {
+            Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
+        }
+
         VersionCheck.check();
 
         pm.registerEvents(new Listener() {
             @EventHandler
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
+                if (firstRun) {
+                    TextComponent welcomeMsg = new TextComponent("------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV" + ChatColor.RESET + " -------------" + ChatColor.GRAY + "\nThanks for installing ChatPointsTTV!\nYou will need to set up the configuration files in order to use the plugin.\nYou can take a look at the quick start guide ");
+                    
+                    TextComponent link = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "here.");
+                    link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://gosdev.me/chatpointsttv/install"));
+                    link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
+
+                    welcomeMsg.addExtra(link);
+                    welcomeMsg.addExtra("\n-----------------------------------------");
+                    player.getPlayer().spigot().sendMessage(welcomeMsg);
+                }
                 if (!VersionCheck.runningLatest) {
                     TextComponent updPrompt = new TextComponent(ChatColor.YELLOW + "ChatPointsTTV v" + VersionCheck.latestVersion + " has been released!\n" + ChatColor.YELLOW + "Click ");
                     
@@ -131,7 +149,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
 
                 if (!twitch.isStarted()) return;
-                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !TwitchClient.accountConnected) {
+                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !TwitchClient.accountConnected && !firstRun) {
                     String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
 
