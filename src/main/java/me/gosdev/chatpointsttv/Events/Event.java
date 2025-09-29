@@ -48,8 +48,8 @@ public class Event {
     public List<String> getCommands() {
         return cmds;
     }
-    public void setCommands(List<String> newCmds) {
-        this.cmds = newCmds;
+    public Event withCommands(List<String> newCmds) {
+        return new Event(this.type, this.channel, this.event, newCmds);
     }
     public EventType getType() {
         return type;

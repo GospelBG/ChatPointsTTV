@@ -13,14 +13,15 @@ import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Events.Event;
 import me.gosdev.chatpointsttv.Events.EventType;
-import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 
 public class TwitchEvents {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
+        ChatPointsTTV.log.info(event.getUserInput());
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
@@ -30,7 +31,7 @@ public class TwitchEvents {
                 replacedCmds.add(cmd.replace("{TEXT}", event.getUserInput()));
             }
 
-            reward.setCommands(replacedCmds);
+            if (!replacedCmds.isEmpty()) reward = reward.withCommands(replacedCmds);
 
             CPTTV_EventHandler.onEvent(Platforms.TWITCH, EventType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
             return;

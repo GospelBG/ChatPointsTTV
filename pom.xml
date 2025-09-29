@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
   <artifactId>chatpointsttv</artifactId>
-  <version>3.0.0-PRERELEASE-3</version>
+  <version>3.0.0-PRERELEASE-4</version>
   <packaging>jar</packaging>
   <name>ChatPointsTTV</name>
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
