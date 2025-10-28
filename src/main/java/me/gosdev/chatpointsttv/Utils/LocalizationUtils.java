@@ -21,7 +21,7 @@ public class LocalizationUtils {
             userColor = ChatPointsTTV.userColor;
             eventColor = ChatPointsTTV.eventColor;
         }
-
+        
         if (username != null) {
             out = out.replace("{USERNAME}", userColor + username + ChatColor.RESET);
         }

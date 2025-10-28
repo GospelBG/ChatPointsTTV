@@ -15,6 +15,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
     public static void test(CommandSender sender, String[] cmdInput) {
+    public static void twitchTest(CommandSender sender, String[] cmdInput) {
         if (!ChatPointsTTV.getTwitch().isStarted() ) {
             sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;

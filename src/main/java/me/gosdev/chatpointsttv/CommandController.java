@@ -16,7 +16,7 @@ import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Commands.LinkCommand;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import me.gosdev.chatpointsttv.Commands.TestCommand;
-import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Twitch.Channel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -92,7 +92,7 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "test":
-                    TestCommand.test(sender, args);
+                    TestCommand.twitchTest(sender, args);
                     return true;
 
                 default:

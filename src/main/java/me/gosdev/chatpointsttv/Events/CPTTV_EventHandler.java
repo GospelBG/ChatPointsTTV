@@ -26,7 +26,9 @@ import me.gosdev.chatpointsttv.Actions.TntAction;
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Platforms;
-import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
+import me.gosdev.chatpointsttv.Twitch.Channel;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class CPTTV_EventHandler {
@@ -34,8 +36,7 @@ public class CPTTV_EventHandler {
     public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event) {
-        String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.name().toLowerCase());
-
+        String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.toString().toLowerCase());
         str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), platform);
 
         return str;
@@ -45,7 +46,7 @@ public class CPTTV_EventHandler {
         new Thread (()-> {
             String errorStr = "There was an error running a " + type + " action: ";
             if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event));
-            if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
+            if (platform.equals(Platforms.TWITCH) && ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
                 }
@@ -78,7 +79,7 @@ public class CPTTV_EventHandler {
                     }
                 } else {
                     title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
-                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_" + platform.toString().toLowerCase() + "_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
                 }    
         
                 switch (alertMode) {
@@ -103,7 +104,7 @@ public class CPTTV_EventHandler {
         
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
-                if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID) || type.equals(EventType.SUB)) {
+                if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID) || type.equals(TwitchEventType.SUB)) {
                     cmd = cmd.replace("{AMOUNT}", event.get());
                 }
                 
@@ -260,7 +261,7 @@ public class CPTTV_EventHandler {
 
         if (!config.contains(key)) return null; // No configured rewards for this type
 
-        if (type.equals(EventType.FOLLOW)) {
+        if (type.equals(TwitchEventType.FOLLOW) || type.equals(TikTokEventType.FOLLOW) || type.equals(TikTokEventType.SHARE)) {
             if (config.isConfigurationSection(key)) { // Streamer-specific?
                 Set<String> keys = (config.getConfigurationSection(key)).getKeys(false);
                 for (String channel : keys) {
@@ -281,7 +282,7 @@ public class CPTTV_EventHandler {
                             ChatPointsTTV.log.severe("ChatPointsTTV: Invalid configuration for " + type.toString().toLowerCase() + " (" + subkey + ") actions. Read the docs for more information.");
                             continue;
                         }
-                        if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID)) {
+                        if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID)) {
                             try {
                                 Integer.valueOf(subkey);
                             } catch (NumberFormatException e) {

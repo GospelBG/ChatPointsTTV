@@ -1,0 +1,70 @@
+# You can set up here your TikTok events.
+# Add as many lines as needed. Replace [CONDITION] with the minimum amount of bits/subs/viewers, a subscription tier or a Channel Point Reward name.
+# For Channel Point Rewards make sure it's spelled EXACTLY as it appears on Twitch.
+
+# See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
+
+LISTENED_PROFILES: []
+
+# Actions format:
+#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
+#     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
+#     GIVE {ITEM} [AMOUNT] [TARGET PLAYER]
+#     EFFECT {EFFECT NAME} {STRENGTH} {DURATION} [TARGET PLAYER]
+#
+#     DELETE {"ALL" / "HAND" / "RANDOM"} [TARGET PLAYER]
+#     SHUFFLE [TARGET PLAYER]
+#
+#     TNT {AMOUNT} [EXPLOSION TIME IN TICKS] [TARGET PLAYER]
+#
+#     CUSTOM_MSG {MESSAGE}
+#
+#  {} = Required
+#  [] = Optional
+
+# Extra fields:
+#     {TEXT} Channel Points User Input
+#     {USER} Viewer's username
+#     {AMOUNT} Bits/Gifted Subs/Viewers amount.
+#
+#  They will be replaced by the plugin automatically.
+
+# To add a streamer-specific reward add the actions inside a list named as the desired channel.
+# To target all channels use "default" as the list key.
+# For more information, see examples in the README file.
+
+# If enabled, follow events from people who had already been following the channel will be ignored.
+FOLLOW_SPAM_PROTECTION: true
+
+# Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
+# For follows and shares, put the desired action after the colon as a list. You shouldn't add anything else.
+FOLLOW_REWARDS:
+  - {ACTION 1}
+  - {ACTION 2}
+
+GIFT_REWARDS:
+  [GIFTED ITEM]:
+    - {ACTION}
+
+SHARE_REWARDS:
+   - {ACTION}
+
+# Add chat bot and other unwanted chatter usernames (in lowercase) to this list to prevent their messages displaying on the in-game chat.
+CHAT_BLACKLIST: []
+
+# OVERRIDEN CONFIGURATION:
+# Uncomment and change the values to override the default configuration for Twitch events.
+# If it is left commented, the default value in config.yml will be used.
+
+# Adds glow effect to spawned mobs
+# MOB_GLOW: true
+
+# Sets chatter's name to spawned mobs
+# DISPLAY_NAME_ON_MOB: true
+
+# In-game event alerts mode.
+# INGAME_ALERTS: chat
+
+# COLORS:
+#   USER_COLOR: GOLD
+#   EVENT_COLOR: YELLOW

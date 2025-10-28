@@ -17,6 +17,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
+import me.gosdev.chatpointsttv.TikTok.TikTokCommandController;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
@@ -29,7 +31,9 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
+    private static TikTokClient tiktok;
     private CommandController cmdController;
+    private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
 
     public static final HashMap<String, String> strings = new HashMap<>();
@@ -105,6 +109,10 @@ public class ChatPointsTTV extends JavaPlugin {
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
+        tikTokCmdController = new TikTokCommandController();
+        this.getCommand("tiktok").setExecutor(tikTokCmdController);
+        this.getCommand("tiktok").setTabCompleter(tikTokCmdController);
+
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
                 p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
@@ -112,6 +120,7 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         twitch = new TwitchClient();
+        tiktok = new TikTokClient();
         if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
 
         if (firstRun) {
@@ -165,12 +174,14 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
+        if (tiktok != null && TikTokClient.accountConnected) TikTokClient.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
         
         // Erase variables
         config = null;
         plugin = null;
         twitch = null;
+        tiktok = null;
 
         CPTTV_EventHandler.actions = new HashMap<>();
 
