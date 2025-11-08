@@ -19,7 +19,7 @@ public class StatusCommand {
         
         switch (platform) {
             case TWITCH:
-                if (ChatPointsTTV.getTwitch().getListenedChannels().size() == 0) {
+                if (ChatPointsTTV.getTwitch().getListenedChannels() == null || ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
                     strChannels = "None";
                     break;
                 }
@@ -32,7 +32,7 @@ public class StatusCommand {
                 break;
 
             case TIKTOK:
-                if (TikTokClient.getClients().size() == 0) {
+                if (TikTokClient.getClients() == null || TikTokClient.getClients().isEmpty()) {
                     strChannels = "None";
                     break;
                 }
