@@ -29,13 +29,22 @@ public class TikTokCommandController implements TabExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         switch(args[0]) {
             case "start":
+                if (TikTokClient.isEnabled) {
+                    sender.sendMessage(ChatColor.RED + "TikTok client is already started.");
+                    return true;
+                }
+
                 sender.sendMessage("Enabling TikTok module...");
-                if (TikTokClient.accountConnected) return true;
 
                 TikTokClient.enable(sender);
                 return true;
 
             case "stop":
+                if (!TikTokClient.isEnabled) {
+                    sender.sendMessage(ChatColor.RED + "TikTok client is already stopped.");
+                    return true;
+                }
+                
                 sender.sendMessage("Disabling TikTok module...");
 
                 TikTokClient.stop(sender);

@@ -27,6 +27,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TikTokClient {
     public static Boolean accountConnected = false;
+    public static Boolean isEnabled = false;
 
     private static TikTokEvents eventHandler;
 
@@ -125,6 +126,7 @@ public class TikTokClient {
         clients = null;
         chatBlacklist = null;
 
+        isEnabled = false;
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
     }
 
@@ -168,6 +170,7 @@ public class TikTokClient {
             link(p, username, false);
         }
 
+        isEnabled = true;
         p.sendMessage("TikTok module enabled successfully!");
     }
     
