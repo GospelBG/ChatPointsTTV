@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Twitch.Channel;
+import me.gosdev.chatpointsttv.Twitch.TwitchButtonComponents;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -27,19 +28,11 @@ public class AccountsCommand {
                 msg.addExtra(ChatColor.GRAY + "  -  " + channel.getChannelUsername() + "\n");
             }
             footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
-        } else {
-            TextComponent addBtn = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "\n[+]" + ChatColor.RESET + ChatColor.GREEN + " Add account");
-            addBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to link another account").create()));
-            addBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
-    
-            TextComponent unlinkBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[❌]" + ChatColor.RESET + ChatColor.RED + " Remove all accounts");
-            unlinkBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink all accounts").create()));
-            unlinkBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink"));  
-
-            footer = addBtn;
+        } else {    
+            footer = TwitchButtonComponents.accountLink();
             if (!ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
                 footer.addExtra(new TextComponent(ChatColor.GRAY + "  -  "));
-                footer.addExtra(unlinkBtn);
+                footer.addExtra(TwitchButtonComponents.accountUnlink());
             }
             footer.addExtra("\n");
 

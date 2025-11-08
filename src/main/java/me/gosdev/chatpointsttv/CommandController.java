@@ -71,7 +71,7 @@ public class CommandController implements TabExecutor {
                     return true;
                     
                 case "status":
-                    StatusCommand.status(sender, plugin);
+                    StatusCommand.status(sender, plugin, Platforms.TWITCH);
                     return true;
 
                 case "stop":

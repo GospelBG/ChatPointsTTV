@@ -7,6 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -48,6 +51,10 @@ public class TikTokCommandController implements TabExecutor {
                 sender.sendMessage("Disabling TikTok module...");
 
                 TikTokClient.stop(sender);
+                return true;
+
+            case "status":
+                StatusCommand.status(sender, ChatPointsTTV.getPlugin(), Platforms.TIKTOK);
                 return true;
 
             case "reload":
