@@ -30,6 +30,11 @@ public class TikTokCommandController implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (args.length == 0) {
+            help(sender);
+            return true;
+        }
+
         switch(args[0]) {
             case "start":
                 if (TikTokClient.isEnabled) {
