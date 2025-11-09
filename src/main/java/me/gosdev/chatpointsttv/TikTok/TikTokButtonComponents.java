@@ -34,7 +34,7 @@ public class TikTokButtonComponents {
     public static TextComponent accountLink() {
         TextComponent comp = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "\n[+]" + ChatColor.RESET + ChatColor.GREEN + " Link profile");
         comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to link another account").create()));
-        comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tiktok link"));
+        comp.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/tiktok link "));
 
         return comp;
     }
