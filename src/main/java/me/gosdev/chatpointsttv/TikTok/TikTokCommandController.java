@@ -1,5 +1,6 @@
 package me.gosdev.chatpointsttv.TikTok;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -101,7 +102,48 @@ public class TikTokCommandController implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
-        return null;
+        ArrayList<String> available = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
+
+        switch (args.length) {
+            case 1:
+                available.add("help");
+                available.add("reload");
+                available.add("status");
+                if (TikTokClient.isEnabled) {
+                    available.add("stop");
+                    available.add("link");
+                    available.add("accounts");
+                    if (TikTokClient.accountConnected) {
+                        available.add("test");
+                        available.add("accounts");  
+                        available.add("unlink");
+                    }
+                } else {
+                    available.add("start");
+                }
+                break;
+            
+            case 2:
+                if (TikTokClient.isEnabled) {
+                    if (args[0].equalsIgnoreCase("link")) {
+                        available.add("<TikTok Username>");
+                    } else if (args[0].equalsIgnoreCase("unlink") && TikTokClient.accountConnected) {
+                        available.addAll(TikTokClient.getClients().keySet());
+                    } else if (args[0].equalsIgnoreCase("test")) {
+                        available.add("TODO");
+                    }
+                }
+                break;
+            
+            }
+
+        for (String s : available) {
+            if (s.startsWith(args[args.length - 1])) {
+                result.add(s);
+            }
+        }
+        return result;
     }
 
     public void help(CommandSender p) {
