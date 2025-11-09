@@ -47,7 +47,10 @@ public class TikTokClient {
         return tiktokConfig;
     }
 
-    public static void link(CommandSender p, String username, Boolean save) {
+    public static void link(CommandSender p, String handle, Boolean save) {
+        // Sanitise username
+        String username = (handle.startsWith("@") ? handle.substring(1) : handle).toLowerCase();
+
         LiveClientBuilder builder = TikTokLive.newClient(username);
         if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.LIKE) != null) {
             builder.onLike((liveClient, event) -> {
