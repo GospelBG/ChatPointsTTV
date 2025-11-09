@@ -67,7 +67,7 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "accounts":
-                    AccountsCommand.displayAccounts(sender);
+                    AccountsCommand.displayAccounts(sender, Platforms.TWITCH);
                     return true;
                     
                 case "status":

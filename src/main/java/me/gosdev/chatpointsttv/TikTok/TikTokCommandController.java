@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import net.md_5.bungee.api.ChatColor;
@@ -91,6 +92,10 @@ public class TikTokCommandController implements TabExecutor {
                 }
                 
                 sender.sendMessage(ChatColor.GREEN + "TikTok account " + args[1] + " unlinked successfully!");
+                return true;
+
+            case "accounts":
+                AccountsCommand.displayAccounts(sender, Platforms.TIKTOK);
                 return true;
             
             default:
