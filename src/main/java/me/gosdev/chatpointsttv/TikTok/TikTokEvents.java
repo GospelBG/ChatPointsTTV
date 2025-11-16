@@ -17,7 +17,7 @@ public class TikTokEvents {
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.LIKE)) {
             try {
                 if (event.getLikes() >= Integer.parseInt(reward.getEvent())) {
-                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, hostName, event.getUser().getName(), Optional.of(String.valueOf(event.getLikes())));
+                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, event.getUser().getName(), hostName, Optional.of(String.valueOf(event.getLikes())));
                     return;
                 }
     
