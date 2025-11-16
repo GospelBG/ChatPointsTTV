@@ -11,6 +11,7 @@ str_twitch_sub: "{USERNAME} has subscribed to {CHANNEL} for {EVENT} months" # Ev
 str_twitch_gift: "{USERNAME} has gifted {EVENT} subs to {CHANNEL}"
 
 str_tiktok_follow: "{USERNAME} has followed {CHANNEL}"
+str_tiktok_like: "{USERNAME} has liked {EVENT} times!"
 str_tiktok_gift: "{USERNAME} has gifted {EVENT} to {CHANNEL}"
 str_tiktok_share: "{USERNAME} has shared {CHANNEL}'s LIVE"
 
@@ -25,5 +26,6 @@ sub_twitch_sub: "has subscribed for {EVENT} months!" # Event = Subscription Mont
 sub_twitch_gift: "has gifted {EVENT} subs!"
 
 sub_tiktok_follow: "has started following!"
+sub_tiktok_like: "liked {EVENT} times!"
 sub_tiktok_gift: "has gifted {EVENT}!"
 sub_tiktok_share: "has shared the LIVE!"
