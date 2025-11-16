@@ -13,7 +13,7 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
-public class EventTest {
+public class TwitchEventTest {
     public static CustomRewardRedemptionAddEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) {
         JSONObject json = new JSONObject();
         JSONObject reward = new JSONObject();

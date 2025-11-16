@@ -12,6 +12,7 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
+import me.gosdev.chatpointsttv.Commands.TestCommand;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -98,6 +99,10 @@ public class TikTokCommandController implements TabExecutor {
                 AccountsCommand.displayAccounts(sender, Platforms.TIKTOK);
                 return true;
             
+            case "test":
+                TestCommand.tiktokTest(sender, args);
+                return true;
+
             default:
                 sender.sendMessage(ChatColor.RED + "Unknown command: /tiktok " + args[0]);
                 help(sender);

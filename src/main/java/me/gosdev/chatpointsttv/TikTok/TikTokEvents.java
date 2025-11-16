@@ -39,7 +39,7 @@ public class TikTokEvents {
     }
 
     public void onFollow(TikTokFollowEvent event, String hostName) {
-        if (FollowerLog.isEnabled) {
+        if (FollowerLog.isEnabled && event.getUser().getId() != -1) { // uID = -1 -> Test Event
             if (FollowerLog.wasFollowing(Platforms.TIKTOK, Long.toString(event.getRoomId()), event.getUser().getId().toString())) return;
             FollowerLog.addFollower(Platforms.TIKTOK, Long.toString(event.getRoomId()), event.getUser().getId().toString());
         }
