@@ -15,6 +15,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
+import me.gosdev.chatpointsttv.AlertMode;
+import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Actions.BaseAction;
 import me.gosdev.chatpointsttv.Actions.DeleteItemsAction;
 import me.gosdev.chatpointsttv.Actions.EffectAction;
@@ -23,9 +26,6 @@ import me.gosdev.chatpointsttv.Actions.InvShuffleAction;
 import me.gosdev.chatpointsttv.Actions.RunCmdAction;
 import me.gosdev.chatpointsttv.Actions.SpawnAction;
 import me.gosdev.chatpointsttv.Actions.TntAction;
-import me.gosdev.chatpointsttv.AlertMode;
-import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
 import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
@@ -36,7 +36,11 @@ public class CPTTV_EventHandler {
     public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event) {
-        String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.toString().toLowerCase());
+        String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
+        if (!ChatPointsTTV.strings.containsKey(key)) {
+            throw new NullPointerException("Missing Message for " + platform.getName() + " " + type.toString() + " events");
+        }
+        String str = ChatPointsTTV.strings.get(key);
         str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), platform);
 
         return str;

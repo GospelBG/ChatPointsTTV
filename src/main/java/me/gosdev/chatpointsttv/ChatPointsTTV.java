@@ -101,8 +101,13 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         FileConfiguration stringsYaml = YamlConfiguration.loadConfiguration(stringsFile);
-        for (String key : YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml")).getKeys(true)) {
-            strings.put(key, stringsYaml.getString(key));
+        FileConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml"));
+        for (String key : defaultStrings.getKeys(true)) {
+            if (stringsYaml.isString(key)) {
+                strings.put(key, stringsYaml.getString(key));
+            } else {
+                strings.put(key, defaultStrings.getString(key));
+            }
         }
 
         cmdController = new CommandController();
