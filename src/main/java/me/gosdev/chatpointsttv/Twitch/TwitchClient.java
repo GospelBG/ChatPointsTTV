@@ -45,6 +45,7 @@ import com.github.twitch4j.helix.domain.InboundFollowers;
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
+import me.gosdev.chatpointsttv.Events.EventType;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
@@ -451,6 +452,10 @@ public class TwitchClient {
         eventManager = null;
         channels.clear();
         credentialManager.clear();
+
+        for (EventType type : TwitchEventType.values()) {
+            CPTTV_EventHandler.actions.remove(type);
+        }
 
         accountConnected = false;
         started = false;    
