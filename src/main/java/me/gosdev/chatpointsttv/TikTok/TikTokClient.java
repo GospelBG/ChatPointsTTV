@@ -91,6 +91,12 @@ public class TikTokClient {
             });
         }
 
+        builder.configure((settings) -> {
+            if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
+                settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
+            }
+        });
+
         builder.buildAndConnectAsync().whenComplete((LiveClient c, Throwable ex) -> {
             if (ex != null) {
                 if (ex.getCause() instanceof  TikTokLiveOfflineHostException) {

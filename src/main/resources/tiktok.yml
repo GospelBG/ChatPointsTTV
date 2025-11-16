@@ -6,6 +6,9 @@
 
 LISTENED_PROFILES: []
 
+# To avoid rate limits, use may use your own EulerStream API key.
+# EULERSTREAM_API_KEY:
+
 # Actions format:
 #     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
