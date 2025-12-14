@@ -153,7 +153,7 @@ public class TikTokCommandController implements TabExecutor {
             case 3:
                 if (args[0].equalsIgnoreCase("test")) {
                     if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                        available.add("<Chatter Name>");
+                        available.add("<Chatter Username>");
                     }
                 }
                 break;
