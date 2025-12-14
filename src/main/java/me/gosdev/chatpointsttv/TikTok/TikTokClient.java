@@ -109,7 +109,7 @@ public class TikTokClient {
                 } else if (ex.getCause() instanceof TikTokLiveUnknownHostException) {
                     p.sendMessage(ChatColor.RED + "Couldn't find TikTok user: @" + username);
                 } else {
-                    p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username +"'s live. Check the server console for details.");
+                    p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username +"'s LIVE. Check the server console for details.");
                     ex.printStackTrace();
                 }
                 return;
