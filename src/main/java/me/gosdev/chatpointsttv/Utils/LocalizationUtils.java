@@ -7,7 +7,7 @@ import me.gosdev.chatpointsttv.Platforms;
 import net.md_5.bungee.api.ChatColor;
 
 public class LocalizationUtils {
-    public static String replacePlaceholders(String in, String username, String channel, String event, Platforms platform) {
+    public static String replacePlaceholders(String in, String username, String channel, String event, Integer amount, Platforms platform) {
         String out = in;
 
         ChatColor userColor;
@@ -32,6 +32,9 @@ public class LocalizationUtils {
         }
         if (event != null) {
             out = out.replace("{EVENT}", eventColor + event + ChatColor.RESET);
+        }
+        if (amount != null) {
+            out = out.replace("{AMOUNT}", eventColor + amount.toString() + ChatColor.RESET);
         }
 
         return out;

@@ -17,7 +17,7 @@ public class TikTokEvents {
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.LIKE)) {
             try {
                 if (event.getLikes() >= Integer.parseInt(reward.getEvent())) {
-                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, event.getUser().getName(), hostName, Optional.of(String.valueOf(event.getLikes())));
+                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, event.getUser().getName(), hostName, Optional.empty(), Optional.of(event.getLikes()));
                     return;
                 }
     
@@ -32,7 +32,7 @@ public class TikTokEvents {
         ChatPointsTTV.log.info("Combo:" + String.valueOf(event.getCombo()) + " " + event.getComboState());
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.GIFT)) {
             if (event.getGift().getName().equalsIgnoreCase(reward.getEvent()) || reward.getEvent().equalsIgnoreCase("any")) {
-                CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.GIFT, reward, event.getUser().getProfileName(), event.getToUser().getProfileName(), Optional.of(event.getGift().getName() + " x" + event.getCombo()));
+                CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.GIFT, reward, event.getUser().getProfileName(), event.getToUser().getProfileName(), Optional.of(event.getGift().getName()), Optional.of(event.getCombo()));
                 return;
             }
         }
@@ -47,7 +47,7 @@ public class TikTokEvents {
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.FOLLOW)) {
             if (!reward.getTargetId().equals(Long.toString(event.getRoomId())) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
-            CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.FOLLOW, reward, event.getUser().getProfileName(), hostName, Optional.empty());
+            CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.FOLLOW, reward, event.getUser().getProfileName(), hostName, Optional.empty(), Optional.empty());
             return;
         }
     }
@@ -56,7 +56,7 @@ public class TikTokEvents {
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.SHARE)) {
             if (!reward.getTargetId().equals(Long.toString(event.getRoomId())) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
-            CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.SHARE, reward, event.getUser().getProfileName(), hostName, Optional.empty());
+            CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.SHARE, reward, event.getUser().getProfileName(), hostName, Optional.empty(), Optional.empty());
             return;
         }
     }

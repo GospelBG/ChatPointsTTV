@@ -31,7 +31,7 @@ public class TwitchEvents {
 
             reward.setCommands(replacedCmds);
 
-            CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()));
+            CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()), Optional.empty());
             return;
         }
     }
@@ -44,7 +44,7 @@ public class TwitchEvents {
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.FOLLOW)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
-            CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty());
+            CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty(), Optional.empty());
             return;    
         }
     }
@@ -57,7 +57,7 @@ public class TwitchEvents {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
             try {
                 if (amount >= Integer.valueOf(reward.getEvent())) {
-                    CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
+                    CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.CHEER, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.empty(), Optional.of(amount));
                     return;
                 }
     
@@ -91,7 +91,7 @@ public class TwitchEvents {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(event.getSub().getDurationMonths().toString()));
+                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(TwitchUtils.PlanToString(tier)), Optional.of(event.getSub().getDurationMonths()));
                 return;
             }
         }
@@ -103,7 +103,7 @@ public class TwitchEvents {
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.GIFT)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
-                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.of(amount.toString()));
+                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.empty(), Optional.of(amount));
                 return;
             }
         }
@@ -116,7 +116,7 @@ public class TwitchEvents {
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.RAID)) {
             if (!reward.getTargetId().equals(event.getToBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
-                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.of(amount.toString()));
+                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.empty(), Optional.of(amount));
                 return;
             }
         }
