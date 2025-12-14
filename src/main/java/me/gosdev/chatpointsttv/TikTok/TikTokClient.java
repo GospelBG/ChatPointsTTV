@@ -3,9 +3,12 @@ package me.gosdev.chatpointsttv.TikTok;
 import java.io.File;
 import java.io.IOException;
 import java.net.http.HttpTimeoutException;
+import java.time.Duration;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -15,6 +18,8 @@ import org.bukkit.entity.Player;
 
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.data.models.gifts.GiftComboStateType;
+import io.github.jwdeveloper.tiktok.data.settings.HttpClientSettings;
+import io.github.jwdeveloper.tiktok.data.settings.LiveClientSettings;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveOfflineHostException;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveRequestException;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveUnknownHostException;
@@ -99,9 +104,16 @@ public class TikTokClient {
             });
         }
 
-        builder.configure((settings) -> {
-            if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
-                settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
+        builder.configure(new Consumer<LiveClientSettings>() {
+            @Override
+            public void accept(LiveClientSettings settings) {
+                HttpClientSettings httpSettings = settings.getHttpSettings();
+                httpSettings.setTimeout(Duration.of(30L, SECONDS));
+
+                if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
+                    settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
+                }
+                settings.setHttpSettings(httpSettings);
             }
         });
 
