@@ -2,6 +2,7 @@ package me.gosdev.chatpointsttv.TikTok;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.http.HttpTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,9 @@ import org.bukkit.entity.Player;
 import io.github.jwdeveloper.tiktok.TikTokLive;
 import io.github.jwdeveloper.tiktok.data.models.gifts.GiftComboStateType;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveOfflineHostException;
+import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveRequestException;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveUnknownHostException;
+import io.github.jwdeveloper.tiktok.exceptions.TikTokSignServerException;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
@@ -108,6 +111,10 @@ public class TikTokClient {
                     p.sendMessage(ChatColor.RED + "Cannot connect to @" + username + " because they are currently offline!");
                 } else if (ex.getCause() instanceof TikTokLiveUnknownHostException) {
                     p.sendMessage(ChatColor.RED + "Couldn't find TikTok user: @" + username);
+                } else if (ex.getCause() instanceof TikTokSignServerException) { // API Credential Error
+                    p.sendMessage(ChatColor.RED + "Error while authenticating with EulerStream. Please check your API Key.");
+                } else if (ex.getCause() instanceof TikTokLiveRequestException && ex.getCause().getCause() instanceof HttpTimeoutException) {
+                    p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
                 } else {
                     p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username +"'s LIVE. Check the server console for details.");
                     ex.printStackTrace();
