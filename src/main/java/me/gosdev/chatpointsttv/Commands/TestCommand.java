@@ -39,48 +39,28 @@ public class TestCommand {
         EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
         EventSubEvent event;
 
-        ArrayList<String> args =  new ArrayList<>();
-        for (int i = 0; i < cmdInput.length; i++) {
-            String arg = cmdInput[i];
-            // Check if the argument starts with a quote and does not end with an escaped quote
-            if (arg.startsWith("\"") && !arg.endsWith("\\\"")) {
-            StringBuilder sb = new StringBuilder(arg.substring(1));
-            // Continue appending arguments until the closing quote is found
-            while (i + 1 < cmdInput.length && !(cmdInput[i + 1].endsWith("\"") && !cmdInput[i + 1].endsWith("\\\""))) {
-                sb.append(" ").append(cmdInput[++i]);
-            }
-            // Append the last part of the quoted argument
-            if (i + 1 < cmdInput.length) {
-                sb.append(" ").append(cmdInput[++i], 0, cmdInput[i].length() - 1);
-            }
-            // Add the complete quoted argument to the args list
-            args.add(sb.toString().replace("\\\"", "\""));
-            } else {
-            // Add the argument to the args list, replacing escaped quotes
-            args.add(arg.replace("\\\"", "\""));
-            }
-        }
+        String[] args = parseQuotes(cmdInput);
 
         try {
-            switch (args.get(1).toLowerCase()) {
+            switch (args[1].toLowerCase()) {
                 case "channelpoints":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
                         return;
                     }
     
-                    String pointsChatter = args.get(2);
-                    String pointsChannel = args.get(3);
-                    String pointsReward = args.get(4);
+                    String pointsChatter = args[2];
+                    String pointsChannel = args[3];
+                    String pointsReward = args[4];
                     String userInput;
     
-                    if (args.size() <= 5) {
+                    if (args.length <= 5) {
                         userInput = null;
                     } else {
-                        for (int i = 6; i < args.size(); i++) {
-                            args.set(5, args.get(5) + " " + args.get(i)); // All arguments after index 4 are considered user input
+                        for (int i = 6; i < args.length; i++) {
+                            args[5] = args[5] + " " + args[i]; // All arguments after index 4 are considered user input
                         }
-                        userInput = args.get(5);
+                        userInput = args[5];
                     }
                     try {
                         event = TwitchEventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty());
@@ -90,13 +70,13 @@ public class TestCommand {
                     }
                     break;
                 case "follow":
-                    if (args.size() < 4) {
+                    if (args.length < 4) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
                         return;
                     }
     
-                    String followUser = args.get(2);
-                    String followChannel = args.get(3);
+                    String followUser = args[2];
+                    String followChannel = args[3];
     
                     try {
                         event = TwitchEventTest.FollowEvent(followChannel, followUser);
@@ -107,19 +87,19 @@ public class TestCommand {
                     break;
     
                 case "cheer":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
                         return;
                     }
     
-                    String cheerUser = args.get(2);
-                    String cheerChannel = args.get(3);
+                    String cheerUser = args[2];
+                    String cheerChannel = args[3];
                     int cheerAmount;
     
                     try {
-                        cheerAmount = Integer.parseInt(args.get(4));
+                        cheerAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args[4]);
                         return;
                     }
     
@@ -132,24 +112,24 @@ public class TestCommand {
                     break;
     
                 case "sub":
-                    if (args.size() < 6) {
+                    if (args.length < 6) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                         return;
                     }
     
-                    String subUser = args.get(2);
-                    String subChannel = args.get(3);
+                    String subUser = args[2];
+                    String subChannel = args[3];
                     SubscriptionPlan subTier;
                     int subMonths;
     
                     try {
-                        subTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
-                        subMonths = Integer.parseInt(args.get(5));
+                        subTier = SubscriptionPlan.valueOf(args[4].toUpperCase());
+                        subMonths = Integer.parseInt(args[5]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args.get(5));
+                        sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args[5]);
                         return;
                     } catch (IllegalArgumentException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args[4]);
                         return;
                     }
                     
@@ -163,19 +143,19 @@ public class TestCommand {
                     break;
     
                 case "subgift":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <amount>");
                         return;
                     }
     
-                    String giftChatter = args.get(2);
-                    String giftChannel = args.get(3);
+                    String giftChatter = args[2];
+                    String giftChannel = args[3];
                     int giftAmount;
     
                     try {
-                        giftAmount = Integer.parseInt(args.get(4));
+                        giftAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args[4]);
                         return;
                     }
                     
@@ -188,19 +168,19 @@ public class TestCommand {
                     break;
     
                 case "raid":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
                         return;
                     }
     
-                    String raidUser = args.get(2);
-                    String raidChannel = args.get(3);
+                    String raidUser = args[2];
+                    String raidChannel = args[3];
                     int raidViewers;
     
                     try {
-                        raidViewers = Integer.parseInt(args.get(4));
+                        raidViewers = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args[4]);
                         return;
                     }
                     
@@ -213,7 +193,7 @@ public class TestCommand {
                     break;
     
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args.get(1));
+                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args[1]);
                     return;
             }
             eventManager.publish(event);
@@ -289,5 +269,31 @@ public class TestCommand {
 
         c.publishEvent(event);
         sender.sendMessage(ChatColor.GREEN + "Test event sent!");
+    }
+
+
+    private static String[] parseQuotes(String[] in) {
+        ArrayList<String> args =  new ArrayList<>();
+        for (int i = 0; i < in.length; i++) {
+            String arg = in[i];
+            // Check if the argument starts with a quote and does not end with an escaped quote
+            if (arg.startsWith("\"") && !arg.endsWith("\\\"")) {
+            StringBuilder sb = new StringBuilder(arg.substring(1));
+            // Continue appending arguments until the closing quote is found
+            while (i + 1 < in.length && !(in[i + 1].endsWith("\"") && !in[i + 1].endsWith("\\\""))) {
+                sb.append(" ").append(in[++i]);
+            }
+            // Append the last part of the quoted argument
+            if (i + 1 < in.length) {
+                sb.append(" ").append(in[++i], 0, in[i].length() - 1);
+            }
+            // Add the complete quoted argument to the args list
+            args.add(sb.toString().replace("\\\"", "\""));
+            } else {
+            // Add the argument to the args list, replacing escaped quotes
+            args.add(arg.replace("\\\"", "\""));
+            }
+        }
+        return args.toArray(new String[0]);
     }
 }
