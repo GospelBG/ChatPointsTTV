@@ -200,7 +200,7 @@ public class TikTokCommandController implements TabExecutor {
         }
             
         for (String s : available) {
-            if (s.startsWith(args[args.length - 1].replace("\"", ""))) {
+            if (s.replace("\"", "").toLowerCase().startsWith(args[args.length - 1].replace("\"", "").toLowerCase())) {
                 result.add(s);
             }
         }
