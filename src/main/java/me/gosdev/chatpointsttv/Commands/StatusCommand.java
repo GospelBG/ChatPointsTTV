@@ -28,7 +28,7 @@ public class StatusCommand {
                     ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
                     strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
                 }
-                strChannels.subSequence(0, strChannels.length() - 2); // Remove last comma
+                strChannels = strChannels.subSequence(0, strChannels.length() - 2).toString(); // Remove last comma
                 break;
 
             case TIKTOK:
@@ -39,7 +39,7 @@ public class StatusCommand {
                 for (String profile : TikTokClient.getClients().keySet()) {
                     strChannels += profile + ", ";
                 }
-                strChannels.subSequence(0, strChannels.length() - 2); // Remove last comma
+                strChannels = strChannels.subSequence(0, strChannels.length() - 2).toString(); // Remove last comma
                 break;
         }
 
