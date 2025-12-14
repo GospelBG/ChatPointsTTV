@@ -8,11 +8,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Commands.AccountsCommand;
-import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import me.gosdev.chatpointsttv.Commands.TestCommand;
+import me.gosdev.chatpointsttv.Platforms;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -141,15 +142,57 @@ public class TikTokCommandController implements TabExecutor {
                     } else if (args[0].equalsIgnoreCase("unlink") && TikTokClient.accountConnected) {
                         available.addAll(TikTokClient.getClients().keySet());
                     } else if (args[0].equalsIgnoreCase("test")) {
-                        available.add("TODO");
+                        available.add("follow");
+                        available.add("like");
+                        available.add("gift");
+                        available.add("share");
                     }
                 }
                 break;
-            
-            }
 
+            case 3:
+                if (args[0].equalsIgnoreCase("test")) {
+                    if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                        available.add("<Chatter Name>");
+                    }
+                }
+                break;
+
+            case 4: 
+                if (args[0].equalsIgnoreCase("test")) {
+                    if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                        available.addAll(TikTokClient.getClients().keySet());
+                    }
+                } 
+                break;
+
+            case 5:
+                if (args[0].equalsIgnoreCase("test")) {
+                    if (args[1].equalsIgnoreCase("gift")) {
+                        List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
+                        for (Gift g : availableGifts) {
+                            String name = g.getName();
+                            if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
+                                name = "\"" + name + "\"";
+                            }
+                            available.add(name);
+                        }
+                    } else if (args[1].equalsIgnoreCase("like")) {
+                        available.add("<Amount>");
+                    }
+                }
+                break;
+
+            case 6:
+                if (args[0].equalsIgnoreCase("test")) {
+                    if (args[1].equalsIgnoreCase("gift")) {
+                        available.add("<Amount>");
+                    }
+                }
+        }
+            
         for (String s : available) {
-            if (s.startsWith(args[args.length - 1])) {
+            if (s.startsWith(args[args.length - 1].replace("\"", ""))) {
                 result.add(s);
             }
         }
