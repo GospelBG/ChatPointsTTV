@@ -246,12 +246,12 @@ public class TestCommand {
 
             case "gift":
                 try {
-                    Gift item = c.getGiftManager().getByName(cmdInput[4]);
-                    if (item == null) { // Query didn't match with available gifts
+                    Gift item = c.getGiftManager().getByName(parseQuotes(cmdInput)[4]);
+                    if (item == Gift.UNDEFINED) { // Query didn't match with available gifts
                         sender.sendMessage("Invalid Gift Item name: " + cmdInput[4]);
                         return;
                     } else {
-                        event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost() ,item, Integer.valueOf(cmdInput[5]));
+                        event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost(), item, Integer.valueOf(cmdInput[5]));
                     }
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Invalid Gift Combo amount: " + cmdInput[5]);
