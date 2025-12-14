@@ -29,6 +29,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 public class TikTokClient {
     public static Boolean accountConnected = false;
     public static Boolean isEnabled = false;
+    public static List<String> listenedProfiles;
 
     private static TikTokEvents eventHandler;
 
@@ -46,6 +47,9 @@ public class TikTokClient {
     }
     public static FileConfiguration getConfig() {
         return tiktokConfig;
+    }
+    public static TikTokEvents getEventHandler() {
+        return eventHandler;
     }
 
     public static void link(CommandSender p, String handle, Boolean save) {
@@ -180,7 +184,8 @@ public class TikTokClient {
 
         eventHandler = new TikTokEvents();
 
-        for (String username : tiktokConfig.getStringList("LISTENED_PROFILES")) {
+        listenedProfiles = tiktokConfig.getStringList("LISTENED_PROFILES");
+        for (String username : listenedProfiles) {
             if (username.isBlank()) continue;
             link(p, username, false);
         }

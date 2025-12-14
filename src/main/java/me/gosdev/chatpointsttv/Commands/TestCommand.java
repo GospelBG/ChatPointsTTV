@@ -1,6 +1,5 @@
 package me.gosdev.chatpointsttv.Commands;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.bukkit.command.CommandSender;
@@ -10,12 +9,16 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 
 import io.github.jwdeveloper.tiktok.data.events.common.TikTokEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokFollowEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokLikeEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
 import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.TikTok.TikTokEventTest;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventTest;
+import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
@@ -209,34 +212,48 @@ public class TestCommand {
             return;
         }
 
-        LiveClient c;
+        LiveClient c = null;
         TikTokEvent event;
         String chatter = cmdInput[2];
+        Boolean offlineTest = false;
 
         if (!TikTokClient.isEnabled) {
             sender.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
             return;
         }
 
-        if (!TikTokClient.accountConnected) {
-            sender.sendMessage(ChatColor.RED + "You must link a TikTok LIVE in order to run test events!");
-            return;
-        }
         if (!TikTokClient.getClients().containsKey(cmdInput[3].toLowerCase())) {
-            sender.sendMessage(ChatColor.RED + "You need to link @" + cmdInput[3] + "'s LIVE first!");
-            return;
+            offlineTest = true;
         } else {
             c = TikTokClient.getClients().get(cmdInput[3].toLowerCase());
         }
 
         switch (cmdInput[1].toLowerCase()) {
             case "follow":
+                if (cmdInput.length != 4) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
                 event = TikTokEventTest.FollowEvent(chatter);
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onFollow((TikTokFollowEvent) event, cmdInput[3].toLowerCase());
+                    return;
+                } 
                 break;
 
             case "like":
+                if (cmdInput.length != 5) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
                 try {
                     event = TikTokEventTest.LikeEvent(chatter, Integer.valueOf(cmdInput[4]));
+                    if (offlineTest) {
+                        TikTokClient.getEventHandler().onLike((TikTokLikeEvent) event, cmdInput[3].toLowerCase());
+                        return;
+                    } 
                 } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "Invalid Like amount: " + cmdInput[4]);
                     return;
@@ -244,22 +261,43 @@ public class TestCommand {
                 break;
 
             case "gift":
-                try {
-                    Gift item = c.getGiftManager().getByName(parseQuotes(cmdInput)[4]);
-                    if (item == Gift.UNDEFINED) { // Query didn't match with available gifts
-                        sender.sendMessage("Invalid Gift Item name: " + cmdInput[4]);
-                        return;
-                    } else {
-                        event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost(), item, Integer.valueOf(cmdInput[5]));
-                    }
-                } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatColor.RED + "Invalid Gift Combo amount: " + cmdInput[5]);
+                cmdInput = LocalizationUtils.parseQuotes(cmdInput); // Parse Multiple-Word arguments
+                if (cmdInput.length != 6) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
                     return;
                 }
+
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onGift(TikTokEventTest.GiftEvent(chatter, TikTokEventTest.generateUser(cmdInput[3].toLowerCase()), new Gift(0, cmdInput[4], 0, ""), Integer.valueOf(cmdInput[5])));
+                    return;
+                } else {
+                    try {
+                        Gift item = c.getGiftManager().getByName(cmdInput[4]);
+                        if (item == Gift.UNDEFINED) { // Query didn't match with available gifts
+                            sender.sendMessage("Invalid Gift Item name: " + cmdInput[4]);
+                            return;
+                        } else {
+                            event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost(), item, Integer.valueOf(cmdInput[5]));
+                        }
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid Gift Combo amount: " + cmdInput[5]);
+                        return;
+                    }
+                }
+                
                 break;
             
             case "share":
+                if (cmdInput.length != 4) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
                 event = TikTokEventTest.ShareEvent(chatter);
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onShare((TikTokShareEvent) event, cmdInput[3].toLowerCase());
+                    return;
+                } 
                 break;
 
             default:

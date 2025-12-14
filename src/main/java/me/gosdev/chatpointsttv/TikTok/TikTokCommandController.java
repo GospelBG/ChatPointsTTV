@@ -161,7 +161,11 @@ public class TikTokCommandController implements TabExecutor {
             case 4: 
                 if (args[0].equalsIgnoreCase("test")) {
                     if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                        available.addAll(TikTokClient.getClients().keySet());
+                        if (!TikTokClient.listenedProfiles.isEmpty()) {
+                            available.addAll(TikTokClient.listenedProfiles);
+                        } else {
+                            available.add("<Streamer Username>");
+                        }
                     }
                 } 
                 break;
@@ -169,13 +173,17 @@ public class TikTokCommandController implements TabExecutor {
             case 5:
                 if (args[0].equalsIgnoreCase("test")) {
                     if (args[1].equalsIgnoreCase("gift")) {
-                        List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
-                        for (Gift g : availableGifts) {
-                            String name = g.getName();
-                            if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
-                                name = "\"" + name + "\"";
+                        if (TikTokClient.getClients().get(args[3]) != null) {
+                            List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
+                            for (Gift g : availableGifts) {
+                                String name = g.getName();
+                                if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
+                                    name = "\"" + name + "\"";
+                                }
+                                available.add(name);
                             }
-                            available.add(name);
+                        } else {
+                            available.add("<Gift>");
                         }
                     } else if (args[1].equalsIgnoreCase("like")) {
                         available.add("<Amount>");
