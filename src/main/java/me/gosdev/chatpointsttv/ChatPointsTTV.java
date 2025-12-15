@@ -32,7 +32,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
-    private static TikTokClient tiktok;
     private TwitchCommandController cmdController;
     private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
@@ -126,8 +125,8 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         twitch = new TwitchClient();
-        tiktok = new TikTokClient();
         if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
+        if (config.getBoolean("ENABLE_TIKTOK", true)) TikTokClient.enable(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
             Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
@@ -180,14 +179,13 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
-        if (tiktok != null && TikTokClient.accountConnected) TikTokClient.stop(Bukkit.getConsoleSender());
+        if (TikTokClient.accountConnected) TikTokClient.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
         
         // Erase variables
         config = null;
         plugin = null;
         twitch = null;
-        tiktok = null;
 
         CPTTV_EventHandler.actions = new HashMap<>();
 

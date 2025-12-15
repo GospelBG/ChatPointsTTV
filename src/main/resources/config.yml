@@ -3,6 +3,8 @@
 
 # If true, the plugin will automatically start the Twitch client.
 ENABLE_TWITCH: true
+# If true, the plugin will automatically start the TikTok client.
+ENABLE_TIKTOK: true
 
 # Whether events should be ignored if the streamer is offline.
 IGNORE_OFFLINE_STREAMERS: false
