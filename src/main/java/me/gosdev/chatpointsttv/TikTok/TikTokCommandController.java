@@ -82,18 +82,22 @@ public class TikTokCommandController implements TabExecutor {
 
             case "unlink":
                 if (args.length < 1 || args.length > 2) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok unlink <username>");
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok unlink [username]");
                     return true;
                 }
-                if (args.length == 2) {
+                if (args.length == 1) {
                    for (String acc : TikTokClient.getClients().keySet()) {
                         TikTokClient.unlink(acc, true);
                    }
+                   sender.sendMessage(ChatColor.GREEN + "All accounts have been unlinked successfully!");
                 } else {
-                    TikTokClient.unlink(args[1], true);
+                    if (TikTokClient.getClients().containsKey(args[1].toLowerCase())) {
+                        TikTokClient.unlink(args[1], true);
+                        sender.sendMessage(ChatColor.GREEN + "TikTok account " + args[1] + " unlinked successfully!");
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Couldn't find " + args[1] + "'s LIVE linked!");
+                    }
                 }
-                
-                sender.sendMessage(ChatColor.GREEN + "TikTok account " + args[1] + " unlinked successfully!");
                 return true;
 
             case "accounts":
