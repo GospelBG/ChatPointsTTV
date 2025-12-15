@@ -61,6 +61,7 @@ public class TikTokClient {
     }
 
     public static void link(CommandSender p, String handle, Boolean save) {
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Linking...");
         // Sanitise username
         String username = (handle.startsWith("@") ? handle.substring(1) : handle).toLowerCase();
 
@@ -74,19 +75,16 @@ public class TikTokClient {
             builder.onGiftCombo((liveClient, event) -> {
                 if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event, clients.get(username).getRoomInfo().getHostName()); // Only handle Finished Combos
             });
-            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "TikTok: Listening for gifts...");     
         }
         if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.FOLLOW) != null) {
             builder.onFollow((liveClient, event) -> {
                 eventHandler.onFollow(event, clients.get(username).getRoomInfo().getHostName());
             });
-            Bukkit.getConsoleSender().sendMessage("TikTok: Listening for follows...");
         }
         if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.SHARE) != null) {
             builder.onShare((liveClient, event) -> {
                 eventHandler.onShare(event, clients.get(username).getRoomInfo().getHostName());
             });
-            Bukkit.getConsoleSender().sendMessage("TikTok: Listening for shares...");
         }
         if (plugin.config.getBoolean("SHOW_CHAT")) {
             builder.onComment((liveClient, event) -> {
@@ -146,7 +144,7 @@ public class TikTokClient {
                 }
             }
 
-            p.sendMessage("TikTok client started successfully!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Linked succesfully to @" + c.getRoomInfo().getHostName() + "'s LIVE!");
         });
     }
 
