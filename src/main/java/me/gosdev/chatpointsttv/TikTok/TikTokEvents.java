@@ -34,7 +34,7 @@ public class TikTokEvents {
             if (!reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetId().equals(hostName)) continue;
 
             if (event.getGift().getName().equalsIgnoreCase(reward.getEvent()) || reward.getEvent().equalsIgnoreCase("any")) {
-                CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.GIFT, reward, event.getUser().getProfileName(), event.getToUser().getProfileName(), Optional.of(event.getGift().getName()), Optional.of(event.getCombo()));
+                CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.GIFT, reward, event.getUser().getProfileName(), hostName, Optional.of(event.getGift().getName()), Optional.of(event.getCombo()));
                 return;
             }
         }
