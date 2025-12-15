@@ -132,9 +132,10 @@ public class TikTokClient {
                         LiveClient c = builder.buildAndConnect();
                         accountConnected = true;
                         clients.put(username, c);
+                        listenedProfiles.add(username);
 
                         if (save) {
-                            tiktokConfig.set("LISTENED_PROFILES", clients.keySet().toArray());
+                            tiktokConfig.set("LISTENED_PROFILES", listenedProfiles);
                             try {
                                 tiktokConfig.save(new File(plugin.getDataFolder(), "tiktok.yml"));
                             } catch (IOException e) {
