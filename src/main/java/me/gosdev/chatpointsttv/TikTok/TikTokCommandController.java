@@ -151,52 +151,61 @@ public class TikTokCommandController implements TabExecutor {
                 break;
 
             case 3:
-                if (args[0].equalsIgnoreCase("test")) {
-                    if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                        available.add("<Chatter Username>");
+                if (TikTokClient.isEnabled) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                            available.add("<Chatter Username>");
+                        }
                     }
                 }
                 break;
 
-            case 4: 
-                if (args[0].equalsIgnoreCase("test")) {
-                    if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                        if (!TikTokClient.listenedProfiles.isEmpty()) {
-                            available.addAll(TikTokClient.listenedProfiles);
-                        } else {
-                            available.add("<Streamer Username>");
+            case 4:
+                if (TikTokClient.isEnabled) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                            if (TikTokClient.listenedProfiles == null || !TikTokClient.listenedProfiles.isEmpty()) {
+                                available.addAll(TikTokClient.listenedProfiles);
+                            } else {
+                                available.add("<Streamer Username>");
+                            }
                         }
                     }
-                } 
+                }
                 break;
 
             case 5:
-                if (args[0].equalsIgnoreCase("test")) {
-                    if (args[1].equalsIgnoreCase("gift")) {
-                        if (TikTokClient.getClients().get(args[3]) != null) {
-                            List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
-                            for (Gift g : availableGifts) {
-                                String name = g.getName();
-                                if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
-                                    name = "\"" + name + "\"";
+                if (TikTokClient.isEnabled) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("gift")) {
+                            if (TikTokClient.getClients().get(args[3]) != null) {
+                                List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
+                                for (Gift g : availableGifts) {
+                                    String name = g.getName();
+                                    if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
+                                        name = "\"" + name + "\"";
+                                    }
+                                    available.add(name);
                                 }
-                                available.add(name);
+                            } else {
+                                available.add("<Gift>");
                             }
-                        } else {
-                            available.add("<Gift>");
+                        } else if (args[1].equalsIgnoreCase("like")) {
+                            available.add("<Amount>");
                         }
-                    } else if (args[1].equalsIgnoreCase("like")) {
-                        available.add("<Amount>");
                     }
                 }
                 break;
 
             case 6:
-                if (args[0].equalsIgnoreCase("test")) {
-                    if (args[1].equalsIgnoreCase("gift")) {
-                        available.add("<Amount>");
+                if (TikTokClient.isEnabled) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("gift")) {
+                            available.add("<Amount>");
+                        }
                     }
                 }
+                break;
         }
             
         for (String s : available) {
