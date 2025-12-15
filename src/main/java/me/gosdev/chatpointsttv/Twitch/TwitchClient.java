@@ -177,62 +177,64 @@ public class TwitchClient {
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
-        if (linkThread != null) {
-            try {
-                linkThread.join();
-            } catch (InterruptedException e) {}
-        }
-        
-        linkThread = new Thread(() -> {
-            saveCredential(credential.getUserId(), credential);
-            credentialManager.put(credential.getUserId(), credential);
-
-            for (Channel channel : channels.values()) {
-                if (credential.getUserId().equals(channel.getChannelId())) {
-                    p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
-                    return;
-                }
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            if (linkThread != null) {
+                try {
+                    linkThread.join();
+                } catch (InterruptedException e) {}
             }
+            
+            linkThread = new Thread(() -> {
+                saveCredential(credential.getUserId(), credential);
+                credentialManager.put(credential.getUserId(), credential);
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
-    
-            tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
-                @Override
-                public void run() {
-                    refreshCredentials(credential.getUserId());
-                }
-            }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
-    
-            if (accountConnected) {
-                subscribeToEvents(credential);
-            } else {
-                start(credential);
-            }
-
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
-
-            if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
-                List<String> followerIDs = new ArrayList<>();
-                String cursor = null;
-                while (true) { 
-                    InboundFollowers request = client.getHelix().getChannelFollowers(credential.getAccessToken(), credential.getUserId(), null, null, cursor).execute();
-                    cursor = request.getPagination().getCursor();
-                    for (InboundFollow follower : request.getFollows()) {
-                        followerIDs.add(follower.getUserId());
+                for (Channel channel : channels.values()) {
+                    if (credential.getUserId().equals(channel.getChannelId())) {
+                        p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
+                        return;
                     }
-                    if (cursor == null) break;
                 }
-                FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
-            }
-        });
-        linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
-            linkThread.interrupt();
-            e.printStackTrace();
-            p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Account linking failed!");
-            stop(Bukkit.getConsoleSender());
-        });
 
-        linkThread.start();
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
+        
+                tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
+                    @Override
+                    public void run() {
+                        refreshCredentials(credential.getUserId());
+                    }
+                }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
+        
+                if (accountConnected) {
+                    subscribeToEvents(credential);
+                } else {
+                    start(credential);
+                }
+
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
+
+                if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                    List<String> followerIDs = new ArrayList<>();
+                    String cursor = null;
+                    while (true) { 
+                        InboundFollowers request = client.getHelix().getChannelFollowers(credential.getAccessToken(), credential.getUserId(), null, null, cursor).execute();
+                        cursor = request.getPagination().getCursor();
+                        for (InboundFollow follower : request.getFollows()) {
+                            followerIDs.add(follower.getUserId());
+                        }
+                        if (cursor == null) break;
+                    }
+                    FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
+                }
+            });
+            linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
+                linkThread.interrupt();
+                e.printStackTrace();
+                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Account linking failed!");
+                stop(Bukkit.getConsoleSender());
+            });
+
+            linkThread.start();
+        });
     }
 
     private void start(OAuth2Credential credential) {
