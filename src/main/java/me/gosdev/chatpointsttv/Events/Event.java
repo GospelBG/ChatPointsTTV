@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
 import me.gosdev.chatpointsttv.Twitch.TwitchUtils;
 
 public class Event {
@@ -19,7 +21,12 @@ public class Event {
         this.channel = channel;
 
         try {
-            channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
+            if (type instanceof TwitchEventType) {
+                channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
+            } else if (type instanceof TikTokEventType) {
+                channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : channel.toLowerCase();
+            }
+        
         } catch (NullPointerException e) {
             ChatPointsTTV.log.warning(e.getMessage());
             channelId = null;

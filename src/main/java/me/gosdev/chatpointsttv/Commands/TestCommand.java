@@ -1,6 +1,5 @@
 package me.gosdev.chatpointsttv.Commands;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.bukkit.command.CommandSender;
@@ -9,12 +8,21 @@ import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 
+import io.github.jwdeveloper.tiktok.data.events.common.TikTokEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokFollowEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokLikeEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
+import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
+import io.github.jwdeveloper.tiktok.live.LiveClient;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Twitch.EventTest;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
+import me.gosdev.chatpointsttv.TikTok.TikTokEventTest;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventTest;
+import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 import net.md_5.bungee.api.ChatColor;
 
 public class TestCommand {
-    public static void test(CommandSender sender, String[] cmdInput) {
+    public static void twitchTest(CommandSender sender, String[] cmdInput) {
         if (!ChatPointsTTV.getTwitch().isStarted() ) {
             sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
             return;
@@ -33,67 +41,47 @@ public class TestCommand {
         EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
         EventSubEvent event;
 
-        ArrayList<String> args =  new ArrayList<>();
-        for (int i = 0; i < cmdInput.length; i++) {
-            String arg = cmdInput[i];
-            // Check if the argument starts with a quote and does not end with an escaped quote
-            if (arg.startsWith("\"") && !arg.endsWith("\\\"")) {
-            StringBuilder sb = new StringBuilder(arg.substring(1));
-            // Continue appending arguments until the closing quote is found
-            while (i + 1 < cmdInput.length && !(cmdInput[i + 1].endsWith("\"") && !cmdInput[i + 1].endsWith("\\\""))) {
-                sb.append(" ").append(cmdInput[++i]);
-            }
-            // Append the last part of the quoted argument
-            if (i + 1 < cmdInput.length) {
-                sb.append(" ").append(cmdInput[++i], 0, cmdInput[i].length() - 1);
-            }
-            // Add the complete quoted argument to the args list
-            args.add(sb.toString().replace("\\\"", "\""));
-            } else {
-            // Add the argument to the args list, replacing escaped quotes
-            args.add(arg.replace("\\\"", "\""));
-            }
-        }
+        String[] args = LocalizationUtils.parseQuotes(cmdInput);
 
         try {
-            switch (args.get(1).toLowerCase()) {
+            switch (args[1].toLowerCase()) {
                 case "channelpoints":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
                         return;
                     }
     
-                    String pointsChatter = args.get(2);
-                    String pointsChannel = args.get(3);
-                    String pointsReward = args.get(4);
+                    String pointsChatter = args[2];
+                    String pointsChannel = args[3];
+                    String pointsReward = args[4];
                     String userInput;
     
-                    if (args.size() <= 5) {
+                    if (args.length <= 5) {
                         userInput = null;
                     } else {
-                        for (int i = 6; i < args.size(); i++) {
-                            args.set(5, args.get(5) + " " + args.get(i)); // All arguments after index 4 are considered user input
+                        for (int i = 6; i < args.length; i++) {
+                            args[5] = args[5] + " " + args[i]; // All arguments after index 4 are considered user input
                         }
-                        userInput = args.get(5);
+                        userInput = args[5];
                     }
                     try {
-                        event = EventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty());
+                        event = TwitchEventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty());
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
                     }
                     break;
                 case "follow":
-                    if (args.size() < 4) {
+                    if (args.length < 4) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
                         return;
                     }
     
-                    String followUser = args.get(2);
-                    String followChannel = args.get(3);
+                    String followUser = args[2];
+                    String followChannel = args[3];
     
                     try {
-                        event = EventTest.FollowEvent(followChannel, followUser);
+                        event = TwitchEventTest.FollowEvent(followChannel, followUser);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
@@ -101,24 +89,24 @@ public class TestCommand {
                     break;
     
                 case "cheer":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
                         return;
                     }
     
-                    String cheerUser = args.get(2);
-                    String cheerChannel = args.get(3);
+                    String cheerUser = args[2];
+                    String cheerChannel = args[3];
                     int cheerAmount;
     
                     try {
-                        cheerAmount = Integer.parseInt(args.get(4));
+                        cheerAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args[4]);
                         return;
                     }
     
                     try {
-                        event = EventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount);
+                        event = TwitchEventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
@@ -126,30 +114,30 @@ public class TestCommand {
                     break;
     
                 case "sub":
-                    if (args.size() < 6) {
+                    if (args.length < 6) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                         return;
                     }
     
-                    String subUser = args.get(2);
-                    String subChannel = args.get(3);
+                    String subUser = args[2];
+                    String subChannel = args[3];
                     SubscriptionPlan subTier;
                     int subMonths;
     
                     try {
-                        subTier = SubscriptionPlan.valueOf(args.get(4).toUpperCase());
-                        subMonths = Integer.parseInt(args.get(5));
+                        subTier = SubscriptionPlan.valueOf(args[4].toUpperCase());
+                        subMonths = Integer.parseInt(args[5]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args.get(5));
+                        sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args[5]);
                         return;
                     } catch (IllegalArgumentException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args[4]);
                         return;
                     }
                     
     
                     try {
-                        event = EventTest.SubEvent(subChannel, subUser, subTier, subMonths);
+                        event = TwitchEventTest.SubEvent(subChannel, subUser, subTier, subMonths);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
@@ -157,24 +145,24 @@ public class TestCommand {
                     break;
     
                 case "subgift":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <amount>");
                         return;
                     }
     
-                    String giftChatter = args.get(2);
-                    String giftChannel = args.get(3);
+                    String giftChatter = args[2];
+                    String giftChannel = args[3];
                     int giftAmount;
     
                     try {
-                        giftAmount = Integer.parseInt(args.get(4));
+                        giftAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args[4]);
                         return;
                     }
                     
                     try {
-                        event = EventTest.SubGiftEvent(giftChannel, giftChatter, giftAmount);
+                        event = TwitchEventTest.SubGiftEvent(giftChannel, giftChatter, giftAmount);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
@@ -182,24 +170,24 @@ public class TestCommand {
                     break;
     
                 case "raid":
-                    if (args.size() < 5) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
                         return;
                     }
     
-                    String raidUser = args.get(2);
-                    String raidChannel = args.get(3);
+                    String raidUser = args[2];
+                    String raidChannel = args[3];
                     int raidViewers;
     
                     try {
-                        raidViewers = Integer.parseInt(args.get(4));
+                        raidViewers = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args.get(4));
+                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args[4]);
                         return;
                     }
                     
                     try {
-                        event = EventTest.RaidReward(raidChannel, raidUser, raidViewers);
+                        event = TwitchEventTest.RaidReward(raidChannel, raidUser, raidViewers);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;
@@ -207,7 +195,7 @@ public class TestCommand {
                     break;
     
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args.get(1));
+                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args[1]);
                     return;
             }
             eventManager.publish(event);
@@ -216,5 +204,107 @@ public class TestCommand {
         } catch (IllegalArgumentException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
+    }
+
+    public static void tiktokTest(CommandSender sender, String[] cmdInput) {
+        if (cmdInput.length < 4) {
+            sender.sendMessage(ChatColor.RED + "Usage: /tiktok test <type> ...");
+            return;
+        }
+
+        LiveClient c = null;
+        TikTokEvent event;
+        String chatter = cmdInput[2];
+        Boolean offlineTest = false;
+
+        if (!TikTokClient.isEnabled) {
+            sender.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
+            return;
+        }
+
+        if (!TikTokClient.getClients().containsKey(cmdInput[3].toLowerCase())) {
+            offlineTest = true;
+        } else {
+            c = TikTokClient.getClients().get(cmdInput[3].toLowerCase());
+        }
+
+        switch (cmdInput[1].toLowerCase()) {
+            case "follow":
+                if (cmdInput.length != 4) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
+                event = TikTokEventTest.FollowEvent(chatter);
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onFollow((TikTokFollowEvent) event, cmdInput[3].toLowerCase());
+                    return;
+                } 
+                break;
+
+            case "like":
+                if (cmdInput.length != 5) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
+                try {
+                    event = TikTokEventTest.LikeEvent(chatter, Integer.valueOf(cmdInput[4]));
+                    if (offlineTest) {
+                        TikTokClient.getEventHandler().onLike((TikTokLikeEvent) event, cmdInput[3].toLowerCase());
+                        return;
+                    } 
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(ChatColor.RED + "Invalid Like amount: " + cmdInput[4]);
+                    return;
+                }
+                break;
+
+            case "gift":
+                cmdInput = LocalizationUtils.parseQuotes(cmdInput); // Parse Multiple-Word arguments
+                if (cmdInput.length != 6) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onGift(TikTokEventTest.GiftEvent(chatter, TikTokEventTest.generateUser(cmdInput[3].toLowerCase()), new Gift(0, cmdInput[4], 0, ""), Integer.valueOf(cmdInput[5])), cmdInput[3].toLowerCase());
+                    return;
+                } else {
+                    try {
+                        Gift item = c.getGiftManager().getByName(cmdInput[4]);
+                        if (item == Gift.UNDEFINED) { // Query didn't match with available gifts
+                            sender.sendMessage("Invalid Gift Item name: " + cmdInput[4]);
+                            return;
+                        } else {
+                            event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost(), item, Integer.valueOf(cmdInput[5]));
+                        }
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid Gift Combo amount: " + cmdInput[5]);
+                        return;
+                    }
+                }
+                
+                break;
+            
+            case "share":
+                if (cmdInput.length != 4) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    return;
+                }
+
+                event = TikTokEventTest.ShareEvent(chatter);
+                if (offlineTest) {
+                    TikTokClient.getEventHandler().onShare((TikTokShareEvent) event, cmdInput[3].toLowerCase());
+                    return;
+                } 
+                break;
+
+            default:
+                return;
+        }
+
+        c.publishEvent(event);
+        sender.sendMessage(ChatColor.GREEN + "Test event sent!");
     }
 }

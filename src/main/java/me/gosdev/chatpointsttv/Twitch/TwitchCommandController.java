@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv;
+package me.gosdev.chatpointsttv.Twitch;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -12,16 +12,17 @@ import org.bukkit.command.TabExecutor;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Commands.LinkCommand;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
 import me.gosdev.chatpointsttv.Commands.TestCommand;
-import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Platforms;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
-public class CommandController implements TabExecutor {
+public class TwitchCommandController implements TabExecutor {
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
@@ -67,11 +68,11 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "accounts":
-                    AccountsCommand.displayAccounts(sender);
+                    AccountsCommand.displayAccounts(sender, Platforms.TWITCH);
                     return true;
                     
                 case "status":
-                    StatusCommand.status(sender, plugin);
+                    StatusCommand.status(sender, plugin, Platforms.TWITCH);
                     return true;
 
                 case "stop":
@@ -92,7 +93,7 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "test":
-                    TestCommand.test(sender, args);
+                    TestCommand.twitchTest(sender, args);
                     return true;
 
                 default:

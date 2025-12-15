@@ -17,7 +17,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
+import me.gosdev.chatpointsttv.TikTok.TikTokCommandController;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
+import me.gosdev.chatpointsttv.Twitch.TwitchCommandController;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -29,7 +32,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
-    private CommandController cmdController;
+    private TwitchCommandController cmdController;
+    private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
 
     public static final HashMap<String, String> strings = new HashMap<>();
@@ -97,13 +101,22 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         FileConfiguration stringsYaml = YamlConfiguration.loadConfiguration(stringsFile);
-        for (String key : YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml")).getKeys(true)) {
-            strings.put(key, stringsYaml.getString(key));
+        FileConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml"));
+        for (String key : defaultStrings.getKeys(true)) {
+            if (stringsYaml.isString(key)) {
+                strings.put(key, stringsYaml.getString(key));
+            } else {
+                strings.put(key, defaultStrings.getString(key));
+            }
         }
 
-        cmdController = new CommandController();
+        cmdController = new TwitchCommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
+
+        tikTokCmdController = new TikTokCommandController();
+        this.getCommand("tiktok").setExecutor(tikTokCmdController);
+        this.getCommand("tiktok").setTabCompleter(tikTokCmdController);
 
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
@@ -113,6 +126,7 @@ public class ChatPointsTTV extends JavaPlugin {
         
         twitch = new TwitchClient();
         if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
+        if (config.getBoolean("ENABLE_TIKTOK", true)) TikTokClient.enable(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
             Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
@@ -165,6 +179,7 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
+        if (TikTokClient.accountConnected) TikTokClient.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
         
         // Erase variables

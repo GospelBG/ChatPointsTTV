@@ -1,4 +1,4 @@
-package me.gosdev.chatpointsttv.Utils;
+package me.gosdev.chatpointsttv.Twitch;
 
 import java.util.List;
 

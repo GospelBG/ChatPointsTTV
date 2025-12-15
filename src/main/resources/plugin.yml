@@ -7,8 +7,13 @@ api-version: '1.13'
 
 commands:
   twitch:
-    description: Manage ChatPointsTTV from this command. Use "/twitch help" to get a full list of commands.
+    description: Manage ChatPointsTTV's Twitch module from this command. Use "/twitch help" to get a full list of commands.
     usage: /twitch <function>
+    permission: chatpointsttv.manage
+
+  tiktok:
+    description: Manage ChatPointsTTV's TikTok module from this command. Use "/tiktok help" to get a full list of commands.
+    usage: /tiktok <function>
     permission: chatpointsttv.manage
 
 permissions:

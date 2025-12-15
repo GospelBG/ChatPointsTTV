@@ -5,7 +5,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 
 public class RunCmdAction extends BaseAction {
     private final String target;
@@ -21,7 +20,7 @@ public class RunCmdAction extends BaseAction {
         CommandSender sender;
         if (target.equalsIgnoreCase("CONSOLE")) {
             sender = Bukkit.getConsoleSender();
-        } else if (target.equalsIgnoreCase(CPTTV_EventHandler.EVERYONE)) {
+        } else if (target.equalsIgnoreCase("TARGET")) {
             for (Player p : ChatPointsTTV.getPlugin().getServer().getOnlinePlayers()) {
                 if (p.hasPermission(ChatPointsTTV.permissions.TARGET.permission_id)) {
                     Bukkit.getScheduler().scheduleSyncDelayedTask(ChatPointsTTV.getPlugin(), () -> { // Commands should only be dispatched synchronously.

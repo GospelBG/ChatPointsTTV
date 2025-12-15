@@ -8,8 +8,8 @@ import org.bukkit.command.CommandSender;
 import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.DeviceCodeGrantFlow;
-import me.gosdev.chatpointsttv.Utils.Channel;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

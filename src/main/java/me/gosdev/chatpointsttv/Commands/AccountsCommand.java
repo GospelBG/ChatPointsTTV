@@ -1,10 +1,16 @@
 package me.gosdev.chatpointsttv.Commands;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.TikTok.TikTokButtonComponents;
+import me.gosdev.chatpointsttv.TikTok.TikTokClient;
+import me.gosdev.chatpointsttv.Twitch.Channel;
+import me.gosdev.chatpointsttv.Twitch.TwitchButtonComponents;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -14,49 +20,74 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 
 public class AccountsCommand {
-    public static void displayAccounts(CommandSender p) {
-        if (!ChatPointsTTV.getTwitch().isStarted()) {
-            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
-            return;
-        }
+    public static void displayAccounts(CommandSender p, Platforms platform) {
         TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
-        TextComponent footer;
+        TextComponent footer = null;
+
+        ArrayList<String> channels = new ArrayList<>();
+
+        switch (platform) {
+            case TWITCH:
+                if (!ChatPointsTTV.getTwitch().isStarted()) {
+                    p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+                    return;
+                }
+    
+                for (Channel i : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                    channels.add(i.getChannelUsername());
+                }
+
+                if (p.equals(Bukkit.getConsoleSender())) {
+                    footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
+                } else {
+                    footer = TwitchButtonComponents.accountLink();
+                    if (!channels.isEmpty()) {
+                        footer.addExtra(ChatColor.GRAY + "  -  ");
+                        footer.addExtra(TwitchButtonComponents.accountUnlink());
+                    }
+                }
+                break;
+
+            case TIKTOK:
+                if (!TikTokClient.isEnabled) {
+                    p.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
+                    return;
+                }
+
+                channels.addAll(TikTokClient.getClients().keySet());
+
+                if (p.equals(Bukkit.getConsoleSender())) {
+                    footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /tiktok unlink <username>\nTo add an account, use /tiktok link <username>");
+                } else {
+                    footer = TikTokButtonComponents.accountLink();
+                    if (!channels.isEmpty()) {
+                        footer.addExtra(ChatColor.GRAY + "  -  ");
+                        footer.addExtra(TikTokButtonComponents.accountUnlink());
+                    }
+                }
+                break;
+        }
         
         if (p.equals(Bukkit.getConsoleSender())) {
-            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
-                msg.addExtra(ChatColor.GRAY + "  -  " + channel.getChannelUsername() + "\n");
+            for (String channel : channels) {
+                msg.addExtra(ChatColor.GRAY + "  -  " + channel + "\n");
             }
-            footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
-        } else {
-            TextComponent addBtn = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "\n[+]" + ChatColor.RESET + ChatColor.GREEN + " Add account");
-            addBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to link another account").create()));
-            addBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
-    
-            TextComponent unlinkBtn = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[❌]" + ChatColor.RESET + ChatColor.RED + " Remove all accounts");
-            unlinkBtn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink all accounts").create()));
-            unlinkBtn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink"));  
-
-            footer = addBtn;
-            if (!ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
-                footer.addExtra(new TextComponent(ChatColor.GRAY + "  -  "));
-                footer.addExtra(unlinkBtn);
-            }
-            footer.addExtra("\n");
-
-            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+        } else {    
+            for (String channel : channels) {
                 BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
                 deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
-                deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink " + channel.getChannelUsername()));
+                deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + platform.getName().toLowerCase() + " unlink " + channel));
                 msg.addExtra(deleteButton);
-                msg.addExtra(new TextComponent("  " + channel.getChannelUsername() + "\n"));
+                msg.addExtra(new TextComponent("  " + channel + "\n"));
             }
         }
 
-        if (ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
+        if (channels.isEmpty()) {
             msg.addExtra(ChatColor.GRAY + "  There are no connected accounts :(\n");
         }
 
         msg.addExtra(footer);
+        msg.addExtra("\n");
         p.spigot().sendMessage(msg);
     }
 }
