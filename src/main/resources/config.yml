@@ -29,8 +29,3 @@ MOB_GLOW: true
 
 # Sets chatter's name to spawned mobs
 DISPLAY_NAME_ON_MOB: true
-
-#  Use Bukkit API color codes (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)
-COLORS:
-  USER_COLOR: GOLD
-  EVENT_COLOR: YELLOW

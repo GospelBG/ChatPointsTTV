@@ -80,8 +80,6 @@ public class TwitchClient {
     public Boolean shouldMobsGlow;
     public Boolean nameSpawnedMobs;
     public AlertMode alertMode;
-    public ChatColor eventColor;
-    public ChatColor userColor;
     
     private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
@@ -147,16 +145,6 @@ public class TwitchClient {
         nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
         alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
 
-        try {
-            eventColor = ChatColor.valueOf(twitchConfig.getString("COLORS.EVENT_COLOR", ChatPointsTTV.eventColor.name()).toUpperCase());
-        } catch (NullPointerException e) {
-            eventColor = null;
-        }
-        try {
-            userColor = ChatColor.valueOf(twitchConfig.getString("COLORS.USER_COLOR", ChatPointsTTV.userColor.name()).toUpperCase());
-        } catch (NullPointerException e) {
-            userColor = null;
-        }
         
         if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
             FollowerLog.start();

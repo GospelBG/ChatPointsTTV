@@ -67,7 +67,3 @@ CHAT_BLACKLIST: []
 
 # In-game event alerts mode.
 # INGAME_ALERTS: chat
-
-# COLORS:
-#   USER_COLOR: GOLD
-#   EVENT_COLOR: YELLOW

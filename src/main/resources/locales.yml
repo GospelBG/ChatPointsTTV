@@ -3,29 +3,28 @@
 # In need of a reset, delete this file and it will be regenerated automatically in the next server start.
 
 # Event Log
-str_twitch_channel_points: "{USERNAME} has redeemed {EVENT} in {CHANNEL}" # Event = Reward Name
-str_twitch_cheer: "{USERNAME} has cheered {AMOUNT} bits in {CHANNEL}"
-str_twitch_follow: "{USERNAME} has followed {CHANNEL}"
-str_twitch_raid: "{USERNAME} has raided {CHANNEL} with {AMOUNT} viewers"
-str_twitch_sub: "{USERNAME} has subscribed to {CHANNEL} for {AMOUNT} months" # Amount = Subscription Months | Event = Subscription Tier
-str_twitch_gift: "{USERNAME} has gifted {AMOUNT} subs to {CHANNEL}"
-
-str_tiktok_follow: "{USERNAME} has followed {CHANNEL}"
-str_tiktok_like: "{USERNAME} has liked {AMOUNT} times!"
-str_tiktok_gift: "{USERNAME} has gifted x{AMOUNT} {EVENT} to {CHANNEL}" # Event = Gift Item
-str_tiktok_share: "{USERNAME} has shared {CHANNEL}'s LIVE"
+str_twitch_channel_points: "§6{USERNAME}§r has redeemed §e{EVENT}§r in {CHANNEL}" # Event = Reward Name
+str_twitch_cheer: "§6{USERNAME}§r has cheered §e{AMOUNT} bits§r in {CHANNEL}"
+str_twitch_follow: "§6{USERNAME}§r has §efollowed§r {CHANNEL}"
+str_twitch_raid: "§6{USERNAME}§r has §eraided§r {CHANNEL} with {AMOUNT} viewers"
+str_twitch_sub: "§6{USERNAME}§r has §esubscribed§r to {CHANNEL} for {AMOUNT} months" # Amount = Subscription Months | Event = Subscription Tier
+str_twitch_gift: "§6{USERNAME}§r has gifted §e{AMOUNT} subs§r to {CHANNEL}"
+str_tiktok_follow: "§6{USERNAME}§r has §efollowed§r {CHANNEL}"
+str_tiktok_like: "§6{USERNAME}§r has §eliked {AMOUNT} times§r!"
+str_tiktok_gift: "§6{USERNAME}§r has gifted §ex{AMOUNT} {EVENT}§r to {CHANNEL}" # Event = Gift Item
+str_tiktok_share: "§6{USERNAME}§r has §eshared§r {CHANNEL}'s LIVE"
 
 # In-game title messages
-title: "{USERNAME}"
+title: "§6{USERNAME}"
 
-sub_twitch_channel_points: "has redeemed {EVENT}!"
-sub_twitch_cheer: "has cheered {AMOUNT} bits!"
+sub_twitch_channel_points: "has redeemed §6{EVENT}!"
+sub_twitch_cheer: "has cheered §e{AMOUNT} bits§r!"
 sub_twitch_follow: "has started following!"
-sub_twitch_raid: "has raided {AMOUNT} viewers!"
-sub_twitch_sub: "has subscribed for {AMOUNT} months!" # Amount = Subscription Months
-sub_twitch_gift: "has gifted {AMOUNT} subs!"
+sub_twitch_raid: "has raided §e{AMOUNT} viewers§r!"
+sub_twitch_sub: "has subscribed for §e{AMOUNT} months§r!" # Amount = Subscription Months
+sub_twitch_gift: "has gifted §e{AMOUNT} subs§r!"
 
 sub_tiktok_follow: "has started following!"
-sub_tiktok_like: "liked {AMOUNT} times!"
-sub_tiktok_gift: "has gifted x{AMOUNT} {EVENT}!"
-sub_tiktok_share: "has shared the LIVE!"
+sub_tiktok_like: "liked §e{AMOUNT} times§r!"
+sub_tiktok_gift: "has gifted §ex{AMOUNT} {EVENT}§r!"
+sub_tiktok_share: "has §eshared§r the LIVE!"

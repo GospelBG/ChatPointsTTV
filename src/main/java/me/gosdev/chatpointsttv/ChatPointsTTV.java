@@ -37,8 +37,6 @@ public class ChatPointsTTV extends JavaPlugin {
     private boolean firstRun = false;
 
     public static final HashMap<String, String> strings = new HashMap<>();
-    public static ChatColor eventColor;
-    public static ChatColor userColor;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
     public static AlertMode alertMode;
@@ -89,8 +87,6 @@ public class ChatPointsTTV extends JavaPlugin {
         config = getConfig();
 
         logEvents = config.getBoolean("LOG_EVENTS", false);
-        userColor = ChatColor.valueOf(config.getString("COLORS.USER_COLOR", ChatColor.WHITE.name()));
-        eventColor = ChatColor.valueOf(config.getString("COLORS.EVENT_COLOR", ChatColor.LIGHT_PURPLE.name()));
         shouldMobsGlow = config.getBoolean("MOB_GLOW", false);
         alertMode = AlertMode.valueOf(config.getString("INGAME_ALERTS", "NONE").toUpperCase());
         nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", true);
