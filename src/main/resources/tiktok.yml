@@ -29,6 +29,7 @@ LISTENED_PROFILES: []
 #     {TEXT} Channel Points User Input
 #     {USER} Viewer's username
 #     {AMOUNT} Bits/Gifted Subs/Viewers amount.
+#     {EVENT} Extra event info (e.g., Gift Item).
 #
 #  They will be replaced by the plugin automatically.
 
