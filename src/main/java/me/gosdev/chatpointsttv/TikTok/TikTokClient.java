@@ -72,7 +72,7 @@ public class TikTokClient {
         }
         if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.GIFT) != null) {
             builder.onGiftCombo((liveClient, event) -> {
-                if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event); // Only handle Finished Combos
+                if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event, clients.get(username).getRoomInfo().getHostName()); // Only handle Finished Combos
             });
             Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "TikTok: Listening for gifts...");     
         }
