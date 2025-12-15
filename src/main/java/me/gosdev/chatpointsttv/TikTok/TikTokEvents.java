@@ -30,7 +30,6 @@ public class TikTokEvents {
     }
 
     public void onGift(TikTokGiftComboEvent event, String hostName) {
-        ChatPointsTTV.log.info("Combo:" + String.valueOf(event.getCombo()) + " " + event.getComboState());
         for (Event reward : CPTTV_EventHandler.getActions(TikTokClient.getConfig(), TikTokEventType.GIFT)) {
             if (!reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetId().equals(hostName)) continue;
 
@@ -44,7 +43,7 @@ public class TikTokEvents {
     public void onFollow(TikTokFollowEvent event, String hostName) {
         if (FollowerLog.isEnabled && event.getUser().getId() != -1) { // uID = -1 -> Test Event
             String hostId = TikTokClient.getClients().get(hostName).getRoomInfo().getHost().getId().toString();
-            
+
             if (FollowerLog.wasFollowing(Platforms.TIKTOK, hostId, event.getUser().getId().toString())) return;
             FollowerLog.addFollower(Platforms.TIKTOK, hostId, event.getUser().getId().toString());
         }
