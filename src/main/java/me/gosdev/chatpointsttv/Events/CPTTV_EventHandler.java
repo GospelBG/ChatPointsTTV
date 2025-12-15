@@ -261,7 +261,7 @@ public class CPTTV_EventHandler {
     public static ArrayList<Event> getActions(FileConfiguration config, EventType type) {
         if (actions.get(type) != null) return actions.get(type); // Give stored dictionary if it was already fetched
 
-        String key = type.toString().toUpperCase() + "_REWARDS";
+        String key = type.toString().toUpperCase() + "_EVENTS";
         ArrayList<Event> action_list = new ArrayList<>();
 
         if (!config.contains(key)) return null; // No configured rewards for this type

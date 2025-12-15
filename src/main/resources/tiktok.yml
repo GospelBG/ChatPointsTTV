@@ -41,15 +41,15 @@ FOLLOW_SPAM_PROTECTION: true
 
 # Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
 # For follows and shares, put the desired action after the colon as a list. You shouldn't add anything else.
-FOLLOW_REWARDS:
+FOLLOW_EVENTS:
   - {ACTION 1}
   - {ACTION 2}
 
-GIFT_REWARDS:
+GIFT_EVENTS:
   [GIFTED ITEM]:
     - {ACTION}
 
-SHARE_REWARDS:
+SHARE_EVENTS:
    - {ACTION}
 
 # Add chat bot and other unwanted chatter usernames (in lowercase) to this list to prevent their messages displaying on the in-game chat.
