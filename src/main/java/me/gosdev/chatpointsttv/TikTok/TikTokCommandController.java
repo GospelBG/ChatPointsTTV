@@ -168,7 +168,7 @@ public class TikTokCommandController implements TabExecutor {
                 if (TikTokClient.isEnabled) {
                     if (args[0].equalsIgnoreCase("test")) {
                         if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                            if (TikTokClient.listenedProfiles == null || !TikTokClient.listenedProfiles.isEmpty()) {
+                            if (TikTokClient.listenedProfiles != null || !TikTokClient.listenedProfiles.isEmpty()) {
                                 available.addAll(TikTokClient.listenedProfiles);
                             } else {
                                 available.add("<Streamer Username>");
