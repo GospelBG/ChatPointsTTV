@@ -185,18 +185,7 @@ public class TikTokCommandController implements TabExecutor {
                 if (TikTokClient.isEnabled) {
                     if (args[0].equalsIgnoreCase("test")) {
                         if (args[1].equalsIgnoreCase("gift")) {
-                            if (TikTokClient.getClients().get(args[3]) != null) {
-                                List<Gift> availableGifts = TikTokClient.getClients().get(args[3]).getGiftManager().toList();
-                                for (Gift g : availableGifts) {
-                                    String name = g.getName();
-                                    if (name.contains(" ")) { // Surround gift name with quotes if it has 2+ words
-                                        name = "\"" + name + "\"";
-                                    }
-                                    available.add(name);
-                                }
-                            } else {
-                                available.add("<Gift>");
-                            }
+                            available.add("<Gift>");
                         } else if (args[1].equalsIgnoreCase("like")) {
                             available.add("<Amount>");
                         }
