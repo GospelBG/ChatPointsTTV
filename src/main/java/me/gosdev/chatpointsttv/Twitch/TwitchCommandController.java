@@ -20,7 +20,10 @@ import me.gosdev.chatpointsttv.Commands.TestCommand;
 import me.gosdev.chatpointsttv.Platforms;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchCommandController implements TabExecutor {
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
@@ -273,6 +276,17 @@ public class TwitchCommandController implements TabExecutor {
 
     private void help(CommandSender p) {
         p.spigot().sendMessage(helpMsg);
-    }
 
+        if (!p.equals(Bukkit.getConsoleSender())){
+            TextComponent docsTip = new TextComponent("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "\nTip: " + ChatColor.RESET + ChatColor.GRAY + "Check out ");
+
+            TextComponent link = new TextComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "ChatPointsTTV's website");
+            link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://gosdev.me/chatpointsttv/commands/twitch"));
+            link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
+            docsTip.addExtra(link);
+            docsTip.addExtra(ChatColor.GRAY + " for more information on its commands!");
+            
+            p.spigot().sendMessage(docsTip);
+        }
+    }
 }
