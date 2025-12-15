@@ -20,6 +20,7 @@ import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.TikTok.TikTokCommandController;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
+import me.gosdev.chatpointsttv.Twitch.TwitchCommandController;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -32,7 +33,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
     private static TikTokClient tiktok;
-    private CommandController cmdController;
+    private TwitchCommandController cmdController;
     private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
 
@@ -110,7 +111,7 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
 
-        cmdController = new CommandController();
+        cmdController = new TwitchCommandController();
         this.getCommand("twitch").setExecutor(cmdController);
         this.getCommand("twitch").setTabCompleter(cmdController);
 
