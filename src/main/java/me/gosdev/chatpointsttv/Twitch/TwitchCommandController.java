@@ -91,7 +91,7 @@ public class TwitchCommandController implements TabExecutor {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already started.");
                         return true;
                     }
-                    ChatPointsTTV.getTwitch().enable();
+                    ChatPointsTTV.getTwitch().enable(sender);
                     sender.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
                     return true;
 
@@ -269,7 +269,7 @@ public class TwitchCommandController implements TabExecutor {
 
     private void reload(ChatPointsTTV plugin, CommandSender p) {
         ChatPointsTTV.getTwitch().stop(p);
-        ChatPointsTTV.getTwitch().enable();
+        ChatPointsTTV.getTwitch().enable(p);
     }
 
     private void help(CommandSender p) {

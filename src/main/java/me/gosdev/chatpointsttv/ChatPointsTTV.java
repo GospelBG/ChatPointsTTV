@@ -126,7 +126,7 @@ public class ChatPointsTTV extends JavaPlugin {
         }
         
         twitch = new TwitchClient();
-        if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(); 
+        if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(Bukkit.getConsoleSender()); 
         if (config.getBoolean("ENABLE_TIKTOK", true)) TikTokClient.enable(Bukkit.getConsoleSender()); 
 
         if (firstRun) {

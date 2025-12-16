@@ -117,7 +117,8 @@ public class TwitchClient {
         return accountConnected;
     }
 
-    public void enable() {
+    public void enable(CommandSender p) {
+        CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
         File twitchConfigFile = new File(plugin.getDataFolder(), "twitch.yml");
@@ -154,7 +155,7 @@ public class TwitchClient {
             for (String userid : accounts.getKeys(false)) {
                 // Try to refresh token
                 try {
-                    link(Bukkit.getConsoleSender(), refreshCredentials(userid));
+                    link(p, refreshCredentials(userid));
                 } catch (RuntimeException e) {
                     ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
                     saveCredential(userid, null);
