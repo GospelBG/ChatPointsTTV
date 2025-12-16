@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Commands.AccountsCommand;
 import me.gosdev.chatpointsttv.Commands.StatusCommand;
