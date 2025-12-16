@@ -28,7 +28,7 @@ import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
-import me.gosdev.chatpointsttv.Events.EventType;
+import me.gosdev.chatpointsttv.Platforms;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -187,10 +187,6 @@ public class TikTokClient {
         chatBlacklist = null;
         tiktokConfig = null;
 
-        for (EventType type : TikTokEventType.values()) {
-            CPTTV_EventHandler.actions.remove(type);
-        }
-
         isEnabled = false;
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
     }
@@ -217,6 +213,8 @@ public class TikTokClient {
     public static void enable(CommandSender p) {
         clients = new HashMap<>();
         chatBlacklist = new ArrayList<>();
+
+        CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
 
         File tiktokConfigFile = new File(plugin.getDataFolder(), "tiktok.yml");
         if (!tiktokConfigFile.exists()) {

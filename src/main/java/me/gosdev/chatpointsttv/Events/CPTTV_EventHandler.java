@@ -33,7 +33,7 @@ import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class CPTTV_EventHandler {
     public static final String EVERYONE = "*";
-    public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
+    private static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
@@ -318,5 +318,11 @@ public class CPTTV_EventHandler {
         actions.put(type, action_list);
 
         return actions.get(type);
+    }
+
+    public static void clearActions(Platforms plat) {
+        for (EventType e : plat.getEventTypes()) {
+            actions.remove(e);
+        }
     }
 }

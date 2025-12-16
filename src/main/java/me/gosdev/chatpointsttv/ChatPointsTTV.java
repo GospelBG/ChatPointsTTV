@@ -16,7 +16,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.TikTok.TikTokCommandController;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
@@ -187,8 +186,6 @@ public class ChatPointsTTV extends JavaPlugin {
         config = null;
         plugin = null;
         twitch = null;
-
-        CPTTV_EventHandler.actions = new HashMap<>();
 
         HandlerList.unregisterAll(this);
     }
