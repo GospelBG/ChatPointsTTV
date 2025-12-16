@@ -26,7 +26,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchCommandController implements TabExecutor {
-    private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV help" + ChatColor.RESET + " ----------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link a Twitch account.\n" +
@@ -53,7 +53,7 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 case "reload":
-                    reload(plugin);
+                    reload(plugin, sender);
                     return true;
 
                 case "help":
@@ -267,11 +267,9 @@ public class TwitchCommandController implements TabExecutor {
         return result;
     }
 
-    private void reload(ChatPointsTTV plugin) {
-        ChatPointsTTV.log.info("Reloading ChatPointsTTV...");
-
-        plugin.onDisable();
-        plugin.onEnable();
+    private void reload(ChatPointsTTV plugin, CommandSender p) {
+        ChatPointsTTV.getTwitch().stop(p);
+        ChatPointsTTV.getTwitch().enable();
     }
 
     private void help(CommandSender p) {

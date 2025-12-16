@@ -32,7 +32,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ChatPointsTTV extends JavaPlugin {
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
-    private TwitchCommandController cmdController;
+    private CommandController cmdController;
+    private TwitchCommandController twitchCmdController;
     private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
 
@@ -106,9 +107,13 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
 
-        cmdController = new TwitchCommandController();
-        this.getCommand("twitch").setExecutor(cmdController);
-        this.getCommand("twitch").setTabCompleter(cmdController);
+        cmdController = new CommandController();
+        this.getCommand("cpttv").setExecutor(cmdController);
+        this.getCommand("cpttv").setTabCompleter(cmdController);
+
+        twitchCmdController = new TwitchCommandController();
+        this.getCommand("twitch").setExecutor(twitchCmdController);
+        this.getCommand("twitch").setTabCompleter(twitchCmdController);
 
         tikTokCmdController = new TikTokCommandController();
         this.getCommand("tiktok").setExecutor(tikTokCmdController);

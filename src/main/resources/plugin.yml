@@ -6,6 +6,11 @@ main: 'me.gosdev.chatpointsttv.ChatPointsTTV'
 api-version: '1.13'
 
 commands:
+  cpttv:
+    description: Main command for ChatPointsTTV. Use "/cpttv help" to get a full list of commands.
+    usage: /cpttv <function>
+    permission: chatpointsttv.manage
+
   twitch:
     description: Manage ChatPointsTTV's Twitch module from this command. Use "/twitch help" to get a full list of commands.
     usage: /twitch <function>
