@@ -22,10 +22,6 @@
               <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
             </relocation>
             <relocation>
-              <pattern>com.alessiodp.libby</pattern>
-              <shadedPattern>me.gosdev.chatpointsttv.libraries.libby</shadedPattern>
-            </relocation>
-            <relocation>
               <pattern>com.github.philippheuer.events4j</pattern>
               <shadedPattern>me.gosdev.chatpointsttv.libraries.events4j</shadedPattern>
             </relocation>
@@ -88,14 +84,6 @@
       <version>3.1.0</version>
       <scope>compile</scope>
     </dependency>
-
-    <!-- <dependency>
-      <groupId>com.alessiodp.libby</groupId>
-      <artifactId>libby-bukkit</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency> -->
-
     <dependency>
       <groupId>com.github.philippheuer.events4j</groupId>
       <artifactId>events4j-handler-simple</artifactId>
