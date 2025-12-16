@@ -58,7 +58,6 @@
   </build>
 
   <properties>
-      <revision>2.4.1</revision>
       <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
