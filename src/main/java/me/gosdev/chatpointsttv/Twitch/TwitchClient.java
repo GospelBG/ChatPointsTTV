@@ -2,7 +2,6 @@ package me.gosdev.chatpointsttv.Twitch;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -157,7 +156,7 @@ public class TwitchClient {
                     link(p, refreshCredentials(userid));
                 } catch (RuntimeException e) {
                     ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
-                    saveCredential(userid, null);
+                    ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
                 }
             }
         }
@@ -383,19 +382,11 @@ public class TwitchClient {
     }
 
     public void saveCredential(String userId, OAuth2Credential credential) {
-        if (credential == null) {
-            accounts.set(userId, null);
-        } else {
-            ConfigurationSection account = accounts.createSection(userId);
-            account.set("access_token", credential.getAccessToken());
-            account.set("refresh_token", credential.getRefreshToken());
-        }
-
-        try {
-            accountsConfig.save(accountsFile);
-        } catch (IOException e) {
-            ChatPointsTTV.log.severe("ChatPointsTTV: There was an issue saving account session credentials.");
-        }
+        HashMap<String, String> account = new HashMap<>();
+        account.put("access_token", credential.getAccessToken());
+        account.put("refresh_token", credential.getRefreshToken());
+        
+        ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TWITCH, userId, Optional.of(account));
     }
 
     public void unlinkAccount(String username) {
@@ -409,7 +400,7 @@ public class TwitchClient {
         channels.remove(username);
         client.getChat().leaveChannel(username);
 
-        saveCredential(channel.getChannelId(), null); // Remove stored credential
+        ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, channel.getChannelId());
         identityProvider.revokeCredential(credentialManager.get(channel.getChannelId()));
         tokenRefreshTasks.get(channel.getChannelId()).cancel();
         credentialManager.remove(channel.getChannelId());

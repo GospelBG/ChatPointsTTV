@@ -20,6 +20,7 @@ import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.TikTok.TikTokCommandController;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchCommandController;
+import me.gosdev.chatpointsttv.Utils.AccountsManager;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -29,6 +30,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class ChatPointsTTV extends JavaPlugin {
+    private static AccountsManager accounts;
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
     private CommandController cmdController;
@@ -64,6 +66,10 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin;
     }
 
+    public static AccountsManager getAccountsManager() {
+        return accounts;
+    }
+
     public static TwitchClient getTwitch() {
         return twitch;
     }
@@ -75,6 +81,7 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onEnable() {
         plugin = this;
+        accounts = new AccountsManager();
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
         metrics = new Metrics(this, 22873);

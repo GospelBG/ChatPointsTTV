@@ -1,13 +1,13 @@
 package me.gosdev.chatpointsttv.TikTok;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -135,12 +135,7 @@ public class TikTokClient {
                         listenedProfiles.add(username);
 
                         if (save) {
-                            tiktokConfig.set("LISTENED_PROFILES", listenedProfiles);
-                            try {
-                                tiktokConfig.save(new File(plugin.getDataFolder(), "tiktok.yml"));
-                            } catch (IOException e) {
-                                Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Failed to save TikTok configuration file!");
-                            }
+                            ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TIKTOK, username, Optional.empty());
                         }
 
                         p.sendMessage(ChatPointsTTV.msgPrefix + "Linked succesfully to @" + c.getRoomInfo().getHostName() + "'s LIVE!");
@@ -198,12 +193,7 @@ public class TikTokClient {
                 clients.remove(clientHost);
 
                 if (save) {
-                    tiktokConfig.set("LISTENED_PROFILES", clients.keySet().toArray());
-                    try {
-                        tiktokConfig.save(new File(plugin.getDataFolder(), "tiktok.yml"));
-                    } catch (IOException e) {
-                        Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Failed to save TikTok configuration file!");
-                    }
+                    ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TIKTOK, clientHost, Optional.empty());
                 }
                 break;
             }
@@ -228,7 +218,7 @@ public class TikTokClient {
 
         eventHandler = new TikTokEvents();
 
-        listenedProfiles = tiktokConfig.getStringList("LISTENED_PROFILES");
+        listenedProfiles = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
         for (String username : listenedProfiles) {
             if (username.isBlank()) continue;
             link(p, username, false);

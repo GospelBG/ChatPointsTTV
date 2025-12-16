@@ -4,8 +4,6 @@
 
 # See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
 
-LISTENED_PROFILES: []
-
 # To avoid rate limits, use may use your own EulerStream API key.
 # EULERSTREAM_API_KEY:
 
