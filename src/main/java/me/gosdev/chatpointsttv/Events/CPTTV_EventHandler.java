@@ -37,10 +37,10 @@ public class CPTTV_EventHandler {
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
-        if (!ChatPointsTTV.strings.containsKey(key)) {
+        if (!ChatPointsTTV.locales.containsKey(key)) {
             throw new NullPointerException("Missing Message for " + platform.getName() + " " + type.toString() + " events");
         }
-        String str = ChatPointsTTV.strings.get(key);
+        String str = ChatPointsTTV.locales.get(key);
         str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), amount.orElse(null), platform);
 
         return str;
@@ -82,8 +82,8 @@ public class CPTTV_EventHandler {
                         subtitle = "";
                     }
                 } else {
-                    title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), amount.orElse(null), platform);
-                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_" + platform.toString().toLowerCase() + "_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), amount.orElse(null), platform);
+                    title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.locales.get("title"), chatter, channel, event.orElse(null), amount.orElse(null), platform);
+                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.locales.get("sub_" + platform.toString().toLowerCase() + "_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), amount.orElse(null), platform);
                 }    
         
                 switch (alertMode) {
