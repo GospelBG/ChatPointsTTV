@@ -38,7 +38,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private TikTokCommandController tikTokCmdController;
     private boolean firstRun = false;
 
-    public static final HashMap<String, String> strings = new HashMap<>();
+    public static HashMap<String, String> strings;
     public static Boolean shouldMobsGlow;
     public static Boolean nameSpawnedMobs;
     public static AlertMode alertMode;
@@ -105,6 +105,7 @@ public class ChatPointsTTV extends JavaPlugin {
         
         FileConfiguration stringsYaml = YamlConfiguration.loadConfiguration(stringsFile);
         FileConfiguration defaultStrings = YamlConfiguration.loadConfiguration(plugin.getTextResource("locales.yml"));
+        strings = new HashMap<>();
         for (String key : defaultStrings.getKeys(true)) {
             if (stringsYaml.isString(key)) {
                 strings.put(key, stringsYaml.getString(key));
