@@ -1,4 +1,6 @@
 package me.gosdev.chatpointsttv.Actions;
+import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -13,7 +15,9 @@ public class EffectAction extends BaseAction {
     private final Player target;
 
     public EffectAction(PotionEffectType effect, Integer strength, Integer duration, Player target) {
-
+        if (effect == null) { // Set random effect
+            effect = PotionEffectType.values()[new Random().nextInt(PotionEffectType.values().length)];
+        }
         this.effect = effect.createEffect(duration * 20, strength);
         this.target = target;
     }
