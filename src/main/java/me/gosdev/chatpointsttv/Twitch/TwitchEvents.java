@@ -91,7 +91,7 @@ public class TwitchEvents {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(TwitchUtils.PlanToString(tier)), Optional.of(event.getSub().getDurationMonths()));
+                CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(TwitchUtils.PlanToString(tier)), Optional.empty());
                 return;
             }
         }
