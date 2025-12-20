@@ -24,9 +24,8 @@
 #  [] = Optional
 
 # Extra fields:
-#     {TEXT} Channel Points User Input
 #     {USER} Viewer's username
-#     {AMOUNT} Bits/Gifted Subs/Viewers amount.
+#     {AMOUNT} Like Combo/Gifted Items.
 #     {EVENT} Extra event info (e.g., Gift Item).
 #
 #  They will be replaced by the plugin automatically.
@@ -43,6 +42,10 @@ FOLLOW_SPAM_PROTECTION: true
 FOLLOW_EVENTS:
   - {ACTION 1}
   - {ACTION 2}
+
+LIKE_EVENTS:
+  [MINIMUM LIKE COMBO]:
+    - {ACTION}
 
 GIFT_EVENTS:
   [GIFTED ITEM]:
