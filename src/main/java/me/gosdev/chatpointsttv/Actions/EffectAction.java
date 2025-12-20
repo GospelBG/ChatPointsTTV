@@ -14,11 +14,14 @@ public class EffectAction extends BaseAction {
     private final PotionEffect effect;
     private final Player target;
 
-    public EffectAction(PotionEffectType effect, Integer strength, Integer duration, Player target) {
-        if (effect == null) { // Set random effect
-            effect = PotionEffectType.values()[new Random().nextInt(PotionEffectType.values().length)];
+    public EffectAction(String effectName, Integer strength, Integer duration, Player target) {
+        if (effectName.equalsIgnoreCase("random")) {
+            this.effect = PotionEffectType.values()[new Random().nextInt(PotionEffectType.values().length)].createEffect(duration * 20, strength);
+        } else if (effectName.equalsIgnoreCase("clear")) {
+            this.effect = null;
+        } else {
+            this.effect = PotionEffectType.getByName(effectName).createEffect(duration * 20, strength);
         }
-        this.effect = effect.createEffect(duration * 20, strength);
         this.target = target;
     }
 
@@ -29,7 +32,15 @@ public class EffectAction extends BaseAction {
                 if (!p.equals(target)) continue;
             } else if (!p.hasPermission(permissions.TARGET.permission_id)) continue;
 
-            Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> p.addPotionEffect(effect, true));
+            if (effect == null) {
+                Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> {
+                    for (PotionEffect e : p.getActivePotionEffects()) {
+                        p.removePotionEffect(e.getType());
+                    }
+                });
+            } else {
+                Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> p.addPotionEffect(effect, true));
+            }
         }
     }    
 }

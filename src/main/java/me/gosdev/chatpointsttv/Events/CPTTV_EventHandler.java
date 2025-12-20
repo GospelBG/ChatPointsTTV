@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import me.gosdev.chatpointsttv.Actions.BaseAction;
 import me.gosdev.chatpointsttv.Actions.DeleteItemsAction;
 import me.gosdev.chatpointsttv.Actions.EffectAction;
+import me.gosdev.chatpointsttv.Actions.FreezeAction;
 import me.gosdev.chatpointsttv.Actions.GiveAction;
 import me.gosdev.chatpointsttv.Actions.InvShuffleAction;
 import me.gosdev.chatpointsttv.Actions.RunCmdAction;
@@ -170,17 +171,21 @@ public class CPTTV_EventHandler {
                             break;
 
                         case "EFFECT":
-                            PotionEffectType effect = PotionEffectType.getByName(parts[1]);
-                            Integer strength = Integer.valueOf(parts[2]);
-                            Integer duration = Integer.valueOf(parts[3]);
-                            if (effect == null) {
+                            String effect = parts[1];
+                            Integer duration = null;
+                            Integer strength = null;
+                            if (!effect.equalsIgnoreCase("clear")) {
+                                duration = Integer.valueOf(parts[3]);
+                                strength = Integer.valueOf(parts[2]);
+                            }
+                            if (PotionEffectType.getByName(effect) == null && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
                                 ChatPointsTTV.log.warning(errorStr + "Potion effect " + parts[1] + " does not exist.");
                                 continue;
                             }
-                            if (parts.length > 4) {
-                                target = Bukkit.getPlayer(parts[4]);
+                            if (parts.length > (effect.equalsIgnoreCase("clear") ? 2 : 4)) {
+                                target = Bukkit.getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[4] + ".");
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
                                 }
                             }
 
