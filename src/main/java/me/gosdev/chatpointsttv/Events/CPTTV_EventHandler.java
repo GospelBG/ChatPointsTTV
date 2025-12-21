@@ -208,6 +208,18 @@ public class CPTTV_EventHandler {
                             action = new DeleteItemsAction(DeleteItemsAction.Type.valueOf(parts[1].toUpperCase()), target);
                             break;
 
+                        case "FREEZE":
+                            Integer time = Integer.valueOf(parts[1]);
+
+                            if (parts.length > 2) {
+                                target = Bukkit.getPlayer(parts[2]);
+                                if (target == null || !target.isOnline()) {
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                }
+                            }
+                            action = new FreezeAction(target, time);
+                            break;
+
                         case "SHUFFLE":
                             if (parts[1].equalsIgnoreCase("ALL")) {
                                 target = Bukkit.getPlayer(parts[1]);
