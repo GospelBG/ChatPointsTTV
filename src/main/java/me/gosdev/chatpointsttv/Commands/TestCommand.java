@@ -114,7 +114,7 @@ public class TestCommand {
                     break;
     
                 case "sub":
-                    if (args.length < 6) {
+                    if (args.length < 5) {
                         sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan> <months>");
                         return;
                     }
@@ -122,11 +122,9 @@ public class TestCommand {
                     String subUser = args[2];
                     String subChannel = args[3];
                     SubscriptionPlan subTier;
-                    int subMonths;
     
                     try {
                         subTier = SubscriptionPlan.valueOf(args[4].toUpperCase());
-                        subMonths = Integer.parseInt(args[5]);
                     } catch (NumberFormatException e) {
                         sender.sendMessage(ChatColor.RED + "Invalid amount of months: " + args[5]);
                         return;
@@ -137,7 +135,7 @@ public class TestCommand {
                     
     
                     try {
-                        event = TwitchEventTest.SubEvent(subChannel, subUser, subTier, subMonths);
+                        event = TwitchEventTest.SubEvent(subChannel, subUser, subTier);
                     } catch (NullPointerException e) {
                         sender.sendMessage(ChatColor.RED + e.getMessage());
                         return;

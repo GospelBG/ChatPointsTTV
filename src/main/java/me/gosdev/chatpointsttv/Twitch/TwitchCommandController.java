@@ -208,10 +208,6 @@ public class TwitchCommandController implements TabExecutor {
                             result.add(plan.name());
                         }
                         break;
-
-                    case 6:
-                        result.add("<Months>");
-                        break;
                 }
                 return result;
             } else if (args[1].equalsIgnoreCase("follow")) {

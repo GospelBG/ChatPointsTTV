@@ -72,7 +72,7 @@ public class TwitchEventTest {
         return event;
     }
 
-    public static ChannelChatNotificationEvent SubEvent(String channel, String chatter, SubscriptionPlan plan, Integer months) {
+    public static ChannelChatNotificationEvent SubEvent(String channel, String chatter, SubscriptionPlan plan) {
         JSONObject json = new JSONObject();
         JSONObject sub = new JSONObject();
 
@@ -88,7 +88,7 @@ public class TwitchEventTest {
 
         sub.put("sub_tier", plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "1000" : plan.toString());
         sub.put("is_prime", plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "true" : "false");
-        sub.put("duration_months", months.toString());
+        sub.put("duration_months", "1");
 
         json.put("sub", sub);
 

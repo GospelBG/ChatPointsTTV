@@ -109,7 +109,7 @@ public class CPTTV_EventHandler {
         
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
-                if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID) || type.equals(TwitchEventType.SUB) ||
+                if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID) ||
                     type.equals(TikTokEventType.GIFT) || type.equals(TikTokEventType.LIKE)) {
                     cmd = cmd.replace("{AMOUNT}", amount.get().toString());
                 }
