@@ -166,8 +166,8 @@ public class CPTTV_EventHandler {
                                 target = Bukkit.getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
+                                    continue;
                                 }
-                                continue;
                             }
                             action = new GiveAction(Material.valueOf(parts[1].toUpperCase()), Optional.ofNullable(act_amount), Optional.ofNullable(target));
                             break;
@@ -188,6 +188,7 @@ public class CPTTV_EventHandler {
                                 target = Bukkit.getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
+                                    continue;
                                 }
                             }
 
@@ -204,6 +205,7 @@ public class CPTTV_EventHandler {
                                 target = Bukkit.getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    continue;
                                 }
                             }
 
@@ -217,6 +219,7 @@ public class CPTTV_EventHandler {
                                 target = Bukkit.getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    continue;
                                 }
                             }
                             action = new FreezeAction(target, time);
