@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -22,6 +23,7 @@ import me.gosdev.chatpointsttv.Actions.FreezeAction;
 import me.gosdev.chatpointsttv.Actions.GiveAction;
 import me.gosdev.chatpointsttv.Actions.InvShuffleAction;
 import me.gosdev.chatpointsttv.Actions.RunCmdAction;
+import me.gosdev.chatpointsttv.Actions.SoundAction;
 import me.gosdev.chatpointsttv.Actions.SpawnAction;
 import me.gosdev.chatpointsttv.Actions.TntAction;
 import me.gosdev.chatpointsttv.AlertMode;
@@ -227,6 +229,18 @@ public class CPTTV_EventHandler {
                             
                             action = new InvShuffleAction(target);
                             break;
+
+                        case "SOUND":
+                            String sound = parts[1];
+
+                            try {
+                                action = new SoundAction(target, Sound.valueOf(sound.toUpperCase()));
+                            } catch (IllegalArgumentException e) {
+                                ChatPointsTTV.log.warning(errorStr + "Sound effect " + parts[1] + " does not exist.");
+                                continue;
+                            }
+                            break;
+
 
                         case "TNT":
                             Integer fuseTime = null;
