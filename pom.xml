@@ -30,6 +30,10 @@
               <shadedPattern>me.gosdev.chatpointsttv.libraries.twitch4j</shadedPattern>
             </relocation>
             <relocation>
+              <pattern>com.github.jwdeveloper.tiktok</pattern>
+              <shadedPattern>me.gosdev.chatpointsttv.libraries.tiktok</shadedPattern>
+            </relocation>
+            <relocation>
               <pattern>org.json</pattern>
               <shadedPattern>me.gosdev.chatpointsttv.libraries.json</shadedPattern>
             </relocation>
