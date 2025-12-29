@@ -151,7 +151,7 @@ public class TikTokClient {
                         }
                         if (i == maxRetries) {
                             if (ex instanceof TikTokSignServerException) {
-                                p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE. Please try again.");
+                                p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.isString("EULERSTREAM_API_KEY") ? " Please check your API key." : " Please try again."));
                             } else if (ex instanceof TikTokLiveRequestException && ex.getCause() instanceof HttpTimeoutException) {
                                 p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
                             } else {
