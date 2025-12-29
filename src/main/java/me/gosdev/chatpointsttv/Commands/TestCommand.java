@@ -15,7 +15,6 @@ import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
 import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.TikTok.TikTokEventTest;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventTest;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
@@ -215,15 +214,15 @@ public class TestCommand {
         String chatter = cmdInput[2];
         Boolean offlineTest = false;
 
-        if (!TikTokClient.isEnabled) {
+        if (!ChatPointsTTV.getTikTok().isEnabled) {
             sender.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
             return;
         }
 
-        if (!TikTokClient.getClients().containsKey(cmdInput[3].toLowerCase())) {
+        if (!ChatPointsTTV.getTikTok().getClients().containsKey(cmdInput[3].toLowerCase())) {
             offlineTest = true;
         } else {
-            c = TikTokClient.getClients().get(cmdInput[3].toLowerCase());
+            c = ChatPointsTTV.getTikTok().getClients().get(cmdInput[3].toLowerCase());
         }
 
         switch (cmdInput[1].toLowerCase()) {
@@ -235,7 +234,7 @@ public class TestCommand {
 
                 event = TikTokEventTest.FollowEvent(chatter);
                 if (offlineTest) {
-                    TikTokClient.getEventHandler().onFollow((TikTokFollowEvent) event, cmdInput[3].toLowerCase());
+                    ChatPointsTTV.getTikTok().getEventHandler().onFollow((TikTokFollowEvent) event, cmdInput[3].toLowerCase());
                     return;
                 } 
                 break;
@@ -249,7 +248,7 @@ public class TestCommand {
                 try {
                     event = TikTokEventTest.LikeEvent(chatter, Integer.valueOf(cmdInput[4]));
                     if (offlineTest) {
-                        TikTokClient.getEventHandler().onLike((TikTokLikeEvent) event, cmdInput[3].toLowerCase());
+                        ChatPointsTTV.getTikTok().getEventHandler().onLike((TikTokLikeEvent) event, cmdInput[3].toLowerCase());
                         return;
                     } 
                 } catch (NumberFormatException e) {
@@ -266,7 +265,7 @@ public class TestCommand {
                 }
 
                 if (offlineTest) {
-                    TikTokClient.getEventHandler().onGift(TikTokEventTest.GiftEvent(chatter, TikTokEventTest.generateUser(cmdInput[3].toLowerCase()), new Gift(0, cmdInput[4], 0, ""), Integer.valueOf(cmdInput[5])), cmdInput[3].toLowerCase());
+                    ChatPointsTTV.getTikTok().getEventHandler().onGift(TikTokEventTest.GiftEvent(chatter, TikTokEventTest.generateUser(cmdInput[3].toLowerCase()), new Gift(0, cmdInput[4], 0, ""), Integer.valueOf(cmdInput[5])), cmdInput[3].toLowerCase());
                     return;
                 } else {
                     try {
@@ -293,7 +292,7 @@ public class TestCommand {
 
                 event = TikTokEventTest.ShareEvent(chatter);
                 if (offlineTest) {
-                    TikTokClient.getEventHandler().onShare((TikTokShareEvent) event, cmdInput[3].toLowerCase());
+                    ChatPointsTTV.getTikTok().getEventHandler().onShare((TikTokShareEvent) event, cmdInput[3].toLowerCase());
                     return;
                 } 
                 break;

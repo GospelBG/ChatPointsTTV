@@ -34,34 +34,34 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TikTokClient {
-    public static Boolean accountConnected = false;
-    public static Boolean isEnabled = false;
-    public static List<String> listenedProfiles;
+    public Boolean accountConnected = false;
+    public Boolean isEnabled = false;
+    public List<String> listenedProfiles;
 
-    private static TikTokEvents eventHandler;
-    private static Thread linkThread;
+    private TikTokEvents eventHandler;
+    public Thread linkThread;
 
-    private static final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-    private static final Integer maxRetries = 3;
-    private static FileConfiguration tiktokConfig;
+    private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+    private final Integer maxRetries = 3;
+    private FileConfiguration tiktokConfig;
 
-    private static HashMap<String, LiveClient> clients = new HashMap<>();
-    private static List<String> chatBlacklist = new ArrayList<>();
+    private HashMap<String, LiveClient> clients = new HashMap<>();
+    private List<String> chatBlacklist = new ArrayList<>();
 
-    public static HashMap<String, LiveClient> getClients() {
+    public HashMap<String, LiveClient> getClients() {
         return clients;
     }
-    public Boolean isAccountConected() {
+    public Boolean isAccountConnected() {
         return accountConnected;
     }
-    public static FileConfiguration getConfig() {
+    public FileConfiguration getConfig() {
         return tiktokConfig;
     }
-    public static TikTokEvents getEventHandler() {
+    public TikTokEvents getEventHandler() {
         return eventHandler;
     }
 
-    public static void link(CommandSender p, String handle, Boolean save) {
+    public void link(CommandSender p, String handle, Boolean save) {
         Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
             if (linkThread != null) {
                 try {
@@ -161,7 +161,7 @@ public class TikTokClient {
                             }
                         } else {
                             ChatPointsTTV.log.warning("There was an error while connecting to @" + username + "'s LIVE. Retrying in a few seconds...");
-                            try {Thread.sleep(3000); } catch (InterruptedException e) {}
+                            try { Thread.sleep(3000); } catch (InterruptedException e) {}
                         }  
                     }
                 }
@@ -172,7 +172,7 @@ public class TikTokClient {
         });
     }
 
-    public static void stop(CommandSender p) {
+    public void stop(CommandSender p) {
         for (String username : clients.keySet()) {
             unlink(username, false);
         }
@@ -186,7 +186,7 @@ public class TikTokClient {
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
     }
 
-    public static void unlink(String username, Boolean save) {
+    public void unlink(String username, Boolean save) {
         for (String clientHost : clients.keySet()) {
             if (clientHost.equalsIgnoreCase(username)) {
                 clients.get(username).disconnect();
@@ -200,7 +200,7 @@ public class TikTokClient {
         }
     }
 
-    public static void enable(CommandSender p) {
+    public void enable(CommandSender p) {
         clients = new HashMap<>();
         chatBlacklist = new ArrayList<>();
 

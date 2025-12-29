@@ -33,6 +33,7 @@ public class ChatPointsTTV extends JavaPlugin {
     private static AccountsManager accounts;
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
+    private static TikTokClient tiktok;
     private CommandController cmdController;
     private TwitchCommandController twitchCmdController;
     private TikTokCommandController tikTokCmdController;
@@ -72,6 +73,10 @@ public class ChatPointsTTV extends JavaPlugin {
 
     public static TwitchClient getTwitch() {
         return twitch;
+    }
+
+    public static TikTokClient getTikTok() {
+        return tiktok;
     }
 
     public static FileConfiguration getPluginConfig() {
@@ -134,7 +139,8 @@ public class ChatPointsTTV extends JavaPlugin {
         
         twitch = new TwitchClient();
         if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(Bukkit.getConsoleSender()); 
-        if (config.getBoolean("ENABLE_TIKTOK", true)) TikTokClient.enable(Bukkit.getConsoleSender()); 
+        tiktok = new TikTokClient();
+        if (config.getBoolean("ENABLE_TIKTOK", true)) tiktok.enable(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
             Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
@@ -171,7 +177,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
 
                 if (!twitch.isStarted()) return;
-                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !TwitchClient.accountConnected && !firstRun) {
+                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !twitch.isAccountConnected() && !firstRun) {
                     String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
 
@@ -187,13 +193,14 @@ public class ChatPointsTTV extends JavaPlugin {
     @Override
     public void onDisable() {
         if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
-        if (TikTokClient.accountConnected) TikTokClient.stop(Bukkit.getConsoleSender());
+        if (tiktok != null && tiktok.accountConnected) tiktok.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
         
         // Erase variables
         config = null;
         plugin = null;
         twitch = null;
+        tiktok = null;
 
         HandlerList.unregisterAll(this);
     }

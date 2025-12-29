@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.TikTok.TikTokButtonComponents;
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.TwitchButtonComponents;
 import net.md_5.bungee.api.ChatColor;
@@ -32,11 +31,11 @@ public class StatusCommand {
                 break;
 
             case TIKTOK:
-                if (TikTokClient.getClients() == null || TikTokClient.getClients().isEmpty()) {
+                if (ChatPointsTTV.getTikTok().getClients() == null || ChatPointsTTV.getTikTok().getClients().isEmpty()) {
                     strChannels = "None";
                     break;
                 }
-                for (String profile : TikTokClient.getClients().keySet()) {
+                for (String profile : ChatPointsTTV.getTikTok().getClients().keySet()) {
                     strChannels += profile + ", ";
                 }
                 strChannels = strChannels.subSequence(0, strChannels.length() - 2).toString(); // Remove last comma
@@ -65,8 +64,8 @@ public class StatusCommand {
                 break;
             
             case TIKTOK:
-                if(TikTokClient.isEnabled) {
-                    if (TikTokClient.accountConnected) {
+                if(ChatPointsTTV.getTikTok().isEnabled) {
+                    if (ChatPointsTTV.getTikTok().accountConnected) {
                         currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
                     } else {
                         currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
@@ -97,7 +96,7 @@ public class StatusCommand {
                     break;
 
                 case TIKTOK:
-                    if(TikTokClient.isEnabled) {
+                    if(ChatPointsTTV.getTikTok().isEnabled) {
                         msg.addExtra(TikTokButtonComponents.manageAccounts());
                         msg.addExtra(ChatColor.GRAY + "  -  ");
                         msg.addExtra(TikTokButtonComponents.clientStop());

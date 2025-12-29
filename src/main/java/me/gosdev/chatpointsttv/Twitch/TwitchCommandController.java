@@ -10,14 +10,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import com.github.philippheuer.events4j.core.EventManager;
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.events.EventSubEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Commands.AccountsCommand;
-import me.gosdev.chatpointsttv.Commands.LinkCommand;
-import me.gosdev.chatpointsttv.Commands.StatusCommand;
-import me.gosdev.chatpointsttv.Commands.TestCommand;
-import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -49,11 +47,15 @@ public class TwitchCommandController implements TabExecutor {
         } else {
             switch (args[0]) {
                 case "link":
-                    LinkCommand.link(plugin, sender);                    
+                    if ((args.length > 1)) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch link");
+                        return true;
+                    }
+                    TwitchAuth.getDeviceCode(plugin, sender);                    
                     return true;
 
                 case "reload":
-                    reload(plugin, sender);
+                    reload(sender);
                     return true;
 
                 case "help":
@@ -66,16 +68,16 @@ public class TwitchCommandController implements TabExecutor {
                             ChatPointsTTV.getTwitch().linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        LinkCommand.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
+                        ChatPointsTTV.getTwitch().unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                     });
                     return true;
 
                 case "accounts":
-                    AccountsCommand.displayAccounts(sender, Platforms.TWITCH);
+                    accounts(sender);
                     return true;
                     
                 case "status":
-                    StatusCommand.status(sender, plugin, Platforms.TWITCH);
+                    displayStatus(sender, plugin);
                     return true;
 
                 case "stop":
@@ -96,7 +98,7 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 case "test":
-                    TestCommand.twitchTest(sender, args);
+                    test(sender, args);
                     return true;
 
                 default:
@@ -128,9 +130,6 @@ public class TwitchCommandController implements TabExecutor {
                 available.add("accounts");
                 available.add("unlink");
             }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("link")) {
-            available.add("browser");
-            available.add("code");
         } else if (args.length == 2 && args[0].equalsIgnoreCase("unlink")) {
             if (args[0].equalsIgnoreCase("unlink")) {
                 for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
@@ -145,112 +144,52 @@ public class TwitchCommandController implements TabExecutor {
                 available.add("follow");
                 available.add("subgift");
                 available.add("raid");
-            } else if (args[1].equalsIgnoreCase("channelpoints")) {
-                int rewardNameEnd = args.length - 1;
-                if (args.length >= 5 && args[4].startsWith("\"")) { // Check if the reward name starts with a quote. If so, wait to find the closing quote
-                    for (int i = 5; i < args.length; i++) {
-                        if (args[i].endsWith("\"")) {
-                            rewardNameEnd = i;
-                        }
-                    }
-                } else rewardNameEnd = 4;
-                switch (args.length) {
-                    case 3:
-                        result.add("<Redeemer Name>");
-                        break;
-
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 5:
-                        result.add("<Reward Name>");
-                        break;
-                
-                    default:
-                        if (args.length > rewardNameEnd + 1) {
-                            result.add("[User Input]");
-                        } else {
-                            result.add("<Reward Name>");
-                        }
-                        break;
+            } else if (args.length == 3) {
+                    available.add("<Chatter Name>");
+            } else if (args.length == 4) {
+                if (ChatPointsTTV.getTwitch().isAccountConnected()) {
+                    available.addAll(ChatPointsTTV.getTwitch().getListenedChannels().keySet());
                 }
-                return result;
-            } else if (args[1].equalsIgnoreCase("cheer")) {
-                switch (args.length) {
-                    case 3:
-                        result.add("<Chatter Name>");
+                available.add("<Streamer Channel>");
+            } else if (args.length == 5) {
+                switch (args[1].toLowerCase()) {
+                    case "channelpoints":
+                        available.add("<Reward Name>");
+                        break;
+                    case "cheer":
+                        available.add("<Amount>");
                         break;
 
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 5:
-                        result.add("<Amount>");
-                        break;
-                }
-
-                return result;
-            } else if (args[1].equalsIgnoreCase("sub")) {
-                switch (args.length) {
-                    case 3:
-                        result.add("<Chatter Name>");
-                        break;
-
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 5:
+                    case "sub":
                         for (SubscriptionPlan plan : EnumSet.allOf(SubscriptionPlan.class)) {
                             if (plan.equals(SubscriptionPlan.NONE)) continue;
-                            result.add(plan.name());
+                            available.add(plan.name());
+                        }
+                        break;
+                    
+                    case "subgift":
+                        available.add("<Amount>");
+                        break;
+
+                    case "raid":
+                        available.add("<Viewers>");
+                        break;
+                }
+            } else if (args.length > 5) {
+                switch (args[1].toLowerCase()) {
+                    case "channelpoints":
+                        int rewardNameEnd = 4;
+                        if (args[4].startsWith("\"")) { // Check if the reward name starts with a quote. If so, wait to find the closing quote
+                            for (int i = 5; i < args.length; i++) {
+                                rewardNameEnd = i;
+                                if (args[i].endsWith("\"")) break;
+                            }
+                        }
+                        if (args.length > rewardNameEnd + 1) {
+                            available.add("[User Input]");
                         }
                         break;
                 }
-                return result;
-            } else if (args[1].equalsIgnoreCase("follow")) {
-                switch (args.length) {
-                    case 3:
-                        result.add("<Chatter Name>");
-                        break;
-
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-                }
-                return result;
-            } else if (args[1].equalsIgnoreCase("subgift")) {
-                switch (args.length) {
-                    case 3:
-                        result.add("<Chatter Name>");
-                        break;
-                    
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 5:
-                        result.add("<Amount>");
-                        break;
-                }
-                return result;
-            } else if (args[1].equalsIgnoreCase("raid")) {
-                switch (args.length) {
-                    case 3:
-                        result.add("<Raider Name>");
-                        break;
-
-                    case 4:
-                        result.add("<Streamer Channel>");
-                        break;
-
-                    case 5:
-                        result.add("<Viewers>");
-                        break;
-                }
-                return result;
             }
         }
             
@@ -263,7 +202,7 @@ public class TwitchCommandController implements TabExecutor {
         return result;
     }
 
-    private void reload(ChatPointsTTV plugin, CommandSender p) {
+    private void reload(CommandSender p) {
         ChatPointsTTV.getTwitch().stop(p);
         ChatPointsTTV.getTwitch().enable(p);
     }
@@ -281,6 +220,280 @@ public class TwitchCommandController implements TabExecutor {
             docsTip.addExtra(ChatColor.GRAY + " for more information on its commands!");
             
             p.spigot().sendMessage(docsTip);
+        }
+    }
+
+    private void accounts(CommandSender p) {
+        java.util.ArrayList<String> channels = new java.util.ArrayList<>();
+        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
+        
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+        
+        for (Channel i : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+            channels.add(i.getChannelUsername());
+        }
+        
+        TextComponent footer = null;
+        if (p.equals(Bukkit.getConsoleSender())) {
+            footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
+        } else {
+            footer = TwitchButtonComponents.accountLink();
+            if (!channels.isEmpty()) {
+                footer.addExtra(ChatColor.GRAY + "  -  ");
+                footer.addExtra(TwitchButtonComponents.accountUnlink());
+            }
+        }
+        
+        if (p.equals(Bukkit.getConsoleSender())) {
+            for (String channel : channels) {
+                msg.addExtra(ChatColor.GRAY + "  -  " + channel + "\n");
+            }
+        } else {
+            for (String channel : channels) {
+                BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
+                deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
+                deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch unlink " + channel));
+                msg.addExtra(deleteButton);
+                msg.addExtra(new TextComponent("  " + channel + "\n"));
+            }
+        }
+        
+        if (channels.isEmpty()) {
+            msg.addExtra(ChatColor.GRAY + "  There are no connected accounts :(\n");
+        }
+        
+        msg.addExtra(footer);
+        msg.addExtra("\n");
+        p.spigot().sendMessage(msg);
+    }
+
+    private void displayStatus(CommandSender p, ChatPointsTTV plugin) {
+        String strChannels = "";
+        
+        if (ChatPointsTTV.getTwitch().getListenedChannels() == null || ChatPointsTTV.getTwitch().getListenedChannels().isEmpty()) {
+            strChannels = "None";
+        } else {
+            for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                ChatColor color = channel.isLive() ? ChatColor.DARK_RED : ChatColor.GRAY;
+                strChannels += color + channel.getChannelUsername() + ChatColor.RESET + ", ";
+            }
+            strChannels = strChannels.subSequence(0, strChannels.length() - 2).toString();
+        }
+        
+        BaseComponent msg = new ComponentBuilder(
+            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch status" + ChatColor.RESET + " ----------\n" +
+            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.getDescription().getVersion() + "\n" +
+            ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" +
+            "\n"
+        ).create()[0];
+        
+        String currentState = "";
+        if (ChatPointsTTV.getTwitch().isStarted()) {
+            if (ChatPointsTTV.getTwitch().isAccountConnected()) {
+                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
+            } else {
+                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
+            }
+        } else {
+            currentState = ChatColor.RED + "" + ChatColor.BOLD + "STOPPED";
+        }
+        
+        BaseComponent status = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "Connection status: " + currentState).create()[0];
+        msg.addExtra(status);
+        
+        if (!p.equals(Bukkit.getConsoleSender())) {
+            msg.addExtra("\n\n");
+            if (ChatPointsTTV.getTwitch().isStarted()) {
+                msg.addExtra(TwitchButtonComponents.manageAccounts());
+                msg.addExtra(ChatColor.GRAY + "  -  ");
+                msg.addExtra(TwitchButtonComponents.clientStop());
+            } else {
+                msg.addExtra(TwitchButtonComponents.clientStart());
+            }
+        }
+        
+        p.spigot().sendMessage(msg);
+    }
+
+    private void test(CommandSender sender, String[] cmdInput) {
+        if (!ChatPointsTTV.getTwitch().isStarted() ) {
+            sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+
+        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
+            sender.sendMessage(ChatColor.RED + "You must link a Twitch account in order to run test events!");
+            return;
+        }
+        
+        if (cmdInput.length < 2) {
+            sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> ...");
+            return;
+        }
+
+        EventManager eventManager = ChatPointsTTV.getTwitch().getClient().getEventManager();
+        EventSubEvent event;
+
+        String[] args = LocalizationUtils.parseQuotes(cmdInput);
+
+        try {
+            switch (args[1].toLowerCase()) {
+                case "channelpoints":
+                    if (args.length < 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
+                        return;
+                    }
+    
+                    String pointsChatter = args[2];
+                    String pointsChannel = args[3];
+                    String pointsReward = args[4];
+                    String userInput;
+    
+                    if (args.length <= 5) {
+                        userInput = null;
+                    } else {
+                        for (int i = 6; i < args.length; i++) {
+                            args[5] = args[5] + " " + args[i];
+                        }
+                        userInput = args[5];
+                    }
+                    try {
+                        event = TwitchEventTest.ChannelPointsRedemptionEvent(pointsChannel, pointsChatter, pointsReward, userInput != null ? Optional.of(userInput) : Optional.empty());
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+                case "follow":
+                    if (args.length != 4) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
+                        return;
+                    }
+    
+                    String followUser = args[2];
+                    String followChannel = args[3];
+    
+                    try {
+                        event = TwitchEventTest.FollowEvent(followChannel, followUser);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+    
+                case "cheer":
+                    if (args.length != 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
+                        return;
+                    }
+    
+                    String cheerUser = args[2];
+                    String cheerChannel = args[3];
+                    int cheerAmount;
+    
+                    try {
+                        cheerAmount = Integer.parseInt(args[4]);
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args[4]);
+                        return;
+                    }
+    
+                    try {
+                        event = TwitchEventTest.CheerEvent(cheerChannel, cheerUser, cheerAmount);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+    
+                case "sub":
+                    if (args.length != 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan>");
+                        return;
+                    }
+    
+                    String subUser = args[2];
+                    String subChannel = args[3];
+                    SubscriptionPlan subTier;
+    
+                    try {
+                        subTier = SubscriptionPlan.valueOf(args[4].toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args[4]);
+                        return;
+                    }
+                    
+    
+                    try {
+                        event = TwitchEventTest.SubEvent(subChannel, subUser, subTier);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+    
+                case "subgift":
+                    if (args.length != 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <amount>");
+                        return;
+                    }
+    
+                    String giftChatter = args[2];
+                    String giftChannel = args[3];
+                    int giftAmount;
+    
+                    try {
+                        giftAmount = Integer.parseInt(args[4]);
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args[4]);
+                        return;
+                    }
+                    
+                    try {
+                        event = TwitchEventTest.SubGiftEvent(giftChannel, giftChatter, giftAmount);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+    
+                case "raid":
+                    if (args.length != 5) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
+                        return;
+                    }
+    
+                    String raidUser = args[2];
+                    String raidChannel = args[3];
+                    int raidViewers;
+    
+                    try {
+                        raidViewers = Integer.parseInt(args[4]);
+                    } catch (NumberFormatException e) {
+                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args[4]);
+                        return;
+                    }
+                    
+                    try {
+                        event = TwitchEventTest.RaidReward(raidChannel, raidUser, raidViewers);
+                    } catch (NullPointerException e) {
+                        sender.sendMessage(ChatColor.RED + e.getMessage());
+                        return;
+                    }
+                    break;
+    
+                default:
+                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args[1]);
+                    return;
+            }
+            eventManager.publish(event);
+            sender.sendMessage(ChatColor.GREEN + "Test event sent!");
+
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(ChatColor.RED + e.getMessage());
         }
     }
 }

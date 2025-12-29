@@ -55,19 +55,18 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 public class TwitchClient {
     public Thread linkThread;
     public Boolean ignoreOfflineStreamers = false;
-    public static Boolean accountConnected = false;
     public OAuth2Credential oauth;
     public HashMap<String, OAuth2Credential> credentialManager;
 
     private boolean started;
+    private Boolean accountConnected = false;
     private List<String> chatBlacklist;
-    private static ITwitchClient client;
-    private static HashMap<String, Channel> channels;
-    private static TwitchEvents eventHandler;
-    private static IEventSubSocket eventSocket;
-    private static EventManager eventManager;
-    private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
-    private static FileConfiguration twitchConfig;
+    private HashMap<String, Channel> channels;
+    private TwitchEvents eventHandler;
+    private IEventSubSocket eventSocket;
+    private EventManager eventManager;
+    private ITwitchClient client;
+    private FileConfiguration twitchConfig;
     private File accountsFile;
     private FileConfiguration accountsConfig;
     private ConfigurationSection accounts;
@@ -79,7 +78,7 @@ public class TwitchClient {
     public Boolean nameSpawnedMobs;
     public AlertMode alertMode;
     
-    private final static String ClientID = "1peexftcqommf5tf5pt74g7b3gyki3";
+    public final static String CLIENT_ID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
         Scopes.CHANNEL_READ_REDEMPTIONS,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
@@ -91,14 +90,9 @@ public class TwitchClient {
         Scopes.CHANNEL_BOT
     ));
 
-    public static String getClientID() {
-        return ClientID;
-    }
-    
     public ITwitchClient getClient() {
         return client;
     }
-
     public FileConfiguration getConfig() {
         return twitchConfig;
     }
@@ -119,25 +113,25 @@ public class TwitchClient {
         CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
-        File twitchConfigFile = new File(plugin.getDataFolder(), "twitch.yml");
+        File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
         if (!twitchConfigFile.exists()) {
-            plugin.saveResource(twitchConfigFile.getName(), false);
+            ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
         }
         twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
 
-        accountsFile = new File(plugin.getDataFolder(), "accounts");
+        accountsFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "accounts");
         accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
         if (!accountsConfig.contains("twitch")) {
             accountsConfig.createSection("twitch");
         }
         accounts = accountsConfig.getConfigurationSection("twitch");
 
-        identityProvider = new TwitchIdentityProvider(getClientID(), null, null);
+        identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
         credentialManager = new HashMap<>();
         exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
 
         chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
-        ignoreOfflineStreamers = plugin.getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+        ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
 
         // Configuration overrides
         shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
@@ -184,7 +178,7 @@ public class TwitchClient {
 
                 p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
         
-                tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Thread() {
+                tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(ChatPointsTTV.getPlugin(), new Thread() {
                     @Override
                     public void run() {
                         refreshCredentials(credential.getUserId());
@@ -277,7 +271,7 @@ public class TwitchClient {
                     eventHandler.onRaid(e);
             }); 
         }
-        if (plugin.getConfig().getBoolean("SHOW_CHAT")) {
+        if (ChatPointsTTV.getPlugin().getConfig().getBoolean("SHOW_CHAT")) {
             eventManager.onEvent(ChannelMessageEvent.class, event -> {
                 if (ignoreOfflineStreamers && !getListenedChannels().get(event.getChannel().getName().toLowerCase()).isLive()) return;
                 if (!chatBlacklist.contains(event.getUser().getName())) {
@@ -354,7 +348,7 @@ public class TwitchClient {
         }
     }
 
-    public OAuth2Credential refreshCredentials(String userId) {
+    private OAuth2Credential refreshCredentials(String userId) {
         OAuth2Credential oldCredential;
         if (!credentialManager.containsKey(userId)) {
             if (!accounts.contains(userId) || !accounts.contains(userId + ".access_token") || !accounts.contains(userId + ".refresh_token")) {
@@ -381,7 +375,7 @@ public class TwitchClient {
         }
     }
 
-    public void saveCredential(String userId, OAuth2Credential credential) {
+    private void saveCredential(String userId, OAuth2Credential credential) {
         HashMap<String, String> account = new HashMap<>();
         account.put("access_token", credential.getAccessToken());
         account.put("refresh_token", credential.getRefreshToken());
@@ -389,7 +383,35 @@ public class TwitchClient {
         ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TWITCH, userId, Optional.of(account));
     }
 
-    public void unlinkAccount(String username) {
+    public void unlink(CommandSender p, Optional<String> channelField) {
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            return;
+        }
+        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
+            p.sendMessage(ChatColor.RED + "There are no accounts linked!");
+            return;
+        }
+        if (channelField.isPresent()) {
+            try {
+                ChatPointsTTV.getTwitch().removeAccount(channelField.get());
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
+            } catch (NullPointerException e) {
+                p.sendMessage(e.getMessage() + " " + channelField.get());
+            }
+        } else {
+            try {
+                for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
+                    ChatPointsTTV.getTwitch().removeAccount(channel.getChannelUsername());
+                }
+                p.sendMessage(ChatPointsTTV.msgPrefix + "All accounts were unlinked successfully!");
+            } catch (NullPointerException e) {
+                p.sendMessage(e.getMessage() + " " + channelField.get());
+            }
+        }
+    }
+
+    private void removeAccount(String username) {
         Channel channel = channels.get(username);
         if (channel == null) throw new NullPointerException("Cannot find channel");
 

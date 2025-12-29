@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -114,8 +113,8 @@ public class CommandController implements TabExecutor{
         }
 
         TextComponent tiktokStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\nTikTok Client: " + ChatColor.RESET);
-        if (TikTokClient.isEnabled) {
-            if (TikTokClient.accountConnected) {
+        if (ChatPointsTTV.getTikTok().isEnabled) {
+            if (ChatPointsTTV.getTikTok().accountConnected) {
                 tiktokStatus.addExtra("" + ChatColor.GREEN + ChatColor.BOLD + "LINKED");
             } else {
                 tiktokStatus.addExtra("" + ChatColor.YELLOW + ChatColor.BOLD + "ENABLED");

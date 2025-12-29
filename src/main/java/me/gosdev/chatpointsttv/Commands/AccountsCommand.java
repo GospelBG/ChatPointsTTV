@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.TikTok.TikTokButtonComponents;
-import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.TwitchButtonComponents;
 import net.md_5.bungee.api.ChatColor;
@@ -49,12 +48,12 @@ public class AccountsCommand {
                 break;
 
             case TIKTOK:
-                if (!TikTokClient.isEnabled) {
+                if (!ChatPointsTTV.getTikTok().isEnabled) {
                     p.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
                     return;
                 }
 
-                channels.addAll(TikTokClient.getClients().keySet());
+                channels.addAll(ChatPointsTTV.getTikTok().getClients().keySet());
 
                 if (p.equals(Bukkit.getConsoleSender())) {
                     footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /tiktok unlink <username>\nTo add an account, use /tiktok link <username>");
