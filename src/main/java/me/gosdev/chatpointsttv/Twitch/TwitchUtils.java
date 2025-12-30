@@ -41,7 +41,8 @@ public class TwitchUtils {
     }
     public static String getUserId(String username) throws IllegalArgumentException {
         try {
-            UserList resultList = ChatPointsTTV.getTwitch().getClient().getHelix().getUsers(ChatPointsTTV.getTwitch().oauth.getAccessToken(), null, Arrays.asList(username)).execute();
+            String accessToken = ChatPointsTTV.getTwitch().credentialManager.values().iterator().next().getAccessToken();
+            UserList resultList = ChatPointsTTV.getTwitch().getClient().getHelix().getUsers(accessToken, null, Arrays.asList(username)).execute();
             if (resultList.getUsers().isEmpty()) {
                 throw new NullPointerException("Couldn't fetch user: " + username);
             }

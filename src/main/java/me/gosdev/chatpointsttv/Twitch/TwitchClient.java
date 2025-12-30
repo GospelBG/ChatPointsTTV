@@ -58,7 +58,6 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 public class TwitchClient {
     public Thread linkThread;
     public Boolean ignoreOfflineStreamers = false;
-    public OAuth2Credential oauth;
     public HashMap<String, OAuth2Credential> credentialManager;
 
     private boolean started;
@@ -223,10 +222,9 @@ public class TwitchClient {
     }
 
     private void start(OAuth2Credential credential) {
-        oauth = credential;
         // Build TwitchClient
         client = TwitchClientBuilder.builder()
-            .withDefaultAuthToken(oauth)
+            .withDefaultAuthToken(credential)
             .withEnableChat(true)
             .withEnableHelix(true)
             .withEnableEventSocket(true)
@@ -426,10 +424,6 @@ public class TwitchClient {
             OAuth2Credential fullCredential = identityProvider.getAdditionalCredentialInformation(refreshed.get()).get();
             saveCredential(fullCredential.getUserId(), fullCredential);
             credentialManager.put(fullCredential.getUserId(), fullCredential);
-
-            if (oauth != null && oauth.getUserId().equals(fullCredential.getUserId())) {
-                oauth.updateCredential(fullCredential);
-            }
 
             return fullCredential;
         } else {
