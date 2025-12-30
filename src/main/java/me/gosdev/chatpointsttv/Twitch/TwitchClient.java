@@ -38,12 +38,15 @@ import com.github.twitch4j.eventsub.socket.IEventSubSocket;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionFailureEvent;
 import com.github.twitch4j.eventsub.socket.events.EventSocketSubscriptionSuccessEvent;
 import com.github.twitch4j.eventsub.subscriptions.SubscriptionTypes;
+import com.github.twitch4j.helix.domain.CustomReward;
 import com.github.twitch4j.helix.domain.InboundFollow;
 import com.github.twitch4j.helix.domain.InboundFollowers;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
+import me.gosdev.chatpointsttv.Events.Event;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
@@ -82,6 +85,7 @@ public class TwitchClient {
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
         Scopes.CHANNEL_READ_REDEMPTIONS,
         Scopes.CHANNEL_READ_SUBSCRIPTIONS,
+        Scopes.CHANNEL_MANAGE_REDEMPTIONS,
         Scopes.MODERATOR_READ_FOLLOWERS,
         Scopes.BITS_READ,
         Scopes.USER_READ_CHAT,
@@ -307,12 +311,13 @@ public class TwitchClient {
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
         if (CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS) != null) {
+            toggleChannelPointRewards(credential, true);
             subs.add(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
         if (CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.FOLLOW) != null) {
             subs.add(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(channel_id).broadcasterUserId(channel_id).build(), null));
-        } 
+        }
 
         if (CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHEER) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
@@ -346,6 +351,63 @@ public class TwitchClient {
         } catch (InterruptedException e) {
             ChatPointsTTV.log.warning("Failed to subscribe to events.");
         }
+    }
+
+    public Boolean createChannelPointRewards(OAuth2Credential account) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        StringBuilder uID = new StringBuilder();
+        for (int i = 0; i < 5; i++) {
+            int index = (int)(chars.length() * Math.random());
+            uID.append(chars.charAt(index));
+        }
+
+        try {
+            client.getHelix().createCustomReward(
+                account.getAccessToken(),
+                account.getUserId(),
+                new CustomReward().builder()
+                    .title("ChatPointsTTV Reward (" + uID.toString() + ")")
+                    .prompt("This reward was created by ChatPointsTTV and its redemptions will be managed automatically.")
+                    .isEnabled(false)
+                    .cost(1)
+                    .build())
+                .execute();
+            return true;
+        } catch (HystrixRuntimeException e) {
+            if (e.getCause().getMessage().contains("errorStatus=400")) { // Max rewards reached
+                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " cannot create new Channel Point Rewards because they have reached the maximum number of rewards.");
+            } else if (e.getCause().getMessage().contains("errorStatus=403")) {
+                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " has no affiliate privileges. Therefore they cannot create Channel Point Rewards.");
+            } else {
+                ChatPointsTTV.log.severe("There was an error while creating a new Channel Point Reward for Twitch account " + account.getUserName() + ".");
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    public void toggleChannelPointRewards(OAuth2Credential account, Boolean state) {
+        if (!twitchConfig.getBoolean("MANAGE_CHANNEL_POINT_REWARDS", true)) return;
+        ArrayList<String> configRewardNames = new ArrayList<>();
+
+        for (Event e : CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS)) {
+            if (e.getTargetId().equals(account.getUserId()) || e.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) configRewardNames.add(e.getEvent().toLowerCase());
+        }
+
+        try {
+            for (CustomReward r : client.getHelix().getCustomRewards(account.getAccessToken(), account.getUserId(), null, true).execute().getRewards()) {
+                if (configRewardNames.contains(r.getTitle().toLowerCase())) {
+                    client.getHelix().updateCustomReward(account.getAccessToken(), account.getUserId(), r.getId(), r.withIsEnabled(state)).execute();
+                }
+            }
+        } catch (HystrixRuntimeException e) {
+            if (e.getCause().getMessage().contains("errorStatus=403")) {} // No affiliate privileges. Fail silently
+            else {
+                ChatPointsTTV.log.severe("There was an error while updating Channel Point Rewards for Twitch account " + account.getUserName() + ".");
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private OAuth2Credential refreshCredentials(String userId) {
@@ -414,6 +476,7 @@ public class TwitchClient {
     private void removeAccount(String username) {
         Channel channel = channels.get(username);
         if (channel == null) throw new NullPointerException("Cannot find channel");
+        toggleChannelPointRewards(credentialManager.get(channel.getChannelId()), false);
 
         for (EventSubSubscription sub : channel.getSubs()) {
             eventSocket.unregister(sub);
@@ -436,6 +499,9 @@ public class TwitchClient {
         try {
             if (linkThread != null && !linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
             if (client != null) {
+                for (Channel channel : channels.values()) {
+                    toggleChannelPointRewards(credentialManager.get(channel.getChannelId()), false);
+                }
                 eventSocket.close();
                 client.close();
             }

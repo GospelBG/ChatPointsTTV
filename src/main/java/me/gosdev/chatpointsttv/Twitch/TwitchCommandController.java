@@ -30,6 +30,7 @@ public class TwitchCommandController implements TabExecutor {
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link a Twitch account.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink [username]: " + ChatColor.RESET + "Removes an account and the stored credentials. If a username is not provided all accounts will be unlinked.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch client.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch createreward <username>: " + ChatColor.RESET + "Creates a new custom channel reward.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch start: " + ChatColor.RESET + "Starts the Twitch client and logs in to any saved accounts.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch stop: " + ChatColor.RESET + "Stops the Twitch client. All incoming events will be ignored.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files.\n" + 
@@ -39,6 +40,7 @@ public class TwitchCommandController implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
+        TwitchClient twitch = ChatPointsTTV.getTwitch();
 
         if (args.length == 0) {
             help(sender);
@@ -65,10 +67,10 @@ public class TwitchCommandController implements TabExecutor {
                 case "unlink":
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                         try {
-                            ChatPointsTTV.getTwitch().linkThread.join();
+                            twitch.linkThread.join();
                         } catch (InterruptedException | NullPointerException e) {}
                         
-                        ChatPointsTTV.getTwitch().unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
+                        twitch.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                     });
                     return true;
 
@@ -81,24 +83,47 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 case "stop":
-                    if (!ChatPointsTTV.getTwitch().isStarted()) {
+                    if (!twitch.isStarted()) {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already stopped.");
                         return true;
                     }
-                    ChatPointsTTV.getTwitch().stop(sender);
+                    twitch.stop(sender);
                     return true;
 
                 case "start":
-                    if (ChatPointsTTV.getTwitch().isStarted()) {
+                    if (twitch.isStarted()) {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already started.");
                         return true;
                     }
-                    ChatPointsTTV.getTwitch().enable(sender);
+                    twitch.enable(sender);
                     sender.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
                     return true;
 
                 case "test":
                     test(sender, args);
+                    return true;
+
+                case "createreward":
+                    if (args.length != 2) {
+                        sender.sendMessage(ChatColor.RED + "Usage: /twitch createreward <username>");
+                        return true;
+                    }
+
+                    if (!twitch.isStarted()) {
+                        sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+                        return true;
+                    }
+
+                    if (!twitch.isAccountConnected()) {
+                        sender.sendMessage(ChatColor.RED + "You must link a Twitch account in order to create channel point rewards!");
+                        return true;
+                    }
+
+                    if (twitch.createChannelPointRewards(twitch.credentialManager.get(twitch.getListenedChannels().get(args[1]).getChannelId()))) {
+                        sender.sendMessage(ChatColor.GREEN + "A new Channel Point Reward has been created. Check your Twitch Dashboard!");
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Failed to create a new Channel Point Reward. Check the server console for more information.");
+                    }
                     return true;
 
                 default:
@@ -129,9 +154,12 @@ public class TwitchCommandController implements TabExecutor {
                 available.add("test");
                 available.add("accounts");
                 available.add("unlink");
+                available.add("createreward");
             }
-        } else if (args.length == 2 && args[0].equalsIgnoreCase("unlink")) {
-            if (args[0].equalsIgnoreCase("unlink")) {
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("createreward")) {
+                available.addAll(ChatPointsTTV.getTwitch().getListenedChannels().keySet());
+            } else if (args[0].equalsIgnoreCase("unlink")) {
                 for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     available.add(channel.getChannelUsername().toLowerCase());
                 }

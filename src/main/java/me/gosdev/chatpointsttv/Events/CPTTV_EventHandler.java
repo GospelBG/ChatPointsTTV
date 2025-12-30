@@ -356,7 +356,7 @@ public class CPTTV_EventHandler {
 
     public static void clearActions(Platforms plat) {
         for (EventType e : plat.getEventTypes()) {
-            actions.remove(e);
+            actions.put(e, null);
         }
     }
 }

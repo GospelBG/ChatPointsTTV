@@ -2,10 +2,12 @@ package me.gosdev.chatpointsttv.Twitch;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
+import com.github.twitch4j.eventsub.domain.RedemptionStatus;
 import com.github.twitch4j.eventsub.events.ChannelChatMessageEvent;
 import com.github.twitch4j.eventsub.events.ChannelChatNotificationEvent;
 import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
@@ -32,6 +34,16 @@ public class TwitchEvents {
             if (!replacedCmds.isEmpty()) reward = reward.withCommands(replacedCmds);
 
             CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.CHANNEL_POINTS, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.of(event.getReward().getTitle()), Optional.empty());
+            
+            try { // Try to mark the redemption as fulfilled. If the reward was not created by ChatPointsTTV or the streamer has no affiliate privileges, fail silently
+                ChatPointsTTV.getTwitch().getClient().getHelix().updateRedemptionStatus(
+                    ChatPointsTTV.getTwitch().credentialManager.get(event.getBroadcasterUserId()).getAccessToken(),
+                    event.getBroadcasterUserId(),
+                    event.getReward().getId(),
+                    Collections.singletonList(event.getId()),
+                    RedemptionStatus.FULFILLED).execute();
+            } catch (Exception e) {}
+
             return;
         }
     }

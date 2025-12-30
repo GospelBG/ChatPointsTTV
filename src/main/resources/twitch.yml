@@ -1,3 +1,6 @@
+# Automatically show and hide and mark as completed redemptions of Channel Point Rewards created by the plugin.
+MANAGE_CHANNEL_POINT_REWARDS: true
+
 # You can set up here your Twitch events.
 # Add as many lines as needed. Replace [CONDITION] with the minimum amount of bits/subs/viewers, a subscription tier or a Channel Point Reward name.
 # For Channel Point Rewards make sure it's spelled EXACTLY as it appears on Twitch.
