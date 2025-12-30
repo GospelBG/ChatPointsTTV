@@ -389,7 +389,7 @@ public class TwitchClient {
         ArrayList<String> configRewardNames = new ArrayList<>();
 
         for (Event e : CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS)) {
-            if (e.getTargetId().equals(account.getUserId()) || e.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) configRewardNames.add(e.getEvent().toLowerCase());
+            if (e.getTargetChannel().equals(account.getUserName().toLowerCase()) || e.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) configRewardNames.add(e.getEvent().toLowerCase());
         }
 
         try {

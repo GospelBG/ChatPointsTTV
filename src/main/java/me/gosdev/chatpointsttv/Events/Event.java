@@ -4,33 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
-import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
-import me.gosdev.chatpointsttv.Twitch.TwitchUtils;
 
 public class Event {
     private final EventType type;
     private final String event;
-    private List<String> cmds;
+    private final List<String> cmds;
     private final String channel;
     private String customMsg;
-    private String channelId = null;
 
     public Event(EventType type, String channel, String event, List<String> cmds) {
         this.type = type;
         this.channel = channel;
-
-        try {
-            if (type instanceof TwitchEventType) {
-                channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : TwitchUtils.getUserId(channel);
-            } else if (type instanceof TikTokEventType) {
-                channelId = channel.equals(CPTTV_EventHandler.EVERYONE) ? "*" : channel.toLowerCase();
-            }
-        
-        } catch (NullPointerException e) {
-            ChatPointsTTV.log.warning(e.getMessage());
-            channelId = null;
-        }
 
         this.event = event;
         this.cmds = new ArrayList<>();
@@ -64,8 +48,8 @@ public class Event {
     public String getChannel() {
         return channel;
     }
-    public String getTargetId() {
-        return channelId;
+    public String getTargetChannel() {
+        return channel;
     }
     public String getCustomMsg() {
         return customMsg;

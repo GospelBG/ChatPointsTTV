@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.helix.domain.StreamList;
-import com.github.twitch4j.helix.domain.UserList;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
@@ -37,22 +36,6 @@ public class TwitchUtils {
                 return "TIER3";
             default:
                 return null;
-        }
-    }
-    public static String getUserId(String username) throws IllegalArgumentException {
-        try {
-            String accessToken = ChatPointsTTV.getTwitch().credentialManager.values().iterator().next().getAccessToken();
-            UserList resultList = ChatPointsTTV.getTwitch().getClient().getHelix().getUsers(accessToken, null, Arrays.asList(username)).execute();
-            if (resultList.getUsers().isEmpty()) {
-                throw new NullPointerException("Couldn't fetch user: " + username);
-            }
-            return resultList.getUsers().get(0).getId();
-        } catch (HystrixRuntimeException e) {
-            if (e.getFailureType().equals(HystrixRuntimeException.FailureType.COMMAND_EXCEPTION)) {
-                throw new IllegalArgumentException("Invalid username: " + username);
-            } else {
-                throw e;
-            }
         }
     }
     public static Boolean isLive(String accessToken, String username) throws IllegalArgumentException {
