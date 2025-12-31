@@ -177,7 +177,7 @@ public class ChatPointsTTV extends JavaPlugin {
                 }
 
                 if (!twitch.isStarted()) return;
-                if ((twitch.linkThread == null || !twitch.linkThread.isAlive()) && !twitch.isAccountConnected() && !firstRun) {
+                if (!twitch.linkInProgress && !twitch.isAccountConnected() && !firstRun) {
                     String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
                     BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
 

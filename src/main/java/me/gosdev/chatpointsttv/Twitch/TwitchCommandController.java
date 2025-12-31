@@ -66,10 +66,6 @@ public class TwitchCommandController implements TabExecutor {
 
                 case "unlink":
                     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        try {
-                            twitch.linkThread.join();
-                        } catch (InterruptedException | NullPointerException e) {}
-                        
                         twitch.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                     });
                     return true;

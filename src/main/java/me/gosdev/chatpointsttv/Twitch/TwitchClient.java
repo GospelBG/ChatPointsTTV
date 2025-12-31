@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.bukkit.Bukkit;
@@ -56,7 +58,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TwitchClient {
-    public Thread linkThread;
     public Boolean ignoreOfflineStreamers = false;
     public HashMap<String, OAuth2Credential> credentialManager;
 
@@ -75,9 +76,11 @@ public class TwitchClient {
     private TwitchIdentityProvider identityProvider;
     private ScheduledThreadPoolExecutor exec;
     private HashMap<String, BukkitTask> tokenRefreshTasks;
+    private ExecutorService linkExecutor;
 
     public Boolean shouldMobsGlow;
     public Boolean nameSpawnedMobs;
+    public Boolean linkInProgress = false;
     public AlertMode alertMode;
     
     public final static String CLIENT_ID = "1peexftcqommf5tf5pt74g7b3gyki3";
@@ -116,6 +119,8 @@ public class TwitchClient {
         CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();
+        linkExecutor = Executors.newSingleThreadExecutor();
+
         File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
         if (!twitchConfigFile.exists()) {
             ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
@@ -157,18 +162,16 @@ public class TwitchClient {
                 }
             }
         }
+        linkExecutor.submit(() -> {
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
+        });
         started = true;
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
-        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-            if (linkThread != null) {
-                try {
-                    linkThread.join();
-                } catch (InterruptedException e) {}
-            }
-            
-            linkThread = new Thread(() -> {
+        linkExecutor.submit(() -> {
+            linkInProgress = true;
+            try {
                 saveCredential(credential.getUserId(), credential);
                 credentialManager.put(credential.getUserId(), credential);
 
@@ -209,15 +212,11 @@ public class TwitchClient {
                     }
                     FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
                 }
-            });
-            linkThread.setUncaughtExceptionHandler((Thread t, Throwable e) -> {
-                linkThread.interrupt();
+            } catch (Exception e) {
+                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Twitch account linking failed.");
                 e.printStackTrace();
-                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Account linking failed!");
-                stop(Bukkit.getConsoleSender());
-            });
-
-            linkThread.start();
+            }
+            linkInProgress = false;
         });
     }
 
@@ -440,31 +439,42 @@ public class TwitchClient {
     }
 
     public void unlink(CommandSender p, Optional<String> channelField) {
-        if (!ChatPointsTTV.getTwitch().isStarted()) {
-            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
-            return;
-        }
-        if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
-            p.sendMessage(ChatColor.RED + "There are no accounts linked!");
-            return;
-        }
-        if (channelField.isPresent()) {
+        linkExecutor.submit(() -> {
+            linkInProgress = true;
             try {
-                ChatPointsTTV.getTwitch().removeAccount(channelField.get());
-                p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
-            } catch (NullPointerException e) {
-                p.sendMessage(e.getMessage() + " " + channelField.get());
-            }
-        } else {
-            try {
-                for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
-                    ChatPointsTTV.getTwitch().removeAccount(channel.getChannelUsername());
+                if (!started) {
+                    p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+                    return;
                 }
-                p.sendMessage(ChatPointsTTV.msgPrefix + "All accounts were unlinked successfully!");
-            } catch (NullPointerException e) {
-                p.sendMessage(e.getMessage() + " " + channelField.get());
+                if (!accountConnected) {
+                    p.sendMessage(ChatColor.RED + "There are no accounts linked!");
+                    return;
+                }
+                if (channelField.isPresent()) {
+                    try {
+                        removeAccount(channelField.get());
+                        p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
+                    } catch (NullPointerException e) {
+                        p.sendMessage(e.getMessage() + " " + channelField.get());
+                    }
+                } else {
+                    try {
+                        ArrayList<Channel> channelsSnapshot = new ArrayList<>(channels.values());
+
+                        for (Channel channel : channelsSnapshot) {
+                            removeAccount(channel.getChannelUsername());
+                        }
+                        p.sendMessage(ChatPointsTTV.msgPrefix + "All accounts were unlinked successfully!");
+                    } catch (NullPointerException e) {
+                        p.sendMessage(e.getMessage() + " " + channelField.get());
+                    }
+                }
+            } catch (Exception e) {
+                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Failed to unlink an account.");
+                e.printStackTrace();
             }
-        }
+            linkInProgress = false;
+        });
     }
 
     private void removeAccount(String username) {
@@ -491,7 +501,7 @@ public class TwitchClient {
 
     public void stop(CommandSender p) {
         try {
-            if (linkThread != null && !linkThread.isInterrupted()) linkThread.join(); // Wait until linking is finished
+            linkExecutor.shutdown();
             if (client != null) {
                 for (Channel channel : channels.values()) {
                     toggleChannelPointRewards(credentialManager.get(channel.getChannelId()), false);
