@@ -188,7 +188,7 @@ public class TikTokClient {
         }
     }
 
-    public void enable(CommandSender p) {
+    public TikTokClient(CommandSender p) {
         clients = new HashMap<>();
         chatBlacklist = new ArrayList<>();
 

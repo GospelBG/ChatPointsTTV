@@ -115,7 +115,7 @@ public class TwitchClient {
         return accountConnected;
     }
 
-    public void enable(CommandSender p) {
+    public TwitchClient(CommandSender p) {
         CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
         channels = new HashMap<>();
         tokenRefreshTasks = new HashMap<>();

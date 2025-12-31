@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -83,6 +84,14 @@ public class ChatPointsTTV extends JavaPlugin {
         return plugin.config;
     }
 
+    public static void enableTwitch(CommandSender p) {
+        twitch = new TwitchClient(p);
+    }
+    
+    public static void enableTikTok(CommandSender p) {
+        tiktok = new TikTokClient(p);
+    }
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -136,11 +145,9 @@ public class ChatPointsTTV extends JavaPlugin {
                 p.spigot().sendMessage(new TextComponent("ChatPointsTTV reloaded!"));
             }
         }
-        
-        twitch = new TwitchClient();
-        if (config.getBoolean("ENABLE_TWITCH", true)) twitch.enable(Bukkit.getConsoleSender()); 
-        tiktok = new TikTokClient();
-        if (config.getBoolean("ENABLE_TIKTOK", true)) tiktok.enable(Bukkit.getConsoleSender()); 
+
+        if (config.getBoolean("ENABLE_TWITCH", true)) twitch = new TwitchClient(Bukkit.getConsoleSender());  
+        if (config.getBoolean("ENABLE_TIKTOK", true)) tiktok = new TikTokClient(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
             Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");

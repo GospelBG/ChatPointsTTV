@@ -50,7 +50,7 @@ public class TikTokCommandController implements TabExecutor {
 
                 sender.sendMessage("Enabling TikTok module...");
 
-                ChatPointsTTV.getTikTok().enable(sender);
+                ChatPointsTTV.enableTikTok(sender);
                 return true;
 
             case "stop":
@@ -71,7 +71,7 @@ public class TikTokCommandController implements TabExecutor {
             case "reload":
                 sender.sendMessage("Reloading ChatPointsTTV...");
                 ChatPointsTTV.getTikTok().stop(sender);
-                ChatPointsTTV.getTikTok().enable(sender);
+                ChatPointsTTV.enableTikTok(sender);
                 return true;
 
             case "link":
