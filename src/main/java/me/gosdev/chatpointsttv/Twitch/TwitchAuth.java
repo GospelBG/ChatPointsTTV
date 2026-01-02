@@ -47,7 +47,9 @@ public class TwitchAuth {
         flowController = new DeviceFlowController();
         DeviceAuthorization auth = flowController.startOAuth2DeviceAuthorizationGrantType(identityProvider, TwitchClient.scopes,  response -> {
             if (response.getCredential() != null) {
-                client.link(p, identityProvider.getAdditionalCredentialInformation(response.getCredential()).get());
+                ChatPointsTTV.getTwitch().getExecutor().submit(() -> {
+                    client.link(p, identityProvider.getAdditionalCredentialInformation(response.getCredential()).get());
+                });
             } else {
                 switch(response.getError()) {
                     case ACCESS_DENIED:

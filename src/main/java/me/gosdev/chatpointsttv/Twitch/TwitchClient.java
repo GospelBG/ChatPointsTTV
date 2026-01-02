@@ -12,6 +12,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -62,8 +64,9 @@ public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
     public ConcurrentHashMap<String, OAuth2Credential> credentialManager;
 
-    private boolean started;
-    private Boolean accountConnected = false;
+    private AtomicBoolean started = new AtomicBoolean(false);
+    private AtomicBoolean accountConnected = new AtomicBoolean(false);
+    public AtomicBoolean reloading = new AtomicBoolean(true);
     private List<String> chatBlacklist;
     private ConcurrentHashMap<String, Channel> channels;
     private TwitchEvents eventHandler;
@@ -77,7 +80,7 @@ public class TwitchClient {
     private TwitchIdentityProvider identityProvider;
     private ScheduledThreadPoolExecutor exec;
     private HashMap<String, BukkitTask> tokenRefreshTasks;
-    private ExecutorService linkExecutor;
+    private final ExecutorService twitchExecutor;
 
     public Boolean shouldMobsGlow;
     public Boolean nameSpawnedMobs;
@@ -109,50 +112,56 @@ public class TwitchClient {
     }
 
     public boolean isStarted() {
-        return started;
+        return started.get();
     }
 
     public Boolean isAccountConnected() {
-        return accountConnected;
+        return accountConnected.get();
+    }
+
+    public ExecutorService getExecutor() {
+        return twitchExecutor;
     }
 
     public TwitchClient(CommandSender p) {
-        CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
-        channels = new ConcurrentHashMap<>();
-        tokenRefreshTasks = new HashMap<>();
-        linkExecutor = Executors.newSingleThreadExecutor();
+        started.set(false);
+        twitchExecutor = Executors.newSingleThreadExecutor();
 
-        File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
-        if (!twitchConfigFile.exists()) {
-            ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
-        }
-        twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
+        twitchExecutor.submit(() -> {            
+            CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
+            channels = new ConcurrentHashMap<>();
+            tokenRefreshTasks = new HashMap<>();
 
-        accountsFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "accounts");
-        accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
-        if (!accountsConfig.contains("twitch")) {
-            accountsConfig.createSection("twitch");
-        }
-        accounts = accountsConfig.getConfigurationSection("twitch");
+            File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
+            if (!twitchConfigFile.exists()) {
+                ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
+            }
+            twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
 
-        identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
-        credentialManager = new ConcurrentHashMap<>();
-        exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
+            accountsFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "accounts");
+            accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
+            if (!accountsConfig.contains("twitch")) {
+                accountsConfig.createSection("twitch");
+            }
+            accounts = accountsConfig.getConfigurationSection("twitch");
 
-        chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
-        ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+            identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
+            credentialManager = new ConcurrentHashMap<>();
+            exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
 
-        // Configuration overrides
-        shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
-        nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
-        alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
+            chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
+            ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
 
-        
-        if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
-            FollowerLog.start();
-        }
+            // Configuration overrides
+            shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
+            nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
+            alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
 
-        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            
+            if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                FollowerLog.start();
+            }
+
             if (accounts != null) {
                 for (String userid : accounts.getKeys(false)) {
                     // Try to refresh token
@@ -164,64 +173,64 @@ public class TwitchClient {
                     }      
                 }
             }
-            linkExecutor.submit(() -> {
-                p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
-            });
             
-            started = true;
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");   
+            started.set(true);
+            reloading.set(false);
         });
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
-        linkExecutor.submit(() -> {
-            linkInProgress = true;
-            try {
-                saveCredential(credential.getUserId(), credential);
-                credentialManager.put(credential.getUserId(), credential);
+        linkInProgress = true;
+        try {
+            saveCredential(credential.getUserId(), credential);
+            credentialManager.put(credential.getUserId(), credential);
 
-                for (Channel channel : channels.values()) {
-                    if (credential.getUserId().equals(channel.getChannelId())) {
-                        p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
-                        return;
-                    }
+            for (Channel channel : channels.values()) {
+                if (credential.getUserId().equals(channel.getChannelId())) {
+                    p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
+                    return;
                 }
-
-                p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
-        
-                tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(ChatPointsTTV.getPlugin(), new Thread() {
-                    @Override
-                    public void run() {
-                        refreshCredentials(credential.getUserId());
-                    }
-                }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
-        
-                if (accountConnected) {
-                    subscribeToEvents(credential);
-                } else {
-                    start(credential);
-                }
-
-                p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
-
-                if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
-                    List<String> followerIDs = new ArrayList<>();
-                    String cursor = null;
-                    while (true) { 
-                        InboundFollowers request = client.getHelix().getChannelFollowers(credential.getAccessToken(), credential.getUserId(), null, null, cursor).execute();
-                        cursor = request.getPagination().getCursor();
-                        for (InboundFollow follower : request.getFollows()) {
-                            followerIDs.add(follower.getUserId());
-                        }
-                        if (cursor == null) break;
-                    }
-                    FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
-                }
-            } catch (Exception e) {
-                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Twitch account linking failed.");
-                e.printStackTrace();
             }
-            linkInProgress = false;
-        });
+
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
+    
+            tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(ChatPointsTTV.getPlugin(), new Thread() {
+                @Override
+                public void run() {
+                    refreshCredentials(credential.getUserId());
+                }
+            }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
+    
+            if (accountConnected.get()) {
+                subscribeToEvents(credential);
+            } else {
+                start(credential);
+            }
+
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
+
+            if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                List<String> followerIDs = new ArrayList<>();
+                String cursor = null;
+                while (true) { 
+                    InboundFollowers request = client.getHelix().getChannelFollowers(credential.getAccessToken(), credential.getUserId(), null, null, cursor).execute();
+                    cursor = request.getPagination().getCursor();
+                    List<InboundFollow> follows = request.getFollows();
+
+                    if (follows == null || follows.isEmpty()) break;
+                    for (InboundFollow follower : follows) {
+                        followerIDs.add(follower.getUserId());
+                    }
+                    if (cursor == null) break;
+                }
+                FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
+            }
+        } catch (Exception e) {
+            p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Twitch account linking failed.");
+            e.printStackTrace();
+        }
+        linkInProgress = false;
     }
 
     private void start(OAuth2Credential credential) {
@@ -302,7 +311,7 @@ public class TwitchClient {
         // Join the twitch chat of this channel(s) and enable stream/follow events
         subscribeToEvents(credential);
         
-        accountConnected = true;
+        accountConnected.set(true);
     }
     
     private void subscribeToEvents(OAuth2Credential credential) {
@@ -443,14 +452,14 @@ public class TwitchClient {
     }
 
     public void unlink(CommandSender p, Optional<String> channelField) {
-        linkExecutor.submit(() -> {
+        twitchExecutor.submit(() -> {
             linkInProgress = true;
             try {
-                if (!started) {
+                if (!started.get()) {
                     p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
                     return;
                 }
-                if (!accountConnected) {
+                if (!accountConnected.get()) {
                     p.sendMessage(ChatColor.RED + "There are no accounts linked!");
                     return;
                 }
@@ -499,40 +508,60 @@ public class TwitchClient {
         credentialManager.remove(channel.getChannelId());
 
         if (credentialManager.isEmpty()) {
-            accountConnected = false;
+            accountConnected.set(false);
         }
     }
 
     public void stop(CommandSender p) {
-        try {
-            linkExecutor.shutdown();
-            if (client != null) {
-                for (Channel channel : channels.values()) {
-                    toggleChannelPointRewards(credentialManager.get(channel.getChannelId()), false);
-                }
-                eventSocket.close();
-                client.close();
+        if (twitchExecutor.isShutdown()) return;
+
+        twitchExecutor.submit(() -> {
+            if (!isStarted()) {
+                p.sendMessage(ChatColor.RED + "Twitch Module is already stopped.");
+                return;
             }
-        } catch (Exception e) {
-            ChatPointsTTV.log.warning("There was an error while disabling the Twitch client.");
-            e.printStackTrace();
-            return;
+            
+            try {
+                if (client != null) {
+                    for (Channel channel : channels.values()) {
+                        toggleChannelPointRewards(credentialManager.get(channel.getChannelId()), false);
+                    }
+                    if (eventSocket != null) eventSocket.close();
+                    client.close();
+                }
+            } catch (Exception e) {
+                ChatPointsTTV.log.warning("There was an error while disabling the Twitch client.");
+                e.printStackTrace();
+                return;
+            }
+
+            if (tokenRefreshTasks != null) {
+                for (BukkitTask task : tokenRefreshTasks.values()) {
+                    task.cancel();
+                }
+            }
+
+            client = null;
+            eventHandler = null;
+            eventSocket = null;
+            eventManager = null;
+            channels.clear();
+            credentialManager.clear();
+
+            accountConnected.set(false);
+        });
+
+        twitchExecutor.shutdown();
+        try {
+            if(!linkInProgress && !twitchExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                twitchExecutor.shutdownNow();
+                ChatPointsTTV.log.warning("Twitch Module is taking too long to stop. Forcing shutdown...");
+            }
+        } catch (InterruptedException e) {
+            twitchExecutor.shutdownNow();
         }
-        
-        for (BukkitTask task : tokenRefreshTasks.values()) {
-            task.cancel();
-        }
 
-        client = null;
-        eventHandler = null;
-        eventSocket = null;
-        eventManager = null;
-        channels.clear();
-        credentialManager.clear();
-
-        accountConnected = false;
-        started = false;    
-
+        started.set(false);
         p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has been successfully stopped!");
     }
 }

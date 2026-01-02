@@ -2,6 +2,8 @@ package me.gosdev.chatpointsttv;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.bstats.bukkit.Metrics;
@@ -24,13 +26,13 @@ import me.gosdev.chatpointsttv.Twitch.TwitchCommandController;
 import me.gosdev.chatpointsttv.Utils.AccountsManager;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class ChatPointsTTV extends JavaPlugin {
+    private final AtomicBoolean isReloading = new AtomicBoolean(false);
     private static AccountsManager accounts;
     private static ChatPointsTTV plugin;
     private static TwitchClient twitch;
@@ -72,6 +74,10 @@ public class ChatPointsTTV extends JavaPlugin {
         return accounts;
     }
 
+    public Boolean isReloading() {
+        return isReloading.get();
+    }
+
     public static TwitchClient getTwitch() {
         return twitch;
     }
@@ -85,11 +91,11 @@ public class ChatPointsTTV extends JavaPlugin {
     }
 
     public static void enableTwitch(CommandSender p) {
-        twitch = new TwitchClient(p);
+        if (twitch == null || !twitch.isStarted()) twitch = new TwitchClient(p);
     }
     
     public static void enableTikTok(CommandSender p) {
-        tiktok = new TikTokClient(p);
+        if (tiktok == null || !tiktok.isStarted()) tiktok = new TikTokClient(p);
     }
 
     @Override
@@ -98,9 +104,8 @@ public class ChatPointsTTV extends JavaPlugin {
         accounts = new AccountsManager();
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
-        metrics = new Metrics(this, 22873);
+        if (metrics == null) metrics = new Metrics(this, 22873);
         
-        // Get the latest config after saving the default if missing
         if (!plugin.getDataFolder().exists()) firstRun = true;
 
         this.saveDefaultConfig();
@@ -128,17 +133,23 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
 
-        cmdController = new CommandController();
-        this.getCommand("cpttv").setExecutor(cmdController);
-        this.getCommand("cpttv").setTabCompleter(cmdController);
+        if (cmdController == null) {
+            cmdController = new CommandController();
+            this.getCommand("cpttv").setExecutor(cmdController);
+            this.getCommand("cpttv").setTabCompleter(cmdController);
+        }
 
-        twitchCmdController = new TwitchCommandController();
-        this.getCommand("twitch").setExecutor(twitchCmdController);
-        this.getCommand("twitch").setTabCompleter(twitchCmdController);
+        if (twitchCmdController == null) {
+            twitchCmdController = new TwitchCommandController();
+            this.getCommand("twitch").setExecutor(twitchCmdController);
+            this.getCommand("twitch").setTabCompleter(twitchCmdController);
+        }
 
-        tikTokCmdController = new TikTokCommandController();
-        this.getCommand("tiktok").setExecutor(tikTokCmdController);
-        this.getCommand("tiktok").setTabCompleter(tikTokCmdController);
+        if (tikTokCmdController == null) {
+            tikTokCmdController = new TikTokCommandController();
+            this.getCommand("tiktok").setExecutor(tikTokCmdController);
+            this.getCommand("tiktok").setTabCompleter(tikTokCmdController);
+        }
 
         for (Player p : plugin.getServer().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE.permission_id)) {
@@ -146,8 +157,8 @@ public class ChatPointsTTV extends JavaPlugin {
             }
         }
 
-        if (config.getBoolean("ENABLE_TWITCH", true)) twitch = new TwitchClient(Bukkit.getConsoleSender());  
-        if (config.getBoolean("ENABLE_TIKTOK", true)) tiktok = new TikTokClient(Bukkit.getConsoleSender()); 
+        if (config.getBoolean("ENABLE_TWITCH", true)) enableTwitch(Bukkit.getConsoleSender());  
+        if (config.getBoolean("ENABLE_TIKTOK", true)) enableTikTok(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
             Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
@@ -182,25 +193,15 @@ public class ChatPointsTTV extends JavaPlugin {
     
                     player.getPlayer().spigot().sendMessage(updPrompt);
                 }
-
-                if (!twitch.isStarted()) return;
-                if (!twitch.linkInProgress && !twitch.isAccountConnected() && !firstRun) {
-                    String msg = ChatColor.LIGHT_PURPLE + "Welcome! Remember to link your Twitch account to enable ChatPointsTTV and start listening to events!\n";
-                    BaseComponent btn = new ComponentBuilder(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "[Click here to login]").create()[0];
-
-                    btn.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to run command").create()));
-                    btn.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/twitch link"));
-
-                    player.getPlayer().spigot().sendMessage(new BaseComponent[] {new ComponentBuilder(msg).create()[0], btn});
-                }
             }
         }, this);
     }
 
     @Override
     public void onDisable() {
-        if (twitch != null && twitch.isAccountConnected()) twitch.stop(Bukkit.getConsoleSender());
-        if (tiktok != null && tiktok.accountConnected) tiktok.stop(Bukkit.getConsoleSender());
+        twitchCmdController.executor.shutdown();
+        if (twitch != null) twitch.stop(Bukkit.getConsoleSender());
+        if (tiktok != null) tiktok.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
         
         // Erase variables
@@ -210,6 +211,32 @@ public class ChatPointsTTV extends JavaPlugin {
         tiktok = null;
 
         HandlerList.unregisterAll(this);
+    }
+
+    public void reload(CommandSender p) {
+        if (!isReloading.weakCompareAndSetRelease(false, true)) {
+            p.sendMessage(ChatColor.RED + "Already reloading!");
+            return;
+        }
+
+        if (!p.equals(Bukkit.getConsoleSender())) p.sendMessage(ChatPointsTTV.msgPrefix + "Reloading ChatPointsTTV...");
+        ChatPointsTTV.log.info("Reloading ChatPointsTTV...");
+
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            onDisable();
+            try {
+                Bukkit.getScheduler().callSyncMethod(this, () -> { // Need to run on main thread, due to Bukkit API usage
+                    onEnable();
+                    return null;
+                }).get();
+            } catch (InterruptedException e) {
+            } catch (ExecutionException e) {
+                p.sendMessage(ChatColor.RED + "There was an error reloading ChatPointsTTV. Please check the server console.");
+                e.printStackTrace();
+            }
+            
+            isReloading.set(false);
+        });
     }
 
 }

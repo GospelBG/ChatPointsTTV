@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -35,7 +36,8 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TikTokClient {
     public Boolean accountConnected = false;
-    public Boolean isEnabled = false;
+    public Boolean started = false;
+    public AtomicBoolean isReloading = new AtomicBoolean(true);
     public List<String> listenedProfiles;
 
     private TikTokEvents eventHandler;
@@ -53,6 +55,9 @@ public class TikTokClient {
     public Boolean isAccountConnected() {
         return accountConnected;
     }
+    public Boolean isStarted() {
+        return started;
+    }
     public FileConfiguration getConfig() {
         return tiktokConfig;
     }
@@ -61,108 +66,110 @@ public class TikTokClient {
     }
 
     public void link(CommandSender p, String handle, Boolean save) {
-        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-            // Sanitise username
-            String username = (handle.startsWith("@") ? handle.substring(1) : handle).toLowerCase();
+        // Sanitise username
+        String username = (handle.startsWith("@") ? handle.substring(1) : handle).toLowerCase();
 
-            if (clients.containsKey(username)) {
-                p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link the same LIVE twice!");
-                return;
-            }
+        if (clients.containsKey(username)) {
+            p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link the same LIVE twice!");
+            return;
+        }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Linking...");
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Linking...");
 
-            LiveClientBuilder builder = TikTokLive.newClient(username);
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.LIKE) != null) {
-                builder.onLike((liveClient, event) -> {
-                    eventHandler.onLike(event, clients.get(username).getRoomInfo().getHostName());
-                });
-            }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.GIFT) != null) {
-                builder.onGiftCombo((liveClient, event) -> {
-                    if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event, clients.get(username).getRoomInfo().getHostName()); // Only handle Finished Combos
-                });
-            }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.FOLLOW) != null) {
-                builder.onFollow((liveClient, event) -> {
-                    eventHandler.onFollow(event, clients.get(username).getRoomInfo().getHostName());
-                });
-            }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.SHARE) != null) {
-                builder.onShare((liveClient, event) -> {
-                    eventHandler.onShare(event, clients.get(username).getRoomInfo().getHostName());
-                });
-            }
-            if (plugin.config.getBoolean("SHOW_CHAT")) {
-                builder.onComment((liveClient, event) -> {
-                    if (!chatBlacklist.contains(event.getUser().getName())) {
-                        BaseComponent[] components = new BaseComponent[] {
-                            new ComponentBuilder(ChatColor.DARK_PURPLE + event.getUser().getProfileName() + ": ").create()[0],
-                            new ComponentBuilder(event.getText()).create()[0]
-                        };
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            if (player.hasPermission(permissions.BROADCAST.permission_id)) {
-                                player.spigot().sendMessage(components);
-                            }
-                        }
-                    }
-                });
-            }
-
-            builder.configure((LiveClientSettings settings) -> {
-                HttpClientSettings httpSettings = settings.getHttpSettings();
-                httpSettings.setTimeout(Duration.of(30L, SECONDS));
-
-                if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
-                    settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
-                }
-                settings.setHttpSettings(httpSettings);
+        LiveClientBuilder builder = TikTokLive.newClient(username);
+        if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.LIKE) != null) {
+            builder.onLike((liveClient, event) -> {
+                eventHandler.onLike(event, clients.get(username).getRoomInfo().getHostName());
             });
-
-            for (int i = 1; i <= maxRetries; i++) {
-                try {
-                    LiveClient c = builder.buildAndConnect();
-                    accountConnected = true;
-                    clients.put(username, c);
-                    listenedProfiles.add(username);
-
-                    if (save) {
-                        ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TIKTOK, username, Optional.empty());
-                    }
-
-                    p.sendMessage(ChatPointsTTV.msgPrefix + "Linked succesfully to @" + c.getRoomInfo().getHostName() + "'s LIVE!");
-                    break;
-
-                } catch (Exception ex) {
-                    if (ex instanceof  TikTokLiveOfflineHostException) {
-                        p.sendMessage(ChatColor.RED + "Cannot connect to @" + username + " because they are currently offline!");
-                        return;
-                    } else if (ex instanceof TikTokLiveUnknownHostException) {
-                        p.sendMessage(ChatColor.RED + "Couldn't find TikTok user: @" + username);
-                        return;
-                    }
-                    if (i == maxRetries) {
-                        if (ex instanceof TikTokSignServerException) {
-                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.isString("EULERSTREAM_API_KEY") ? " Please check your API key." : " Please try again."));
-                        } else if (ex instanceof TikTokLiveRequestException && ex.getCause() instanceof HttpTimeoutException) {
-                            p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
-                        } else {
-                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE. Check the server console for details.");
-                            ex.printStackTrace();
-                            return;
+        }
+        if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.GIFT) != null) {
+            builder.onGiftCombo((liveClient, event) -> {
+                if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event, clients.get(username).getRoomInfo().getHostName()); // Only handle Finished Combos
+            });
+        }
+        if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.FOLLOW) != null) {
+            builder.onFollow((liveClient, event) -> {
+                eventHandler.onFollow(event, clients.get(username).getRoomInfo().getHostName());
+            });
+        }
+        if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.SHARE) != null) {
+            builder.onShare((liveClient, event) -> {
+                eventHandler.onShare(event, clients.get(username).getRoomInfo().getHostName());
+            });
+        }
+        if (plugin.config.getBoolean("SHOW_CHAT")) {
+            builder.onComment((liveClient, event) -> {
+                if (!chatBlacklist.contains(event.getUser().getName())) {
+                    BaseComponent[] components = new BaseComponent[] {
+                        new ComponentBuilder(ChatColor.DARK_PURPLE + event.getUser().getProfileName() + ": ").create()[0],
+                        new ComponentBuilder(event.getText()).create()[0]
+                    };
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        if (player.hasPermission(permissions.BROADCAST.permission_id)) {
+                            player.spigot().sendMessage(components);
                         }
-                    } else {
-                        ChatPointsTTV.log.warning("There was an error while connecting to @" + username + "'s LIVE. Retrying in a few seconds...");
-                        try { Thread.sleep(3000); } catch (InterruptedException e) {}
-                    }  
+                    }
                 }
+            });
+        }
+
+        builder.configure((LiveClientSettings settings) -> {
+            HttpClientSettings httpSettings = settings.getHttpSettings();
+            httpSettings.setTimeout(Duration.of(30L, SECONDS));
+
+            if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
+                settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
             }
+            settings.setHttpSettings(httpSettings);
         });
+
+        for (int i = 1; i <= maxRetries; i++) {
+            try {
+                LiveClient c = builder.buildAndConnect();
+                accountConnected = true;
+                clients.put(username, c);
+                listenedProfiles.add(username);
+
+                if (save) {
+                    ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TIKTOK, username, Optional.empty());
+                }
+
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Linked succesfully to @" + c.getRoomInfo().getHostName() + "'s LIVE!");
+                break;
+
+            } catch (Exception ex) {
+                if (ex instanceof  TikTokLiveOfflineHostException) {
+                    p.sendMessage(ChatColor.RED + "Cannot connect to @" + username + " because they are currently offline!");
+                    return;
+                } else if (ex instanceof TikTokLiveUnknownHostException) {
+                    p.sendMessage(ChatColor.RED + "Couldn't find TikTok user: @" + username);
+                    return;
+                }
+                if (i == maxRetries) {
+                    if (ex instanceof TikTokSignServerException) {
+                        p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.isString("EULERSTREAM_API_KEY") ? " Please check your API key." : " Please try again."));
+                    } else if (ex instanceof TikTokLiveRequestException && ex.getCause() instanceof HttpTimeoutException) {
+                        p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
+                    } else {
+                        p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE. Check the server console for details.");
+                        ex.printStackTrace();
+                        return;
+                    }
+                } else {
+                    ChatPointsTTV.log.warning("There was an error while connecting to @" + username + "'s LIVE. Retrying in a few seconds...");
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {}
+                }  
+            }
+        }
     }
 
     public void stop(CommandSender p) {
-        for (String username : clients.keySet()) {
-            unlink(username, false);
+        if (clients != null) {
+            for (String username : clients.keySet()) {
+                unlink(username, false);
+            }
         }
 
         accountConnected = false;
@@ -170,7 +177,7 @@ public class TikTokClient {
         chatBlacklist = null;
         tiktokConfig = null;
 
-        isEnabled = false;
+        started = false;
         p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
     }
 
@@ -189,31 +196,33 @@ public class TikTokClient {
     }
 
     public TikTokClient(CommandSender p) {
-        clients = new HashMap<>();
-        chatBlacklist = new ArrayList<>();
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            clients = new HashMap<>();
+            chatBlacklist = new ArrayList<>();
 
-        CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
+            CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
 
-        File tiktokConfigFile = new File(plugin.getDataFolder(), "tiktok.yml");
-        if (!tiktokConfigFile.exists()) {
-            plugin.saveResource(tiktokConfigFile.getName(), false);
-        }
+            File tiktokConfigFile = new File(plugin.getDataFolder(), "tiktok.yml");
+            if (!tiktokConfigFile.exists()) {
+                plugin.saveResource(tiktokConfigFile.getName(), false);
+            }
 
-        tiktokConfig = YamlConfiguration.loadConfiguration(tiktokConfigFile);
-        if (!tiktokConfig.getStringList("CHAT_BLACKLIST").isEmpty()) {
-            chatBlacklist.addAll(tiktokConfig.getStringList("CHAT_BLACKLIST"));
-        }
+            tiktokConfig = YamlConfiguration.loadConfiguration(tiktokConfigFile);
+            if (!tiktokConfig.getStringList("CHAT_BLACKLIST").isEmpty()) {
+                chatBlacklist.addAll(tiktokConfig.getStringList("CHAT_BLACKLIST"));
+            }
 
-        eventHandler = new TikTokEvents();
+            eventHandler = new TikTokEvents();
 
-        listenedProfiles = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
-        for (String username : listenedProfiles) {
-            if (username.isBlank()) continue;
-            link(p, username, false);
-        }
+            listenedProfiles = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
+            for (String username : listenedProfiles) {
+                if (username.isBlank()) continue;
+                link(p, username, false);
+            }
 
-        isEnabled = true;
-        p.sendMessage("TikTok module enabled successfully!");
-    }
-    
+            started = true;
+            isReloading.set(false);
+            p.sendMessage("TikTok module enabled successfully!");
+        });
+    }    
 }

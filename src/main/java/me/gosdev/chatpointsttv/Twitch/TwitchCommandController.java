@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -24,6 +27,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchCommandController implements TabExecutor {
+    public final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
@@ -65,9 +69,7 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 case "unlink":
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                        twitch.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
-                    });
+                    twitch.unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                     return true;
 
                 case "accounts":
@@ -79,18 +81,16 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 case "stop":
-                    if (!twitch.isStarted()) {
-                        sender.sendMessage(ChatColor.RED + "Twitch client is already stopped.");
-                        return true;
-                    }
-                    Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-                        twitch.stop(sender);
-                    });
+                    twitch.stop(sender);
                     return true;
 
                 case "start":
+                    if (twitch.reloading.get()) {
+                        sender.sendMessage(ChatColor.RED + "Twitch Module is already starting.");
+                        return true;
+                    }
                     if (twitch.isStarted()) {
-                        sender.sendMessage(ChatColor.RED + "Twitch client is already started.");
+                        sender.sendMessage(ChatColor.RED + "Twitch Module is already started.");
                         return true;
                     }
                     ChatPointsTTV.enableTwitch(sender);
@@ -231,12 +231,22 @@ public class TwitchCommandController implements TabExecutor {
     }
 
     private void reload(CommandSender p) {
+        if (!ChatPointsTTV.getTwitch().reloading.compareAndSet(false, true)) {
+            p.sendMessage(ChatColor.RED + "Twitch Module is already reloading!");
+            return;
+        }
         Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
             ChatPointsTTV.getTwitch().stop(p);
-
-            Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> { // Reinstantiate TwitchClient class synchronously
-                ChatPointsTTV.enableTwitch(p);
-            });
+            try {
+                Bukkit.getScheduler().callSyncMethod(ChatPointsTTV.getPlugin(), () -> {
+                    ChatPointsTTV.enableTwitch(p); // Should set reloading to false once finished
+                    return null;
+                }).get();
+            } catch (InterruptedException e) {
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module reloaded!");
         });
     }
 
@@ -269,7 +279,7 @@ public class TwitchCommandController implements TabExecutor {
             channels.add(i.getChannelUsername());
         }
         
-        TextComponent footer = null;
+        TextComponent footer;
         if (p.equals(Bukkit.getConsoleSender())) {
             footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
         } else {
@@ -323,7 +333,7 @@ public class TwitchCommandController implements TabExecutor {
             "\n"
         ).create()[0];
         
-        String currentState = "";
+        String currentState;
         if (ChatPointsTTV.getTwitch().isStarted()) {
             if (ChatPointsTTV.getTwitch().isAccountConnected()) {
                 currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
