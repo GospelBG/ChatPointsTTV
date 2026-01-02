@@ -74,7 +74,7 @@ public class TikTokClient {
             return;
         }
 
-        p.sendMessage(ChatPointsTTV.msgPrefix + "Linking...");
+        p.sendMessage(ChatPointsTTV.msgPrefix + "Linking to @" + username + "'s LIVE");
 
         LiveClientBuilder builder = TikTokLive.newClient(username);
         if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.LIKE) != null) {
@@ -178,7 +178,7 @@ public class TikTokClient {
         tiktokConfig = null;
 
         started = false;
-        p.sendMessage(ChatColor.GREEN + "TikTok disconnected successfully!");
+        p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok disconnected successfully!");
     }
 
     public void unlink(String username, Boolean save) {
@@ -222,7 +222,7 @@ public class TikTokClient {
 
             started = true;
             isReloading.set(false);
-            p.sendMessage("TikTok module enabled successfully!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module enabled successfully!");
         });
     }    
 }
