@@ -83,7 +83,9 @@ public class TwitchCommandController implements TabExecutor {
                         sender.sendMessage(ChatColor.RED + "Twitch client is already stopped.");
                         return true;
                     }
-                    twitch.stop(sender);
+                    Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+                        twitch.stop(sender);
+                    });
                     return true;
 
                 case "start":
@@ -114,11 +116,14 @@ public class TwitchCommandController implements TabExecutor {
                         return true;
                     }
 
-                    if (twitch.createChannelPointRewards(twitch.credentialManager.get(twitch.getListenedChannels().get(args[1]).getChannelId()))) {
-                        sender.sendMessage(ChatColor.GREEN + "A new Channel Point Reward has been created. Check your Twitch Dashboard!");
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "Failed to create a new Channel Point Reward. Check the server console for more information.");
-                    }
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                        if (twitch.createChannelPointRewards(twitch.credentialManager.get(twitch.getListenedChannels().get(args[1]).getChannelId()))) {
+                            sender.sendMessage(ChatColor.GREEN + "A new Channel Point Reward has been created. Check your Twitch Dashboard!");
+                        } else {
+                            sender.sendMessage(ChatColor.RED + "Failed to create a new Channel Point Reward. Check the server console for more information.");
+                        }
+                    });
+                    
                     return true;
 
                 default:
@@ -226,8 +231,13 @@ public class TwitchCommandController implements TabExecutor {
     }
 
     private void reload(CommandSender p) {
-        ChatPointsTTV.getTwitch().stop(p);
-        ChatPointsTTV.enableTwitch(p);
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            ChatPointsTTV.getTwitch().stop(p);
+
+            Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> { // Reinstantiate TwitchClient class synchronously
+                ChatPointsTTV.enableTwitch(p);
+            });
+        });
     }
 
     private void help(CommandSender p) {

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -59,12 +60,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
-    public HashMap<String, OAuth2Credential> credentialManager;
+    public ConcurrentHashMap<String, OAuth2Credential> credentialManager;
 
     private boolean started;
     private Boolean accountConnected = false;
     private List<String> chatBlacklist;
-    private HashMap<String, Channel> channels;
+    private ConcurrentHashMap<String, Channel> channels;
     private TwitchEvents eventHandler;
     private IEventSubSocket eventSocket;
     private EventManager eventManager;
@@ -103,7 +104,7 @@ public class TwitchClient {
         return twitchConfig;
     }
 
-    public HashMap<String, Channel> getListenedChannels() {
+    public ConcurrentHashMap<String, Channel> getListenedChannels() {
         return channels;
     }
 
@@ -117,7 +118,7 @@ public class TwitchClient {
 
     public TwitchClient(CommandSender p) {
         CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
-        channels = new HashMap<>();
+        channels = new ConcurrentHashMap<>();
         tokenRefreshTasks = new HashMap<>();
         linkExecutor = Executors.newSingleThreadExecutor();
 
@@ -135,7 +136,7 @@ public class TwitchClient {
         accounts = accountsConfig.getConfigurationSection("twitch");
 
         identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
-        credentialManager = new HashMap<>();
+        credentialManager = new ConcurrentHashMap<>();
         exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
 
         chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
@@ -151,21 +152,24 @@ public class TwitchClient {
             FollowerLog.start();
         }
 
-        if (accounts != null) {
-            for (String userid : accounts.getKeys(false)) {
-                // Try to refresh token
-                try {
-                    link(p, refreshCredentials(userid));
-                } catch (RuntimeException e) {
-                    ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
-                    ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            if (accounts != null) {
+                for (String userid : accounts.getKeys(false)) {
+                    // Try to refresh token
+                    try {
+                        link(p, refreshCredentials(userid));
+                    } catch (RuntimeException e) {
+                        ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
+                        ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
+                    }      
                 }
             }
-        }
-        linkExecutor.submit(() -> {
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
+            linkExecutor.submit(() -> {
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");
+            });
+            
+            started = true;
         });
-        started = true;
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
