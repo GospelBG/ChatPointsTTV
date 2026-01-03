@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -105,6 +106,21 @@ public class ChatPointsTTV extends JavaPlugin {
         PluginManager pm = Bukkit.getServer().getPluginManager();
 
         if (metrics == null) metrics = new Metrics(this, 22873);
+
+        metrics.addCustomChart(new SingleLineChart("twitchModule", () -> {
+            if (twitch != null && twitch.isAccountConnected()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }));
+        metrics.addCustomChart(new SingleLineChart("tiktokModule", () -> {
+            if (tiktok != null && tiktok.isAccountConnected()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }));
         
         if (!plugin.getDataFolder().exists()) firstRun = true;
 
