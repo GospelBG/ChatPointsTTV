@@ -66,6 +66,7 @@ public class TwitchClient {
 
     private AtomicBoolean started = new AtomicBoolean(false);
     private AtomicBoolean accountConnected = new AtomicBoolean(false);
+    private AtomicBoolean linkInProgress = new AtomicBoolean(false);
     public AtomicBoolean reloading = new AtomicBoolean(true);
     private List<String> chatBlacklist;
     private ConcurrentHashMap<String, Channel> channels;
@@ -84,7 +85,6 @@ public class TwitchClient {
 
     public Boolean shouldMobsGlow;
     public Boolean nameSpawnedMobs;
-    public Boolean linkInProgress = false;
     public AlertMode alertMode;
     
     public final static String CLIENT_ID = "1peexftcqommf5tf5pt74g7b3gyki3";
@@ -127,7 +127,7 @@ public class TwitchClient {
         started.set(false);
         twitchExecutor = Executors.newSingleThreadExecutor();
 
-        twitchExecutor.submit(() -> {            
+        twitchExecutor.submit(() -> {
             CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
             channels = new ConcurrentHashMap<>();
             tokenRefreshTasks = new HashMap<>();
@@ -181,7 +181,7 @@ public class TwitchClient {
     }
 
     public void link(CommandSender p, OAuth2Credential credential) {
-        linkInProgress = true;
+        linkInProgress.set(true);
         try {
             saveCredential(credential.getUserId(), credential);
             credentialManager.put(credential.getUserId(), credential);
@@ -230,7 +230,7 @@ public class TwitchClient {
             p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Twitch account linking failed.");
             e.printStackTrace();
         }
-        linkInProgress = false;
+        linkInProgress.set(false);
     }
 
     private void start(OAuth2Credential credential) {
@@ -241,7 +241,7 @@ public class TwitchClient {
             .withEnableHelix(true)
             .withEnableEventSocket(true)
             .withScheduledThreadPoolExecutor(exec)
-            .build();        
+            .build();
 
         eventHandler = new TwitchEvents();
 
@@ -453,7 +453,7 @@ public class TwitchClient {
 
     public void unlink(CommandSender p, Optional<String> channelField) {
         twitchExecutor.submit(() -> {
-            linkInProgress = true;
+            linkInProgress.set(true);
             try {
                 if (!started.get()) {
                     p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
@@ -486,7 +486,7 @@ public class TwitchClient {
                 p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Failed to unlink an account.");
                 e.printStackTrace();
             }
-            linkInProgress = false;
+            linkInProgress.set(false);
         });
     }
 
@@ -520,7 +520,7 @@ public class TwitchClient {
                 p.sendMessage(ChatColor.RED + "Twitch Module is already stopped.");
                 return;
             }
-            
+
             try {
                 if (client != null) {
                     for (Channel channel : channels.values()) {
@@ -553,7 +553,7 @@ public class TwitchClient {
 
         twitchExecutor.shutdown();
         try {
-            if(!linkInProgress && !twitchExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+            if(!linkInProgress.get() && !twitchExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
                 twitchExecutor.shutdownNow();
                 ChatPointsTTV.log.warning("Twitch Module is taking too long to stop. Forcing shutdown...");
             }
