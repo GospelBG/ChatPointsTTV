@@ -25,7 +25,7 @@ public class TwitchAuth {
         p.sendMessage(ChatColor.GRAY + "Please wait...");
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            DeviceAuthorization auth = TwitchAuth.link(p, ChatPointsTTV.getTwitch());
+            DeviceAuthorization auth = TwitchAuth.link(p);
             TextComponent comp = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Account Linking" + ChatColor.RESET + " -------------\n\n");
             if (p.equals(Bukkit.getConsoleSender())) {
                 comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + "Go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + "https://twitch.tv/activate" + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode()));
@@ -42,14 +42,18 @@ public class TwitchAuth {
         });
     }
     
-    public static DeviceAuthorization link(CommandSender p, TwitchClient client) {
+    public static DeviceAuthorization link(CommandSender p) {
         OAuth2IdentityProvider identityProvider = new TwitchIdentityProvider(TwitchClient.CLIENT_ID, null, null);
         flowController = new DeviceFlowController();
         DeviceAuthorization auth = flowController.startOAuth2DeviceAuthorizationGrantType(identityProvider, TwitchClient.scopes,  response -> {
             if (response.getCredential() != null) {
-                ChatPointsTTV.getTwitch().getExecutor().submit(() -> {
-                    client.link(p, identityProvider.getAdditionalCredentialInformation(response.getCredential()).get());
-                });
+                TwitchClient client = ChatPointsTTV.getTwitch();
+
+                if (client != null && client.isStarted()) {
+                    client.getExecutor().submit(() -> {
+                        client.link(p, identityProvider.getAdditionalCredentialInformation(response.getCredential()).get());
+                    });
+                }
             } else {
                 switch(response.getError()) {
                     case ACCESS_DENIED:

@@ -29,7 +29,6 @@ import com.github.twitch4j.ITwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 import com.github.twitch4j.chat.events.channel.ChannelMessageEvent;
-import com.github.twitch4j.common.util.ThreadUtils;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
 import com.github.twitch4j.events.ChannelGoOfflineEvent;
 import com.github.twitch4j.eventsub.EventSubSubscription;
@@ -147,7 +146,8 @@ public class TwitchClient {
 
             identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
             credentialManager = new ConcurrentHashMap<>();
-            exec = ThreadUtils.getDefaultScheduledThreadPoolExecutor("twitch4j", Runtime.getRuntime().availableProcessors());
+            exec = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+            exec.setRemoveOnCancelPolicy(true);
 
             chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
             ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
