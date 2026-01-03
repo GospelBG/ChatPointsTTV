@@ -199,6 +199,7 @@ public class TikTokClient {
         Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
             clients = new HashMap<>();
             chatBlacklist = new ArrayList<>();
+            listenedProfiles = new ArrayList<>();
 
             CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
 
@@ -214,8 +215,7 @@ public class TikTokClient {
 
             eventHandler = new TikTokEvents();
 
-            listenedProfiles = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
-            for (String username : listenedProfiles) {
+            for (String username : ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK)) {
                 if (username.isBlank()) continue;
                 link(p, username, false);
             }
