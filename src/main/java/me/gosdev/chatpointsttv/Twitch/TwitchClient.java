@@ -153,6 +153,8 @@ public class TwitchClient {
             nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
             alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
 
+            setupTwitch4JLogs();
+
             
             if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
                 FollowerLog.start();
@@ -559,5 +561,30 @@ public class TwitchClient {
 
         started.set(false);
         p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has been successfully stopped!");
+    }
+    private void setupTwitch4JLogs() {
+        String[] loggers = {
+            "io.github.xanthic",
+            "com.netflix.config",
+            "me.gosdev.chatpointsttv.libraries.twitch4j"
+        };
+
+        try {
+            // Get Log4J2 with reflection
+            Class<?> configuratorClass = Class.forName("org.apache.logging.log4j.core.config.Configurator");
+            Class<?> levelClass = Class.forName("org.apache.logging.log4j.Level");
+            
+            Object level = levelClass.getField("ERROR").get(null);
+            java.lang.reflect.Method setLevelMethod = configuratorClass.getMethod("setLevel", String.class, levelClass);
+
+            for (String loggerName : loggers) {
+                setLevelMethod.invoke(null, loggerName, level);
+            }
+        } catch (Exception e) {
+            // In case of failure, try with java.util.logging
+            for (String loggerName : loggers) {
+                java.util.logging.Logger.getLogger(loggerName).setLevel(java.util.logging.Level.SEVERE);
+            }
+        }
     }
 }
