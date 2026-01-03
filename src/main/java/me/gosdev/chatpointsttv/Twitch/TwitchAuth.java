@@ -13,6 +13,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchAuth {
@@ -25,6 +26,7 @@ public class TwitchAuth {
         p.sendMessage(ChatColor.GRAY + "Please wait...");
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Boolean shouldHideCode = ChatPointsTTV.getPlugin().config.getBoolean("HIDE_LOGIN_CODES", false);
             DeviceAuthorization auth = TwitchAuth.link(p);
             TextComponent comp = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Account Linking" + ChatColor.RESET + " -------------\n\n");
             if (p.equals(Bukkit.getConsoleSender())) {
@@ -34,9 +36,21 @@ public class TwitchAuth {
                 button.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, auth.getVerificationUri()));
                 button.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(new TextComponent("Click to open in browser")).create()));
     
+                TextComponent code;
                 comp.addExtra(button);
+                if (shouldHideCode) {
+                    comp.addExtra(ChatColor.LIGHT_PURPLE + " to login with Twitch.\n" + ChatColor.GRAY + ChatColor.ITALIC + "Careful! Clicking the button above will show your device code as part of the link");
+                    comp.addExtra(ChatColor.LIGHT_PURPLE + "\n\nYou may also go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + "https://twitch.tv/activate" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " and enter this code: ");
+                    code = new TextComponent("" + ChatColor.DARK_PURPLE + ChatColor.MAGIC + ChatColor.BOLD + "ABCDEFGH");
+                    code.setHoverEvent(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("" + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode()).create()));
 
-                comp.addExtra(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + "https://twitch.tv/activate" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " and enter this code:\n\n" + ChatColor.GRAY + "   ➡ " + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode() + "\n");
+                    code.addExtra("" + ChatColor.GRAY + ChatColor.ITALIC + " (Hover to view)");
+                } else {
+                    comp.addExtra(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + "https://twitch.tv/activate" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " and enter this code:\n\n" + ChatColor.GRAY + "   ➡ ");
+                    code = new TextComponent("" + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode());
+                }
+                comp.addExtra(code);
+                comp.addExtra("\n");
             }
             p.spigot().sendMessage(comp);
         });

@@ -6,6 +6,9 @@ ENABLE_TWITCH: true
 # If true, the plugin will automatically start the TikTok client.
 ENABLE_TIKTOK: true
 
+# To prevent leaking Device Codes, this option will not show Device Codes used for logging in in the chat. Instead, you will need to hover to see the code.
+HIDE_LOGIN_CODES: false
+
 # Whether events should be ignored if the streamer is offline.
 IGNORE_OFFLINE_STREAMERS: false
 
