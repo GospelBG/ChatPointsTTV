@@ -314,8 +314,6 @@ public class TwitchClient {
     
     private void subscribeToEvents(OAuth2Credential credential) {
         String channel_id = credential.getUserId();
-        Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Listening to " + credential.getUserName() + "'s events...");
-
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
         if (CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS) != null) {
