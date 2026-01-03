@@ -63,9 +63,9 @@ public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
     public ConcurrentHashMap<String, OAuth2Credential> credentialManager;
 
-    private AtomicBoolean started = new AtomicBoolean(false);
-    private AtomicBoolean accountConnected = new AtomicBoolean(false);
-    private AtomicBoolean linkInProgress = new AtomicBoolean(false);
+    private final AtomicBoolean started = new AtomicBoolean(false);
+    private final AtomicBoolean accountConnected = new AtomicBoolean(false);
+    private final AtomicBoolean linkInProgress = new AtomicBoolean(false);
     public AtomicBoolean reloading = new AtomicBoolean(true);
     private List<String> chatBlacklist;
     private ConcurrentHashMap<String, Channel> channels;
