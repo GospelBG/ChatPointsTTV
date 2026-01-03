@@ -89,14 +89,10 @@ public class TwitchClient {
     public final static String CLIENT_ID = "1peexftcqommf5tf5pt74g7b3gyki3";
     public final static List<Object> scopes = new ArrayList<>(Arrays.asList(
         Scopes.CHANNEL_READ_REDEMPTIONS,
-        Scopes.CHANNEL_READ_SUBSCRIPTIONS,
         Scopes.CHANNEL_MANAGE_REDEMPTIONS,
         Scopes.MODERATOR_READ_FOLLOWERS,
-        Scopes.BITS_READ,
         Scopes.USER_READ_CHAT,
-        Scopes.CHAT_READ,
-        Scopes.USER_BOT,
-        Scopes.CHANNEL_BOT
+        Scopes.CHAT_READ
     ));
 
     public ITwitchClient getClient() {
