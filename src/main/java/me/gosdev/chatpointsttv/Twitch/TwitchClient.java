@@ -371,7 +371,7 @@ public class TwitchClient {
             client.getHelix().createCustomReward(
                 account.getAccessToken(),
                 account.getUserId(),
-                new CustomReward().builder()
+                CustomReward.builder()
                     .title("ChatPointsTTV Reward (" + uID.toString() + ")")
                     .prompt("This reward was created by ChatPointsTTV and its redemptions will be managed automatically.")
                     .isEnabled(false)
