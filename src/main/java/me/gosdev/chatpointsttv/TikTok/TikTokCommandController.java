@@ -44,11 +44,11 @@ public class TikTokCommandController implements TabExecutor {
         switch(args[0]) {
             case "start":
                 if (ChatPointsTTV.getTikTok().isReloading.get()) {
-                    sender.sendMessage(ChatColor.RED + "TikTok client is already starting.");
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is already starting.");
                     return true;
                 }
                 if (ChatPointsTTV.getTikTok().started) {
-                    sender.sendMessage(ChatColor.RED + "TikTok client is already started.");
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is already started.");
                     return true;
                 }
 
@@ -59,7 +59,7 @@ public class TikTokCommandController implements TabExecutor {
 
             case "stop":
                 if (!ChatPointsTTV.getTikTok().started) {
-                    sender.sendMessage(ChatColor.RED + "TikTok client is already stopped.");
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is already stopped.");
                     return true;
                 }
                 
@@ -241,11 +241,11 @@ public class TikTokCommandController implements TabExecutor {
         java.util.List<String> accounts = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
         
         if (!ChatPointsTTV.getTikTok().started) {
-            p.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
+            p.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
             return;
         }
 
-        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
+        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected TikTok LIVEs" + ChatColor.RESET + " ----------\n\n");
         
         if (p.equals(Bukkit.getConsoleSender())) {
             for (String account : accounts) {
@@ -256,7 +256,7 @@ public class TikTokCommandController implements TabExecutor {
             for (String account : accounts) {
                 if (account.isBlank()) continue;
                 BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
-                deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this account").create()));
+                deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this LIVE").create()));
                 deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tiktok unlink " + account));
                 msg.addExtra(deleteButton);
                 msg.addExtra(new TextComponent("  " + account + "\n"));
@@ -264,12 +264,12 @@ public class TikTokCommandController implements TabExecutor {
         }
 
         if (accounts.isEmpty()) {
-            msg.addExtra(ChatColor.GRAY + "  There are no connected accounts :(\n");
+            msg.addExtra(ChatColor.GRAY + "  There are no connected LIVEs :(\n");
         }
 
         TextComponent footer;
         if (p.equals(Bukkit.getConsoleSender())) {
-            footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink an account, use /tiktok unlink <username>\nTo add an account, use /tiktok link <username>");
+            footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink a LIVE, use /tiktok unlink <username>\nTo add a LIVE, use /tiktok link <username>");
         } else {
             footer = TikTokButtonComponents.accountLink();
             if (!accounts.isEmpty()) {
@@ -296,9 +296,9 @@ public class TikTokCommandController implements TabExecutor {
         }
 
         BaseComponent msg = new ComponentBuilder(
-            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok status" + ChatColor.RESET + " ----------\n" +
+            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Status" + ChatColor.RESET + " ----------\n" +
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.getDescription().getVersion() + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" + 
+            ChatColor.LIGHT_PURPLE + "Listened LIVEs: " + ChatColor.RESET + strChannels + "\n" + 
             "\n"
         ).create()[0];
 
@@ -342,7 +342,7 @@ public class TikTokCommandController implements TabExecutor {
         Boolean offlineTest = false;
 
         if (!ChatPointsTTV.getTikTok().started) {
-            sender.sendMessage(ChatColor.RED + "You must start the TikTok Client first!");
+            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
             return;
         }
 

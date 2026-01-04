@@ -14,7 +14,7 @@ IGNORE_OFFLINE_STREAMERS: false
 # Whether stream chat messages should show up on the in-game chat
 SHOW_CHAT: true
 
-# Whether events should be printed to the server console. (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
+# Whether events should be printed to the server console. (exampleViewer cheered 300 bits; exampleViewer has subscribed with a Tier 1 sub; ...)
 LOG_EVENTS: true
 
 # In-game event alerts mode.
@@ -25,7 +25,6 @@ LOG_EVENTS: true
 INGAME_ALERTS: chat
 
 # GLOBAL CONFIGURATION:
-
 # Adds glow effect to spawned mobs
 MOB_GLOW: true
 

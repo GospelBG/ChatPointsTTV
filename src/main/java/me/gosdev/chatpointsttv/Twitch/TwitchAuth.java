@@ -28,7 +28,7 @@ public class TwitchAuth {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             Boolean shouldHideCode = ChatPointsTTV.getPlugin().config.getBoolean("HIDE_LOGIN_CODES", false);
             DeviceAuthorization auth = TwitchAuth.link(p);
-            TextComponent comp = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Account Linking" + ChatColor.RESET + " -------------\n\n");
+            TextComponent comp = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Twitch Account Linking" + ChatColor.RESET + " -------------\n\n");
             if (p.equals(Bukkit.getConsoleSender())) {
                 comp.addExtra(new TextComponent(ChatColor.LIGHT_PURPLE + "Go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + "https://twitch.tv/activate" + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode()));
             } else {

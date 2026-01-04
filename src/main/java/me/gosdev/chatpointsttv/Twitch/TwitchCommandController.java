@@ -33,10 +33,10 @@ public class TwitchCommandController implements TabExecutor {
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link a Twitch account.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink [username]: " + ChatColor.RESET + "Removes an account and the stored credentials. If a username is not provided all accounts will be unlinked.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch client.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch status: " + ChatColor.RESET + "Displays information about the plugin and the Twitch module.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch createreward <username>: " + ChatColor.RESET + "Creates a new custom channel reward.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch start: " + ChatColor.RESET + "Starts the Twitch client and logs in to any saved accounts.\n" +
-        ChatColor.LIGHT_PURPLE + "/twitch stop: " + ChatColor.RESET + "Stops the Twitch client. All incoming events will be ignored.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch start: " + ChatColor.RESET + "Starts the Twitch module and logs in to any saved accounts.\n" +
+        ChatColor.LIGHT_PURPLE + "/twitch stop: " + ChatColor.RESET + "Stops the Twitch module. All incoming events will be ignored.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files.\n" + 
         ChatColor.LIGHT_PURPLE + "/twitch test <type> <...>: " + ChatColor.RESET + "Mocks an event.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch help: " + ChatColor.RESET + "Displays this help message.").create()[0];
@@ -107,7 +107,7 @@ public class TwitchCommandController implements TabExecutor {
                     }
 
                     if (!twitch.isStarted()) {
-                        sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+                        sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
                         return true;
                     }
 
@@ -268,10 +268,10 @@ public class TwitchCommandController implements TabExecutor {
 
     private void accounts(CommandSender p) {
         java.util.ArrayList<String> channels = new java.util.ArrayList<>();
-        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Accounts" + ChatColor.RESET + " ----------\n\n");
+        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Twitch Accounts" + ChatColor.RESET + " ----------\n\n");
         
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
             return;
         }
         
@@ -327,7 +327,7 @@ public class TwitchCommandController implements TabExecutor {
         }
         
         BaseComponent msg = new ComponentBuilder(
-            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch status" + ChatColor.RESET + " ----------\n" +
+            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Status" + ChatColor.RESET + " ----------\n" +
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" +
             "\n"
@@ -363,7 +363,7 @@ public class TwitchCommandController implements TabExecutor {
 
     private void test(CommandSender sender, String[] cmdInput) {
         if (!ChatPointsTTV.getTwitch().isStarted() ) {
-            sender.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
             return;
         }
 
