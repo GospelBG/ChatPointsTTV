@@ -73,27 +73,30 @@ public class TwitchEvents {
     public void onSub(ChannelChatNotificationEvent event) {
         String chatter = event.getChatterUserName();
         SubscriptionPlan tier;
+        Integer durationMonths;
 
         switch (event.getNoticeType()) {
             case SUB:
                 if (event.getSub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
                 else tier = event.getSub().getSubTier();
+                durationMonths = event.getSub().getDurationMonths();
                 break;
             case RESUB:
                 if (event.getResub().isPrime()) tier = SubscriptionPlan.TWITCH_PRIME;
                 else tier = event.getResub().getSubTier();
+                durationMonths = event.getResub().getDurationMonths();
                 break;
             default:
                 ChatPointsTTV.log.warning("Couldn't fetch sub type!");
                 return;
-            
+
         }
 
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), EventType.SUB)) {
             if (!reward.getTargetId().equals(event.getBroadcasterUserId()) && !reward.getTargetId().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
-                CPTTV_EventHandler.onEvent(Platforms.TWITCH, EventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(event.getSub().getDurationMonths().toString()));
+                CPTTV_EventHandler.onEvent(Platforms.TWITCH, EventType.SUB, reward, chatter, event.getBroadcasterUserName(), Optional.of(durationMonths.toString()));
                 return;
             }
         }

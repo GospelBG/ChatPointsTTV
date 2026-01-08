@@ -49,6 +49,7 @@ import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
 import me.gosdev.chatpointsttv.Utils.ColorUtils;
+import me.gosdev.chatpointsttv.Utils.EquipmentParser;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 import me.gosdev.chatpointsttv.Utils.Scopes;
 import net.md_5.bungee.api.ChatColor;
@@ -128,6 +129,9 @@ public class TwitchClient {
             plugin.saveResource(twitchConfigFile.getName(), false);
         }
         twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
+
+        // Load equipment sets from configuration
+        EquipmentParser.loadEquipmentSets(twitchConfig);
 
         accountsFile = new File(plugin.getDataFolder(), "accounts");
         accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);

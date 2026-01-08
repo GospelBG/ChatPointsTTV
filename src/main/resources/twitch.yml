@@ -4,8 +4,48 @@
 
 # See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
 
+# EQUIPMENT SETS:
+# Define reusable equipment configurations. Reference them with @set_name in actions.
+# You can override specific slots inline: SPAWN Zombie 1 @knight helmet:GOLD_HELMET
+#
+# EQUIPMENT_SETS:
+#   knight:
+#     weapon: DIAMOND_SWORD
+#     helmet: IRON_HELMET
+#     chestplate: IRON_CHESTPLATE
+#     leggings: IRON_LEGGINGS
+#     boots: IRON_BOOTS
+#
+#   archer:
+#     weapon: BOW
+#     helmet: LEATHER_HELMET
+#
+#   tank:
+#     helmet: DIAMOND_HELMET
+#     chestplate: DIAMOND_CHESTPLATE
+#     leggings: DIAMOND_LEGGINGS
+#     boots: DIAMOND_BOOTS
+
 # Actions format:
-#     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
+#     SPAWN {ENTITY_NAME} [AMOUNT] [EQUIPMENT] [TARGET PLAYER]
+#       Equipment formats:
+#         Key-value: weapon:DIAMOND_SWORD helmet:LEATHER_HELMET
+#         Equipment set: @knight
+#         Override set: @knight helmet:GOLD_HELMET
+#         Legacy (deprecated): diamond_sword,leather_helmet,null,null,null
+#       Valid slots: weapon, helmet, chestplate, leggings, boots
+#
+#       Enchantments: Add after material with :enchant:level pairs
+#         weapon:BOW:power:5:flame:1
+#         helmet:DIAMOND_HELMET:protection:4:unbreaking:3
+#         weapon:DIAMOND_SWORD:sharpness:5:fire_aspect:2:looting:3
+#
+#       Common enchantment aliases:
+#         power (arrow_damage), flame (arrow_fire), infinity (arrow_infinite)
+#         sharpness (damage_all), smite (damage_undead), bane_of_arthropods (damage_arthropods)
+#         protection (protection_environmental), fire_protection (protection_fire)
+#         blast_protection (protection_explosions), projectile_protection (protection_projectile)
+#         looting (loot_bonus_mobs), fortune (loot_bonus_blocks), efficiency (dig_speed)
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
 #     GIVE {ITEM} [AMOUNT] [TARGET PLAYER]
 #     EFFECT {EFFECT NAME} {STRENGTH} {DURATION} [TARGET PLAYER]
@@ -30,6 +70,42 @@
 # To add a streamer-specific reward add the actions inside a list named as the desired channel.
 # To target all channels use "default" as the list key.
 # For more information, see examples in the README file.
+
+# EQUIPMENT EXAMPLES:
+#
+# Key-value syntax (specify only what you need):
+# SUB_REWARDS:
+#   TIER1:
+#     - SPAWN Skeleton 1 weapon:BOW
+#     - SPAWN Zombie 1 weapon:DIAMOND_SWORD helmet:DIAMOND_HELMET
+#
+# With enchantments:
+#   TIER2:
+#     - SPAWN Skeleton 1 weapon:BOW:power:5:flame:1
+#     - SPAWN Zombie 1 weapon:DIAMOND_SWORD:sharpness:5:fire_aspect:2
+#
+#   TIER3:
+#     - SPAWN Skeleton 1 weapon:BOW:power:5:flame:1:infinity:1 helmet:DIAMOND_HELMET:protection:4
+#
+# Equipment sets (reusable configurations):
+# EQUIPMENT_SETS:
+#   enchanted_archer:
+#     weapon: BOW:power:5:flame:1:infinity:1
+#     helmet: DIAMOND_HELMET:protection:4:unbreaking:3
+#
+# CHANNEL_POINTS_REWARDS:
+#   "Spawn Knight":
+#     - SPAWN Zombie 1 @knight
+#
+#   "Spawn Golden Knight":
+#     - SPAWN Zombie 1 @knight helmet:GOLD_HELMET
+#
+#   "Spawn Enchanted Archer":
+#     - SPAWN Skeleton 1 @enchanted_archer
+#
+# Target specific players:
+#   - SPAWN Skeleton 1 weapon:BOW:power:5 PlayerName
+#   - SPAWN Zombie 1 @knight elinpelin420
 
 # Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
 # CHANNEL_POINTS_REWARDS:

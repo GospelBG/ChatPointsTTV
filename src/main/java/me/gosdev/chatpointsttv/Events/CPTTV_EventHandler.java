@@ -27,6 +27,9 @@ import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.Utils.EquipmentParser;
+import me.gosdev.chatpointsttv.Utils.EquipmentParser.EquipmentSlots;
+import me.gosdev.chatpointsttv.Utils.EquipmentParser.ParseResult;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class CPTTV_EventHandler {
@@ -126,10 +129,21 @@ public class CPTTV_EventHandler {
                             if (parts.length > 2) {
                                 amount = Integer.valueOf(parts[2]);
                             }
-                            if (parts.length > 3) {
-                                target = Bukkit.getPlayer(parts[3]);
-                            }
-                            action = new SpawnAction(EntityType.valueOf(parts[1]), nameSpawnedMobs ? chatter : null, Optional.ofNullable(amount), target, shouldGlow);
+
+                            // Parse equipment using new utility (supports key-value, sets, and legacy formats)
+                            ParseResult result = EquipmentParser.parseEquipment(
+                                parts, 3,
+                                ChatPointsTTV.getTwitch().getConfig(),
+                                errorStr
+                            );
+
+                            EquipmentSlots equipment = result.getEquipment();
+                            target = result.getTarget();
+
+                            action = new SpawnAction(EntityType.valueOf(parts[1]), nameSpawnedMobs ? chatter : null,
+                                                   Optional.ofNullable(amount), target, shouldGlow,
+                                                   equipment.weapon, equipment.helmet, equipment.chestplate,
+                                                   equipment.leggings, equipment.boots);
                             break;
                         case "RUN":
                             String text = "";
