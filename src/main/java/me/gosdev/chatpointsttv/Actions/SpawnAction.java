@@ -1,5 +1,6 @@
 package me.gosdev.chatpointsttv.Actions;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.Bukkit;
@@ -67,35 +68,88 @@ public class SpawnAction extends BaseAction {
                         EntityEquipment equipment = living.getEquipment();
 
                         if (equipment != null) {
+                            boolean hasEquipment = false;
+                            StringBuilder equipmentLog = new StringBuilder();
+                            equipmentLog.append("Spawned ").append(entity.name()).append(" with ");
+
                             if (weapon != null) {
                                 ItemStack weaponItem = new ItemStack(weapon.material);
                                 weapon.enchantments.forEach((ench, level) -> weaponItem.addUnsafeEnchantment(ench, level));
                                 equipment.setItemInMainHand(weaponItem);
+
+                                hasEquipment = true;
+                                equipmentLog.append("weapon: ").append(weapon.material.name());
+                                appendEnchantments(equipmentLog, weapon.enchantments);
                             }
+
                             if (helmet != null) {
                                 ItemStack helmetItem = new ItemStack(helmet.material);
                                 helmet.enchantments.forEach((ench, level) -> helmetItem.addUnsafeEnchantment(ench, level));
                                 equipment.setHelmet(helmetItem);
+
+                                if (hasEquipment) equipmentLog.append(", ");
+                                hasEquipment = true;
+                                equipmentLog.append("helmet: ").append(helmet.material.name());
+                                appendEnchantments(equipmentLog, helmet.enchantments);
                             }
+
                             if (chestplate != null) {
                                 ItemStack chestplateItem = new ItemStack(chestplate.material);
                                 chestplate.enchantments.forEach((ench, level) -> chestplateItem.addUnsafeEnchantment(ench, level));
                                 equipment.setChestplate(chestplateItem);
+
+                                if (hasEquipment) equipmentLog.append(", ");
+                                hasEquipment = true;
+                                equipmentLog.append("chestplate: ").append(chestplate.material.name());
+                                appendEnchantments(equipmentLog, chestplate.enchantments);
                             }
+
                             if (leggings != null) {
                                 ItemStack leggingsItem = new ItemStack(leggings.material);
                                 leggings.enchantments.forEach((ench, level) -> leggingsItem.addUnsafeEnchantment(ench, level));
                                 equipment.setLeggings(leggingsItem);
+
+                                if (hasEquipment) equipmentLog.append(", ");
+                                hasEquipment = true;
+                                equipmentLog.append("leggings: ").append(leggings.material.name());
+                                appendEnchantments(equipmentLog, leggings.enchantments);
                             }
+
                             if (boots != null) {
                                 ItemStack bootsItem = new ItemStack(boots.material);
                                 boots.enchantments.forEach((ench, level) -> bootsItem.addUnsafeEnchantment(ench, level));
                                 equipment.setBoots(bootsItem);
+
+                                if (hasEquipment) equipmentLog.append(", ");
+                                hasEquipment = true;
+                                equipmentLog.append("boots: ").append(boots.material.name());
+                                appendEnchantments(equipmentLog, boots.enchantments);
+                            }
+
+                            // Log only if equipment was added
+                            if (hasEquipment) {
+                                ChatPointsTTV.log.info(equipmentLog.toString());
                             }
                         }
                     }
                 });
-            }     
+            }
+        }
+    }
+
+    /**
+     * Helper method to append enchantments to log
+     */
+    private void appendEnchantments(StringBuilder log, Map<Enchantment, Integer> enchantments) {
+        if (!enchantments.isEmpty()) {
+            log.append(" (");
+            boolean first = true;
+            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                if (!first) log.append(", ");
+                log.append(entry.getKey().getName()).append(" ").append(entry.getValue());
+                first = false;
+            }
+            log.append(")");
         }
     }
 }

@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
@@ -149,9 +150,10 @@ public class EquipmentParser {
      * @param startIndex Index to start parsing equipment from
      * @param config Twitch configuration for loading equipment sets
      * @param errorStr Error message prefix for warnings
+     * @param entityType Entity type for random equipment generation
      * @return ParseResult containing equipment and optional target player
      */
-    public static ParseResult parseEquipment(String[] parts, int startIndex, FileConfiguration config, String errorStr) {
+    public static ParseResult parseEquipment(String[] parts, int startIndex, FileConfiguration config, String errorStr, EntityType entityType) {
         EquipmentSlots baseEquipment = new EquipmentSlots();
         EquipmentSlots overrideEquipment = new EquipmentSlots();
         Player target = null;
@@ -180,7 +182,7 @@ public class EquipmentParser {
 
             // Check for key-value equipment (key:VALUE)
             if (part.contains(":")) {
-                parseKeyValue(part, overrideEquipment, errorStr);
+                parseKeyValue(part, overrideEquipment, errorStr, entityType);
                 continue;
             }
 
@@ -206,7 +208,7 @@ public class EquipmentParser {
     /**
      * Parse key-value equipment format: key:VALUE
      */
-    private static void parseKeyValue(String keyValue, EquipmentSlots slots, String errorStr) {
+    private static void parseKeyValue(String keyValue, EquipmentSlots slots, String errorStr, EntityType entityType) {
         String[] split = keyValue.split(":", 2);
 
         if (split.length != 2) {
@@ -215,7 +217,7 @@ public class EquipmentParser {
         }
 
         String key = split[0].toLowerCase().trim();
-        String value = split[1].trim(); // Don't convert to uppercase yet, need to preserve case for parsing
+        String value = split[1].trim();
 
         // Validate equipment key
         if (!isValidEquipmentKey(key)) {
@@ -234,8 +236,65 @@ public class EquipmentParser {
             return;
         }
 
-        // Parse material and enchantments (format: MATERIAL:enchant:level:enchant:level...)
-        ItemData itemData = parseItemWithEnchantments(value, errorStr);
+        // Handle random keywords
+        ItemData itemData = null;
+        String valueUpper = value.toUpperCase();
+
+        if (key.equals("weapon") && valueUpper.equals("RANDOM_WEAPON")) {
+            // Check if mob can equip weapons
+            if (!RandomEquipmentGenerator.canEquipWeapon(entityType)) {
+                ChatPointsTTV.log.warning(errorStr + "Entity " + entityType + " cannot equip weapons. RANDOM_WEAPON ignored.");
+                return;
+            }
+
+            itemData = RandomEquipmentGenerator.generateRandomWeapon(entityType, false);
+            if (itemData == null) {
+                ChatPointsTTV.log.warning(errorStr + "No weapon pool defined for " + entityType + ". RANDOM_WEAPON ignored.");
+                return;
+            }
+        } else if (key.equals("weapon") && valueUpper.equals("RANDOM_ENCHANT_WEAPON")) {
+            if (!RandomEquipmentGenerator.canEquipWeapon(entityType)) {
+                ChatPointsTTV.log.warning(errorStr + "Entity " + entityType + " cannot equip weapons. RANDOM_ENCHANT_WEAPON ignored.");
+                return;
+            }
+
+            itemData = RandomEquipmentGenerator.generateRandomWeapon(entityType, true);
+            if (itemData == null) {
+                ChatPointsTTV.log.warning(errorStr + "No weapon pool defined for " + entityType + ". RANDOM_ENCHANT_WEAPON ignored.");
+                return;
+            }
+        } else if (valueUpper.equals("RANDOM_ARMOR")) {
+            // Check if mob can equip armor
+            if (!RandomEquipmentGenerator.canEquipArmor(entityType)) {
+                ChatPointsTTV.log.warning(errorStr + "Entity " + entityType + " cannot equip armor. RANDOM_ARMOR ignored.");
+                return;
+            }
+
+            int slotIndex = getArmorSlotIndex(key);
+            if (slotIndex == -1) {
+                ChatPointsTTV.log.warning(errorStr + "RANDOM_ARMOR can only be used with armor slots (helmet, chestplate, leggings, boots).");
+                return;
+            }
+
+            itemData = RandomEquipmentGenerator.generateRandomArmorPiece(slotIndex, false);
+        } else if (valueUpper.equals("RANDOM_ENCHANT_ARMOR")) {
+            if (!RandomEquipmentGenerator.canEquipArmor(entityType)) {
+                ChatPointsTTV.log.warning(errorStr + "Entity " + entityType + " cannot equip armor. RANDOM_ENCHANT_ARMOR ignored.");
+                return;
+            }
+
+            int slotIndex = getArmorSlotIndex(key);
+            if (slotIndex == -1) {
+                ChatPointsTTV.log.warning(errorStr + "RANDOM_ENCHANT_ARMOR can only be used with armor slots (helmet, chestplate, leggings, boots).");
+                return;
+            }
+
+            itemData = RandomEquipmentGenerator.generateRandomArmorPiece(slotIndex, true);
+        } else {
+            // Regular parsing (existing logic)
+            itemData = parseItemWithEnchantments(value, errorStr);
+        }
+
         if (itemData == null) {
             return;
         }
@@ -257,6 +316,19 @@ public class EquipmentParser {
             case "boots":
                 slots.boots = itemData;
                 break;
+        }
+    }
+
+    /**
+     * Helper to get armor slot index for RandomEquipmentGenerator
+     */
+    private static int getArmorSlotIndex(String key) {
+        switch (key) {
+            case "helmet": return 0;
+            case "chestplate": return 1;
+            case "leggings": return 2;
+            case "boots": return 3;
+            default: return -1;
         }
     }
 

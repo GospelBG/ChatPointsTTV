@@ -134,7 +134,8 @@ public class CPTTV_EventHandler {
                             ParseResult result = EquipmentParser.parseEquipment(
                                 parts, 3,
                                 ChatPointsTTV.getTwitch().getConfig(),
-                                errorStr
+                                errorStr,
+                                EntityType.valueOf(parts[1].toUpperCase())
                             );
 
                             EquipmentSlots equipment = result.getEquipment();
