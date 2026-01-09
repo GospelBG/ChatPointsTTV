@@ -40,12 +40,28 @@
 #         helmet:DIAMOND_HELMET:protection:4:unbreaking:3
 #         weapon:DIAMOND_SWORD:sharpness:5:fire_aspect:2:looting:3
 #
+#       Random Equipment (NEW!):
+#         RANDOM_WEAPON - Random weapon based on mob type
+#           - Skeletons get bows, Zombies get swords/axes, etc.
+#         RANDOM_ENCHANT_WEAPON - Random weapon with 1-3 random enchantments
+#         RANDOM_ARMOR - Random armor piece (leather/chain/iron/gold/diamond)
+#         RANDOM_ENCHANT_ARMOR - Random armor with 1-3 random enchantments
+#
+#       Random Equipment Examples:
+#         weapon:RANDOM_WEAPON                    - Random mob-appropriate weapon
+#         weapon:RANDOM_ENCHANT_WEAPON            - Random weapon with enchants
+#         helmet:RANDOM_ARMOR                     - Random helmet material
+#         helmet:RANDOM_ENCHANT_ARMOR             - Random helmet with enchants
+#         SPAWN Zombie 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ENCHANT_ARMOR
+#         SPAWN Skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
+#
 #       Common enchantment aliases:
 #         power (arrow_damage), flame (arrow_fire), infinity (arrow_infinite)
 #         sharpness (damage_all), smite (damage_undead), bane_of_arthropods (damage_arthropods)
 #         protection (protection_environmental), fire_protection (protection_fire)
 #         blast_protection (protection_explosions), projectile_protection (protection_projectile)
 #         looting (loot_bonus_mobs), fortune (loot_bonus_blocks), efficiency (dig_speed)
+#
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
 #     GIVE {ITEM} [AMOUNT] [TARGET PLAYER]
 #     EFFECT {EFFECT NAME} {STRENGTH} {DURATION} [TARGET PLAYER]
@@ -87,6 +103,14 @@
 #   TIER3:
 #     - SPAWN Skeleton 1 weapon:BOW:power:5:flame:1:infinity:1 helmet:DIAMOND_HELMET:protection:4
 #
+# With random equipment:
+#   TIER1:
+#     - SPAWN Zombie 1 weapon:RANDOM_WEAPON
+#     - SPAWN Skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR
+#
+#   TIER2:
+#     - SPAWN Zombie 5 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ENCHANT_ARMOR chestplate:RANDOM_ENCHANT_ARMOR
+#
 # Equipment sets (reusable configurations):
 # EQUIPMENT_SETS:
 #   enchanted_archer:
@@ -103,6 +127,9 @@
 #   "Spawn Enchanted Archer":
 #     - SPAWN Skeleton 1 @enchanted_archer
 #
+#   "Random Chaos":
+#     - SPAWN Zombie 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ENCHANT_ARMOR chestplate:RANDOM_ENCHANT_ARMOR leggings:RANDOM_ENCHANT_ARMOR boots:RANDOM_ENCHANT_ARMOR
+#
 # Target specific players:
 #   - SPAWN Skeleton 1 weapon:BOW:power:5 PlayerName
 #   - SPAWN Zombie 1 @knight elinpelin420
@@ -117,31 +144,46 @@
 FOLLOW_SPAM_PROTECTION: true
 
 # For follows, put the desired action after the colon as a list. You shouldn't add anything else.
-# FOLLOW_REWARDS:
-#   - {ACTION}
-#   - {ACTION}
+FOLLOW_REWARDS:
+  - SPAWN snow_golem 1
 
-# CHEER_REWARDS:
-#  [MINIMUM BITS AMOUNT]:
-#    - {ACTION}
+CHEER_REWARDS:
+ # 100:
+   # - SHUFFLE *
+ 1000:
+   - GIVE ender_pearl 1
 
 # Subscription tier values: TWITCH_PRIME/TIER1/TIER2/TIER3.
-# SUB_REWARDS:
-#  TWITCH_PRIME:
-#    - {ACTION}
-#  [TIER1/2/3]:
-#    - {ACTION}
+SUB_REWARDS:
+ TWITCH_PRIME:
+   - SPAWN Skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
+ TIER1:
+   - SPAWN Skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
+ TIER2:
+   - SPAWN Skeleton 2 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
+ TIER3:
+   - SPAWN Skeleton 3 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
 
-# GIFT_REWARDS:
-#  [MINIMUM AMOUNT]:
-#    - {ACTION}
+GIFT_REWARDS:
+ 1:
+   - SPAWN Skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR
+ 5:
+   - SPAWN wither_skeleton 1 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ARMOR chestplate:RANDOM_ARMOR
+ 10:
+   - SPAWN Creeper 1
+   - WAIT 5
+   - SPAWN Creeper 1
 
-# RAID_REWARDS:
-#  [VIEWER THRESHOLD]:
-#    - {ACTION}
+RAID_REWARDS:
+ 30:
+   - EFFECT BLINDNESS 1 5
+   - SPAWN Zombie 3 weapon:RANDOM_ENCHANT_WEAPON helmet:RANDOM_ENCHANT_ARMOR chestplate:RANDOM_ENCHANT_ARMOR leggings:RANDOM_ENCHANT_ARMOR boots:RANDOM_ENCHANT_ARMOR
 
 # Add chat bot and other unwanted chatter usernames (in lowercase) to this list to prevent their messages displaying on the in-game chat.
-CHAT_BLACKLIST: []
+CHAT_BLACKLIST:
+- nightbot
+- streamelements
+- streamlabs
 
 # OVERRIDEN CONFIGURATION:
 # Uncomment and change the values to override the default configuration for Twitch events.
