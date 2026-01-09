@@ -1,12 +1,9 @@
-# You can set up here your TikTok events.
-# Add as many lines as needed. Replace [CONDITION] with the minimum amount of bits/subs/viewers, a subscription tier or a Channel Point Reward name.
-# For Channel Point Rewards make sure it's spelled EXACTLY as it appears on Twitch.
-
-# See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
+# Take a look at the documentation website for more information on this config file: https://gosdev.me/chatpointsttv/config/#tiktokyml
 
 # To avoid rate limits, use may use your own EulerStream API key.
 # EULERSTREAM_API_KEY:
 
+# You can set up here your TikTok events and actions.
 # Actions format:
 #     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
@@ -63,7 +60,7 @@ SHARE_EVENTS:
 CHAT_BLACKLIST: []
 
 # OVERRIDEN CONFIGURATION:
-# Uncomment and change the values to override the default configuration for Twitch events.
+# Uncomment and change the values to override the default configuration for TikTok events.
 # If it is left commented, the default value in config.yml will be used.
 
 # Adds glow effect to spawned mobs

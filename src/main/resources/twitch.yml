@@ -1,12 +1,11 @@
+# Take a look at the documentation website for more information on this config file: https://gosdev.me/chatpointsttv/config/#tiktokyml
+
 # Automatically show and hide and mark as completed redemptions of Channel Point Rewards created by the plugin.
 MANAGE_CHANNEL_POINT_REWARDS: true
 
 # You can set up here your Twitch events.
 # Add as many lines as needed. Replace [CONDITION] with the minimum amount of bits/subs/viewers, a subscription tier or a Channel Point Reward name.
 # For Channel Point Rewards make sure it's spelled EXACTLY as it appears on Twitch.
-
-# See full examples on any plugin download site (SpigotMC, CurseForge, Modrinth, Hangar or GitHub)
-
 # Actions format:
 #     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
