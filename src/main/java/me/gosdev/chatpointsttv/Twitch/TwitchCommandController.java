@@ -163,16 +163,16 @@ public class TwitchCommandController implements TabExecutor {
                 for (Channel channel : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     available.add(channel.getChannelUsername().toLowerCase());
                 }
-            }
-        } else if (ChatPointsTTV.getTwitch().isAccountConnected() && args.length >= 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
-            if (args.length == 2) {
+            } else if (args[0].equalsIgnoreCase("test")) {
                 available.add("channelpoints");
                 available.add("cheer");
                 available.add("sub");
                 available.add("follow");
                 available.add("subgift");
                 available.add("raid");
-            } else if (args.length == 3) {
+            }
+        } else if (ChatPointsTTV.getTwitch().isAccountConnected() && args.length > 2 && args[0].equalsIgnoreCase("test")) { // Test Command Arguments
+            if (args.length == 3) {
                     available.add("<Chatter Name>");
             } else if (args.length == 4) {
                 if (ChatPointsTTV.getTwitch().isAccountConnected()) {
