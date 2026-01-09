@@ -38,7 +38,7 @@ MANAGE_CHANNEL_POINT_REWARDS: true
 
 # To add a streamer-specific reward add the actions inside a list named as the desired channel.
 # To target all channels use "default" as the list key.
-# For more information, see examples in the README file.
+# For more information, see examples in the documentation website.
 
 # Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
 # CHANNEL_POINTS_EVENTS:
