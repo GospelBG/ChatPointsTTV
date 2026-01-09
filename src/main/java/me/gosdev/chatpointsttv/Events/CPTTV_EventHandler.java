@@ -119,7 +119,7 @@ public class CPTTV_EventHandler {
                 String[] parts = cmd.split(" ");
     
                 if (parts.length <= 1) {
-                    ChatPointsTTV.log.warning(errorStr + "Invalid command \"" + parts[0] + "\"");
+                    ChatPointsTTV.log.warning(errorStr + "Action \"" + parts[0] + "\" needs arguments!");
                     continue;
                 }
                 try {
