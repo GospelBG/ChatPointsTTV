@@ -177,6 +177,9 @@ public class CPTTV_EventHandler {
                             Integer duration = null;
                             Integer strength = null;
                             if (!effect.equalsIgnoreCase("clear")) {
+                                if (parts.length < 4) {
+                                    ChatPointsTTV.log.warning(errorStr + "This action needs at least 3 arguments.");
+                                }
                                 duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
                                 strength = Integer.valueOf(parts[2]);
                             }
