@@ -3,12 +3,14 @@
 # In need of a reset, delete this file and it will be regenerated automatically in the next server start.
 
 # Event Log
+
 str_twitch_channel_points: "§6{USERNAME}§r has redeemed §e{EVENT}§r in {CHANNEL}" # Event = Reward Name
-str_twitch_cheer: "§6{USERNAME}§r has cheered §e{AMOUNT} bits§r in {CHANNEL}"
 str_twitch_follow: "§6{USERNAME}§r has §efollowed§r {CHANNEL}"
-str_twitch_raid: "§6{USERNAME}§r has §eraided§r {CHANNEL} with a party of {AMOUNT} viewers"
+str_twitch_cheer: "§6{USERNAME}§r has cheered §e{AMOUNT} bits§r in {CHANNEL}"
 str_twitch_sub: "§6{USERNAME}§r has §esubscribed§r to {CHANNEL}" # Amount = Subscription Months
 str_twitch_gift: "§6{USERNAME}§r has gifted §e{AMOUNT} subs§r to {CHANNEL}"
+str_twitch_raid: "§6{USERNAME}§r has §eraided§r {CHANNEL} with a party of {AMOUNT} viewers"
+
 str_tiktok_follow: "§6{USERNAME}§r has §efollowed§r {CHANNEL}"
 str_tiktok_like: "§6{USERNAME}§r has §eliked {AMOUNT} times§r!"
 str_tiktok_gift: "§6{USERNAME}§r has gifted §ex{AMOUNT} {EVENT}§r to {CHANNEL}" # Event = Gift Item
@@ -18,11 +20,11 @@ str_tiktok_share: "§6{USERNAME}§r has §eshared§r {CHANNEL}'s LIVE"
 title: "§6{USERNAME}"
 
 sub_twitch_channel_points: "has redeemed §6{EVENT}!"
-sub_twitch_cheer: "has cheered §e{AMOUNT} bits§r!"
 sub_twitch_follow: "has started following!"
-sub_twitch_raid: "has raided with a party of §e{AMOUNT} viewers§r!"
+sub_twitch_cheer: "has cheered §e{AMOUNT} bits§r!"
 sub_twitch_sub: "has §esubscribed§r!"
 sub_twitch_gift: "has gifted §e{AMOUNT} subs§r!"
+sub_twitch_raid: "has raided with a party of §e{AMOUNT} viewers§r!"
 
 sub_tiktok_follow: "has started following!"
 sub_tiktok_like: "liked §e{AMOUNT} times§r!"
