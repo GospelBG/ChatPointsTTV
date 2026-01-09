@@ -14,7 +14,7 @@ public class Event {
 
     public Event(EventType type, String channel, String event, List<String> cmds) {
         this.type = type;
-        this.channel = channel;
+        this.channel = channel.toLowerCase();
 
         this.event = event;
         this.cmds = new ArrayList<>();
