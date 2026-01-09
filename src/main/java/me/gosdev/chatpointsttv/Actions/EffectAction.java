@@ -15,6 +15,8 @@ public class EffectAction extends BaseAction {
     private final Player target;
 
     public EffectAction(String effectName, Integer strength, Integer duration, Player target) {
+        if (duration == null) duration = Integer.MAX_VALUE;
+
         if (effectName.equalsIgnoreCase("random")) {
             this.effect = PotionEffectType.values()[new Random().nextInt(PotionEffectType.values().length)].createEffect(duration * 20, strength);
         } else if (effectName.equalsIgnoreCase("clear")) {

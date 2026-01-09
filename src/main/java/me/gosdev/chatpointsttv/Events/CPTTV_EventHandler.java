@@ -177,7 +177,7 @@ public class CPTTV_EventHandler {
                             Integer duration = null;
                             Integer strength = null;
                             if (!effect.equalsIgnoreCase("clear")) {
-                                duration = Integer.valueOf(parts[3]);
+                                duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
                                 strength = Integer.valueOf(parts[2]);
                             }
                             if (PotionEffectType.getByName(effect) == null && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
