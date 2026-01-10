@@ -177,7 +177,7 @@ public class ChatPointsTTV extends JavaPlugin {
         if (config.getBoolean("ENABLE_TIKTOK", true)) enableTikTok(Bukkit.getConsoleSender()); 
 
         if (firstRun) {
-            Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You will need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
+            Bukkit.getConsoleSender().sendMessage(msgPrefix + "Configuration files have just been created. You need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
         }
 
         VersionCheck.check();
@@ -187,14 +187,14 @@ public class ChatPointsTTV extends JavaPlugin {
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
                 if (firstRun) {
-                    TextComponent welcomeMsg = new TextComponent("------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV" + ChatColor.RESET + " -------------" + ChatColor.GRAY + "\nThanks for installing ChatPointsTTV!\nYou will need to set up the configuration files in order to use the plugin.\nYou can take a look at the quick start guide ");
+                    TextComponent welcomeMsg = new TextComponent("------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Welcome to ChatPointsTTV" + ChatColor.RESET + " -------------" + ChatColor.GRAY + "\nThanks for installing ChatPointsTTV!\nYou need to set up the configuration files in order to use the plugin.\nYou can take a look at the quick start guide ");
                     
-                    TextComponent link = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "here.");
+                    TextComponent link = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "here");
                     link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://gosdev.me/chatpointsttv/install"));
                     link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
 
                     welcomeMsg.addExtra(link);
-                    welcomeMsg.addExtra("\n-----------------------------------------");
+                    welcomeMsg.addExtra(".\n-----------------------------------------");
                     player.getPlayer().spigot().sendMessage(welcomeMsg);
                 }
                 if (!VersionCheck.runningLatest) {
