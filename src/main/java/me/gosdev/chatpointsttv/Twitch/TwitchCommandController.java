@@ -5,8 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -27,7 +25,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchCommandController implements TabExecutor {
-    public final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +

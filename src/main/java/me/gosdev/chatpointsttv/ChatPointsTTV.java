@@ -215,7 +215,6 @@ public class ChatPointsTTV extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        twitchCmdController.executor.shutdown();
         if (twitch != null) twitch.stop(Bukkit.getConsoleSender());
         if (tiktok != null) tiktok.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
