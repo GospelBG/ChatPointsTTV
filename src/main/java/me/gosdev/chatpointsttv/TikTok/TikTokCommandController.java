@@ -44,7 +44,7 @@ public class TikTokCommandController implements TabExecutor {
         switch(args[0]) {
             case "start":
                 if (ChatPointsTTV.getTikTok().isReloading.get()) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is already starting.");
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
                     return true;
                 }
                 if (ChatPointsTTV.getTikTok().started) {
@@ -59,7 +59,11 @@ public class TikTokCommandController implements TabExecutor {
 
             case "stop":
                 if (!ChatPointsTTV.getTikTok().started) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is already stopped.");
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is stopped.");
+                    return true;
+                }
+                if (ChatPointsTTV.getTikTok().isReloading.get()) {
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is still stopping. Please wait.");
                     return true;
                 }
                 
@@ -74,7 +78,7 @@ public class TikTokCommandController implements TabExecutor {
 
             case "reload":
                 if (!ChatPointsTTV.getTikTok().isReloading.compareAndSet(false, true)) {
-                    sender.sendMessage(ChatColor.RED + "TikTok module is already reloading!");
+                    sender.sendMessage(ChatColor.RED + "TikTok module is reloading!");
                     return true;
                 }
                 sender.sendMessage("Reloading ChatPointsTTV...");
@@ -87,6 +91,15 @@ public class TikTokCommandController implements TabExecutor {
                     sender.sendMessage(ChatColor.RED + "Usage: /tiktok link <username>");
                     return true;
                 }
+                if (ChatPointsTTV.getTikTok().isReloading.get()) {
+                    sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
+                    return true;
+                }
+                if (!ChatPointsTTV.getTikTok().isStarted()) {
+                    sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+                    return true;
+                }
+
                 Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
                     ChatPointsTTV.getTikTok().link(sender, args[1], true);
                 });

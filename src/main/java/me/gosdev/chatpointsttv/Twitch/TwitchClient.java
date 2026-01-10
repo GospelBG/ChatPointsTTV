@@ -61,14 +61,14 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
-    public ConcurrentHashMap<String, OAuth2Credential> credentialManager;
+    public ConcurrentHashMap<String, OAuth2Credential> credentialManager = new ConcurrentHashMap<>();
 
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final AtomicBoolean accountConnected = new AtomicBoolean(false);
     private final AtomicBoolean linkInProgress = new AtomicBoolean(false);
     public AtomicBoolean reloading = new AtomicBoolean(true);
     private List<String> chatBlacklist;
-    private ConcurrentHashMap<String, Channel> channels;
+    private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
     private TwitchEvents eventHandler;
     private IEventSubSocket eventSocket;
     private EventManager eventManager;
@@ -77,9 +77,9 @@ public class TwitchClient {
     private File accountsFile;
     private FileConfiguration accountsConfig;
     private ConfigurationSection accounts;
-    private TwitchIdentityProvider identityProvider;
+    private final TwitchIdentityProvider identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
     private ScheduledThreadPoolExecutor exec;
-    private HashMap<String, BukkitTask> tokenRefreshTasks;
+    private final HashMap<String, BukkitTask> tokenRefreshTasks = new HashMap<>();
     private final ExecutorService twitchExecutor;
 
     public Boolean shouldMobsGlow;
@@ -120,12 +120,11 @@ public class TwitchClient {
 
     public TwitchClient(CommandSender p) {
         started.set(false);
+        reloading.set(true);
         twitchExecutor = Executors.newSingleThreadExecutor();
 
         twitchExecutor.submit(() -> {
             CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
-            channels = new ConcurrentHashMap<>();
-            tokenRefreshTasks = new HashMap<>();
 
             File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
             if (!twitchConfigFile.exists()) {
@@ -140,8 +139,6 @@ public class TwitchClient {
             }
             accounts = accountsConfig.getConfigurationSection("twitch");
 
-            identityProvider = new TwitchIdentityProvider(CLIENT_ID, null, null);
-            credentialManager = new ConcurrentHashMap<>();
             exec = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
             exec.setRemoveOnCancelPolicy(true);
 
@@ -452,7 +449,7 @@ public class TwitchClient {
             linkInProgress.set(true);
             try {
                 if (!started.get()) {
-                    p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+                    p.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
                     return;
                 }
                 if (!accountConnected.get()) {
@@ -509,13 +506,13 @@ public class TwitchClient {
     }
 
     public void stop(CommandSender p) {
-        if (twitchExecutor.isShutdown()) return;
-
-        twitchExecutor.submit(() -> {
+        new Thread(() -> {
             if (!isStarted()) {
                 p.sendMessage(ChatColor.RED + "Twitch Module is already stopped.");
                 return;
             }
+
+            twitchExecutor.shutdown();
 
             try {
                 if (client != null) {
@@ -526,7 +523,7 @@ public class TwitchClient {
                     client.close();
                 }
             } catch (Exception e) {
-                ChatPointsTTV.log.warning("There was an error while disabling the Twitch client.");
+                ChatPointsTTV.log.warning("There was an error while disabling the Twitch Module.");
                 e.printStackTrace();
                 return;
             }
@@ -544,21 +541,21 @@ public class TwitchClient {
             channels.clear();
             credentialManager.clear();
 
-            accountConnected.set(false);
-        });
-
-        twitchExecutor.shutdown();
-        try {
-            if(!linkInProgress.get() && !twitchExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+            try {
+                if(!linkInProgress.get() && !twitchExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+                    twitchExecutor.shutdownNow();
+                    ChatPointsTTV.log.warning("Twitch Module is taking too long to stop. Forcing shutdown...");
+                }
+            } catch (InterruptedException e) {
                 twitchExecutor.shutdownNow();
-                ChatPointsTTV.log.warning("Twitch Module is taking too long to stop. Forcing shutdown...");
             }
-        } catch (InterruptedException e) {
-            twitchExecutor.shutdownNow();
-        }
 
-        started.set(false);
-        p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has been successfully stopped!");
+            started.set(false);
+
+            accountConnected.set(false);
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has been successfully stopped!");
+
+        }).start();
     }
     private void setupTwitch4JLogs() {
         String[] loggers = {
