@@ -251,7 +251,7 @@ public class TikTokCommandController implements TabExecutor {
     }
 
     private void accounts(CommandSender p) {
-        java.util.List<String> accounts = ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK);
+        List<String> accounts = ChatPointsTTV.getTikTok().listenedProfiles;
         
         if (!ChatPointsTTV.getTikTok().started) {
             p.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
