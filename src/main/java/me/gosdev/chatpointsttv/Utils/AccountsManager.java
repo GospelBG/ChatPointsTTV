@@ -37,6 +37,7 @@ public class AccountsManager {
 
     public void saveAccount(Platforms plat, String user, Optional<HashMap<String, String>> credential) {
         if (credential.isPresent()) {
+            if (!accounts.isConfigurationSection(plat.getName().toLowerCase()))  accounts.createSection(plat.getName().toLowerCase());
             ConfigurationSection platformAccounts = accounts.getConfigurationSection(plat.getName().toLowerCase()).createSection(user);
 
             for (String key : credential.get().keySet()) {
