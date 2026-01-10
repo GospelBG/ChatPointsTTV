@@ -1,4 +1,5 @@
 name: ChatPointsTTV
+description: Twitch and TikTok integration for Streamers
 version: ${project.version}
 author: GosDev
 website: ${project.url}
