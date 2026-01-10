@@ -45,6 +45,7 @@ public class AccountsManager {
             }
         } else { // Just store user
             List<String> platformAccounts = accounts.getStringList(plat.getName().toLowerCase());
+            if (platformAccounts.contains(user)) return;
             platformAccounts.add(user);
             accounts.set(plat.getName().toLowerCase(), platformAccounts);
         }
