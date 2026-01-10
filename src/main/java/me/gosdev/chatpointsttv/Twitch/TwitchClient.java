@@ -391,10 +391,13 @@ public class TwitchClient {
 
     public void toggleChannelPointRewards(OAuth2Credential account, Boolean state) {
         if (!twitchConfig.getBoolean("MANAGE_CHANNEL_POINT_REWARDS", true)) return;
+        ArrayList<Event> actions = CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS);
         ArrayList<String> configRewardNames = new ArrayList<>();
 
-        for (Event e : CPTTV_EventHandler.getActions(twitchConfig, TwitchEventType.CHANNEL_POINTS)) {
-            if (e.getTargetChannel().equals(account.getUserName().toLowerCase()) || e.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) configRewardNames.add(e.getEvent().toLowerCase());
+        if (actions != null) {
+            for (Event e : actions) {
+                if (e.getTargetChannel().equals(account.getUserName().toLowerCase()) || e.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) configRewardNames.add(e.getEvent().toLowerCase());
+            }
         }
 
         try {
