@@ -260,19 +260,17 @@ public class TikTokCommandController implements TabExecutor {
 
         TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected TikTok LIVEs" + ChatColor.RESET + " ----------\n\n");
         
-        if (p.equals(Bukkit.getConsoleSender())) {
-            for (String account : accounts) {
+        for (String account : accounts) {
+            if (p.equals(Bukkit.getConsoleSender())) {
                 if (account.isBlank()) continue;
-                msg.addExtra(ChatColor.GRAY + "  -  " + account + "\n");
-            }
-        } else {
-            for (String account : accounts) {
+                msg.addExtra(ChatColor.GRAY + "  -  @" + account + "\n");
+            } else {
                 if (account.isBlank()) continue;
                 BaseComponent deleteButton = new ComponentBuilder(ChatColor.RED + "  [❌]").create()[0];
                 deleteButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to unlink this LIVE").create()));
                 deleteButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tiktok unlink " + account));
                 msg.addExtra(deleteButton);
-                msg.addExtra(new TextComponent("  " + account + "\n"));
+                msg.addExtra(new TextComponent("  @" + account + "\n"));
             }
         }
 
@@ -303,7 +301,7 @@ public class TikTokCommandController implements TabExecutor {
             strChannels = "None";
         } else {
             for (String profile : ChatPointsTTV.getTikTok().getClients().keySet()) {
-                strChannels += profile + ", ";
+                strChannels += "@" + profile + ", ";
             }
             strChannels = strChannels.subSequence(0, strChannels.length() - 2).toString();
         }
