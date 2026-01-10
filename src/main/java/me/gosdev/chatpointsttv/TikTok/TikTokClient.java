@@ -186,7 +186,7 @@ public class TikTokClient {
         if (!started || tiktokExecutor.isShutdown()) return;
         isReloading.set(true);
 
-        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+        new Thread(() -> {
             tiktokExecutor.shutdown();
             try {
                 if(!tiktokExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
@@ -207,7 +207,7 @@ public class TikTokClient {
 
             isReloading.set(false);
             p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has been successfully stopped!");
-        });
+        }).start();
     }
 
     public void unlink(String username, Boolean save) {
