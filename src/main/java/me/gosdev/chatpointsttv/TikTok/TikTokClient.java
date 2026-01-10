@@ -43,6 +43,7 @@ public class TikTokClient {
     public volatile Boolean started = false;
     public AtomicBoolean isReloading = new AtomicBoolean(true);
     public List<String> listenedProfiles;
+    public Thread stopThread;
 
     private TikTokEvents eventHandler;
 
@@ -186,7 +187,7 @@ public class TikTokClient {
         if (!started || tiktokExecutor.isShutdown()) return;
         isReloading.set(true);
 
-        new Thread(() -> {
+        stopThread = new Thread(() -> {
             tiktokExecutor.shutdown();
             try {
                 if(!tiktokExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
@@ -207,7 +208,9 @@ public class TikTokClient {
 
             isReloading.set(false);
             p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has been successfully stopped!");
-        }).start();
+        });
+
+        stopThread.start();
     }
 
     public void unlink(String username, Boolean save) {

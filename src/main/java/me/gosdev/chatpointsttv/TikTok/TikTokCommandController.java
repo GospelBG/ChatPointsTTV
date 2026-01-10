@@ -81,9 +81,19 @@ public class TikTokCommandController implements TabExecutor {
                     sender.sendMessage(ChatColor.RED + "TikTok module is reloading!");
                     return true;
                 }
-                sender.sendMessage("Reloading ChatPointsTTV...");
-                ChatPointsTTV.getTikTok().stop(sender);
-                ChatPointsTTV.enableTikTok(sender);
+
+                Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+                    sender.sendMessage("Reloading ChatPointsTTV...");
+                    ChatPointsTTV.getTikTok().stop(sender);
+
+                    try {
+                        ChatPointsTTV.getTikTok().stopThread.join();
+                    } catch (InterruptedException e) {
+                    }
+
+                    ChatPointsTTV.enableTikTok(sender);
+                });
+
                 return true;
 
             case "link":
