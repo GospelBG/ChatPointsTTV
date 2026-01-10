@@ -169,7 +169,7 @@ public class TwitchClient {
                 }
             }
             
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch client has started successfully!");   
+            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has started successfully!");   
             started.set(true);
             reloading.set(false);
         });

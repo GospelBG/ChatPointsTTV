@@ -18,8 +18,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class CommandController implements TabExecutor {
     private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("cpttv").getUsage() + ChatColor.RESET + "\n" +
-        ChatColor.LIGHT_PURPLE + "/cpttv status: " + ChatColor.RESET + "Displays information about the plugin and the cpttv client.\n" +
-        ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files.\n" + 
+        ChatColor.LIGHT_PURPLE + "/cpttv status: " + ChatColor.RESET + "Displays information about the plugin.\n" +
+        ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin along with all modules and reloads configuration files.\n" + 
         ChatColor.LIGHT_PURPLE + "/cpttv help: " + ChatColor.RESET + "Displays this help message.").create()[0];
 
     @Override
@@ -104,7 +104,7 @@ public class CommandController implements TabExecutor {
         msg.addExtra(ChatColor.LIGHT_PURPLE + "Plugin Version: " + ChatColor.WHITE + ChatPointsTTV.getPlugin().getDescription().getVersion());
         if (!VersionCheck.runningLatest) msg.addExtra(updButton);
 
-        TextComponent twitchStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\n\nTwitch Client: " + ChatColor.RESET);
+        TextComponent twitchStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\n\nTwitch Module: " + ChatColor.RESET);
         if (ChatPointsTTV.getTwitch().isStarted()) {
             if (ChatPointsTTV.getTwitch().isAccountConnected()) {
                 twitchStatus.addExtra("" + ChatColor.GREEN + ChatColor.BOLD + "LINKED");
@@ -115,7 +115,7 @@ public class CommandController implements TabExecutor {
             twitchStatus.addExtra(""  + ChatColor.RED + ChatColor.BOLD + "DISABLED");
         }
 
-        TextComponent tiktokStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\nTikTok Client: " + ChatColor.RESET);
+        TextComponent tiktokStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\nTikTok Module: " + ChatColor.RESET);
         if (ChatPointsTTV.getTikTok().started) {
             if (ChatPointsTTV.getTikTok().accountConnected) {
                 tiktokStatus.addExtra("" + ChatColor.GREEN + ChatColor.BOLD + "LINKED");

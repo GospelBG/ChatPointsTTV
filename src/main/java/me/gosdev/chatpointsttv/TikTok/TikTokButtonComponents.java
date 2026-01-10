@@ -8,16 +8,16 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class TikTokButtonComponents {
     public static TextComponent clientStop() {
-        TextComponent comp = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.RED + " Stop TikTok Client");
-        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop all TikTok events.").create()));
+        TextComponent comp = new TextComponent(ChatColor.RED + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.RED + " Stop TikTok Module");
+        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to stop listening to incoming TikTok events.").create()));
         comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tiktok stop"));
 
         return comp;
     }
 
     public static TextComponent clientStart() {
-        TextComponent comp = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.GREEN + " Start TikTok Client");
-        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to start the TikTok client.").create()));
+        TextComponent comp = new TextComponent(ChatColor.GREEN + "" + ChatColor.BOLD + "[⏻]" + ChatColor.RESET + ChatColor.GREEN + " Start TikTok Module");
+        comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to start the TikTok Module.").create()));
         comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tiktok start"));
 
         return comp;

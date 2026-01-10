@@ -20,7 +20,7 @@ public class TwitchAuth {
     public static DeviceFlowController flowController;
         public static void getDeviceCode(ChatPointsTTV plugin, CommandSender p) {
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            p.sendMessage(ChatColor.RED + "You must start the Twitch Client first!");
+            p.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
             return;
         }
         p.sendMessage(ChatColor.GRAY + "Please wait...");
