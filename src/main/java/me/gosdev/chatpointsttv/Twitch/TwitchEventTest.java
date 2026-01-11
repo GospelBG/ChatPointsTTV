@@ -13,16 +13,16 @@ import com.github.twitch4j.eventsub.events.ChannelFollowEvent;
 import com.github.twitch4j.eventsub.events.ChannelRaidEvent;
 import com.github.twitch4j.eventsub.events.CustomRewardRedemptionAddEvent;
 
-public class EventTest {
+public class TwitchEventTest {
     public static CustomRewardRedemptionAddEvent ChannelPointsRedemptionEvent(String channel, String chatter, String title, Optional<String> userInput) {
         JSONObject json = new JSONObject();
         JSONObject reward = new JSONObject();
 
-        json.put("user_id", TwitchUtils.getUserId(chatter));
+        json.put("user_id", "0");
         json.put("user_login", chatter.toLowerCase());
         json.put("user_name", chatter);
 
-        json.put("broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("broadcaster_user_id", "0");
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
         
@@ -41,11 +41,11 @@ public class EventTest {
     public static ChannelFollowEvent FollowEvent(String channel, String chatter) {
         JSONObject json = new JSONObject();
 
-        json.put("user_id", TwitchUtils.getUserId(chatter));
+        json.put("user_id", "0");
         json.put("user_login", chatter.toLowerCase());
         json.put("user_name", chatter);
 
-        json.put("broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("broadcaster_user_id", "0");
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
 
@@ -58,11 +58,11 @@ public class EventTest {
     public static ChannelChatMessageEvent CheerEvent(String channel, String chatter, Integer amount) {
         JSONObject json = new JSONObject();
 
-        json.put("chatter_user_id", TwitchUtils.getUserId(chatter));
+        json.put("chatter_user_id", "0");
         json.put("chatter_user_login", chatter.toLowerCase());
         json.put("chatter_user_name", chatter);
 
-        json.put("broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("broadcaster_user_id", "0");
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
 
@@ -72,15 +72,15 @@ public class EventTest {
         return event;
     }
 
-    public static ChannelChatNotificationEvent SubEvent(String channel, String chatter, SubscriptionPlan plan, Integer months) {
+    public static ChannelChatNotificationEvent SubEvent(String channel, String chatter, SubscriptionPlan plan) {
         JSONObject json = new JSONObject();
         JSONObject sub = new JSONObject();
 
-        json.put("chatter_user_id", TwitchUtils.getUserId(chatter));
+        json.put("chatter_user_id", "0");
         json.put("chatter_user_login", chatter.toLowerCase());
         json.put("chatter_user_name", chatter);
 
-        json.put("broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("broadcaster_user_id", "0");
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
 
@@ -88,7 +88,7 @@ public class EventTest {
 
         sub.put("sub_tier", plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "1000" : plan.toString());
         sub.put("is_prime", plan.equals(SubscriptionPlan.TWITCH_PRIME) ? "true" : "false");
-        sub.put("duration_months", months.toString());
+        sub.put("duration_months", "1");
 
         json.put("sub", sub);
 
@@ -101,11 +101,11 @@ public class EventTest {
         JSONObject sub = new JSONObject();
 
 
-        json.put("chatter_user_id", TwitchUtils.getUserId(chatter));
+        json.put("chatter_user_id", "0");
         json.put("chatter_user_login", chatter.toLowerCase());
         json.put("chatter_user_name", chatter);
 
-        json.put("broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("broadcaster_user_id", "0");
         json.put("broadcaster_user_login", channel.toLowerCase());
         json.put("broadcaster_user_name", channel);
 
@@ -123,11 +123,11 @@ public class EventTest {
     public static ChannelRaidEvent RaidReward(String channel, String raider, Integer viewers) {
         JSONObject json = new JSONObject();
 
-        json.put("from_broadcaster_user_id", TwitchUtils.getUserId(raider));
+        json.put("from_broadcaster_user_id", "0");
         json.put("from_broadcaster_user_login", raider.toLowerCase());
         json.put("from_broadcaster_user_name", raider);
 
-        json.put("to_broadcaster_user_id", TwitchUtils.getUserId(channel));
+        json.put("to_broadcaster_user_id", "0");
         json.put("to_broadcaster_user_login", channel.toLowerCase());
         json.put("to_broadcaster_user_name", channel);
 

@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -18,34 +19,41 @@ import org.bukkit.potion.PotionEffectType;
 import me.gosdev.chatpointsttv.Actions.BaseAction;
 import me.gosdev.chatpointsttv.Actions.DeleteItemsAction;
 import me.gosdev.chatpointsttv.Actions.EffectAction;
+import me.gosdev.chatpointsttv.Actions.FreezeAction;
 import me.gosdev.chatpointsttv.Actions.GiveAction;
 import me.gosdev.chatpointsttv.Actions.InvShuffleAction;
 import me.gosdev.chatpointsttv.Actions.RunCmdAction;
+import me.gosdev.chatpointsttv.Actions.SoundAction;
 import me.gosdev.chatpointsttv.Actions.SpawnAction;
 import me.gosdev.chatpointsttv.Actions.TntAction;
 import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.Platforms;
-import me.gosdev.chatpointsttv.Utils.Channel;
+import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
+import me.gosdev.chatpointsttv.Twitch.Channel;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class CPTTV_EventHandler {
     public static final String EVERYONE = "*";
-    public static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
+    private static final Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
-    public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event) {
-        String str = ChatPointsTTV.strings.get("str_" + platform.toString().toLowerCase() + "_"+type.name().toLowerCase());
-
-        str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), platform);
+    public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
+        String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
+        if (!ChatPointsTTV.locales.containsKey(key)) {
+            throw new NullPointerException("Missing Message for " + platform.getName() + " " + type.toString() + " events");
+        }
+        String str = ChatPointsTTV.locales.get(key);
+        str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), amount.orElse(null), platform);
 
         return str;
     }
 
-    public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event) {
+    public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         new Thread (()-> {
             String errorStr = "There was an error running a " + type + " action: ";
-            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event));
-            if (ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
+            if (ChatPointsTTV.logEvents) Bukkit.getConsoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event, amount));
+            if (platform.equals(Platforms.TWITCH) && ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
                     if (ch.getChannelUsername().equals(channel) && !ch.isLive()) return; // Return if channel matches and it's offline.
                 }
@@ -55,14 +63,22 @@ public class CPTTV_EventHandler {
             Boolean nameSpawnedMobs;
             AlertMode alertMode;
 
-            if (platform.equals(Platforms.TWITCH)) {
-                shouldGlow = ChatPointsTTV.getTwitch().shouldMobsGlow;
-                nameSpawnedMobs = ChatPointsTTV.getTwitch().nameSpawnedMobs;
-                alertMode = ChatPointsTTV.getTwitch().alertMode;
-            } else {
-                shouldGlow = ChatPointsTTV.shouldMobsGlow;
-                nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
-                alertMode = ChatPointsTTV.alertMode;
+            switch (platform) {
+                case TWITCH:
+                    shouldGlow = ChatPointsTTV.getTwitch().shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.getTwitch().nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.getTwitch().alertMode;
+                    break;
+                case TIKTOK:
+                    shouldGlow = ChatPointsTTV.getTikTok().shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.getTikTok().nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.getTikTok().alertMode;
+                    break;
+                default:
+                    shouldGlow = ChatPointsTTV.shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.alertMode;
+                    break;
             }
 
             if (!alertMode.equals(AlertMode.NONE)) { // In-game alert
@@ -77,8 +93,8 @@ public class CPTTV_EventHandler {
                         subtitle = "";
                     }
                 } else {
-                    title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("title"), chatter, channel, event.orElse(null), platform);
-                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.strings.get("sub_twitch_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), platform);
+                    title = LocalizationUtils.replacePlaceholders(ChatPointsTTV.locales.get("title"), chatter, channel, event.orElse(null), amount.orElse(null), platform);
+                    subtitle = LocalizationUtils.replacePlaceholders(ChatPointsTTV.locales.get("sub_" + platform.toString().toLowerCase() + "_" + type.toString().toLowerCase()), chatter, channel, event.orElse(null), amount.orElse(null), platform);
                 }    
         
                 switch (alertMode) {
@@ -103,19 +119,20 @@ public class CPTTV_EventHandler {
         
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);
-                if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID) || type.equals(EventType.SUB)) {
-                    cmd = cmd.replace("{AMOUNT}", event.get());
+                if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID) ||
+                    type.equals(TikTokEventType.GIFT) || type.equals(TikTokEventType.LIKE)) {
+                    cmd = cmd.replace("{AMOUNT}", amount.get().toString());
                 }
                 
                 String[] parts = cmd.split(" ");
     
                 if (parts.length <= 1) {
-                    ChatPointsTTV.log.warning(errorStr + "Invalid command \"" + parts[0] + "\"");
+                    ChatPointsTTV.log.warning(errorStr + "Action \"" + parts[0] + "\" needs arguments!");
                     continue;
                 }
                 try {
                     BaseAction action;
-                    Integer amount = null;
+                    Integer act_amount = null;
                     Player target = null;
                     switch (parts[0].toUpperCase()) {
                         case "SPAWN":
@@ -124,12 +141,12 @@ public class CPTTV_EventHandler {
                                 continue;
                             }
                             if (parts.length > 2) {
-                                amount = Integer.valueOf(parts[2]);
+                                act_amount = Integer.valueOf(parts[2]);
                             }
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
                             }
-                            action = new SpawnAction(EntityType.valueOf(parts[1]), nameSpawnedMobs ? chatter : null, Optional.ofNullable(amount), target, shouldGlow);
+                            action = new SpawnAction(EntityType.valueOf(parts[1]), nameSpawnedMobs ? chatter : null, Optional.ofNullable(act_amount), target, shouldGlow);
                             break;
                         case "RUN":
                             String text = "";
@@ -151,30 +168,38 @@ public class CPTTV_EventHandler {
                                 continue;
                             }
                             if (parts.length > 2) {
-                                amount = Integer.valueOf(parts[2]);
+                                act_amount = Integer.valueOf(parts[2]);
                             }
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
+                                    continue;
                                 }
-                                continue;
                             }
-                            action = new GiveAction(Material.valueOf(parts[1].toUpperCase()), Optional.ofNullable(amount), Optional.ofNullable(target));
+                            action = new GiveAction(Material.valueOf(parts[1].toUpperCase()), Optional.ofNullable(act_amount), Optional.ofNullable(target));
                             break;
 
                         case "EFFECT":
-                            PotionEffectType effect = PotionEffectType.getByName(parts[1]);
-                            Integer strength = Integer.valueOf(parts[2]);
-                            Integer duration = Integer.valueOf(parts[3]);
-                            if (effect == null) {
+                            String effect = parts[1];
+                            Integer duration = null;
+                            Integer strength = null;
+                            if (!effect.equalsIgnoreCase("clear")) {
+                                if (parts.length < 4) {
+                                    ChatPointsTTV.log.warning(errorStr + "This action needs at least 3 arguments.");
+                                }
+                                duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
+                                strength = Integer.valueOf(parts[2]);
+                            }
+                            if (PotionEffectType.getByName(effect) == null && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
                                 ChatPointsTTV.log.warning(errorStr + "Potion effect " + parts[1] + " does not exist.");
                                 continue;
                             }
-                            if (parts.length > 4) {
-                                target = Bukkit.getPlayer(parts[4]);
+                            if (parts.length > (effect.equalsIgnoreCase("clear") ? 2 : 4)) {
+                                target = Bukkit.getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[4] + ".");
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
+                                    continue;
                                 }
                             }
 
@@ -191,10 +216,24 @@ public class CPTTV_EventHandler {
                                 target = Bukkit.getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
                                     ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    continue;
                                 }
                             }
 
                             action = new DeleteItemsAction(DeleteItemsAction.Type.valueOf(parts[1].toUpperCase()), target);
+                            break;
+
+                        case "FREEZE":
+                            Integer time = Integer.valueOf(parts[1]);
+
+                            if (parts.length > 2) {
+                                target = Bukkit.getPlayer(parts[2]);
+                                if (target == null || !target.isOnline()) {
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    continue;
+                                }
+                            }
+                            action = new FreezeAction(target, time);
                             break;
 
                         case "SHUFFLE":
@@ -204,6 +243,18 @@ public class CPTTV_EventHandler {
                             
                             action = new InvShuffleAction(target);
                             break;
+
+                        case "SOUND":
+                            String sound = parts[1];
+
+                            try {
+                                action = new SoundAction(target, Sound.valueOf(sound.toUpperCase()));
+                            } catch (IllegalArgumentException e) {
+                                ChatPointsTTV.log.warning(errorStr + "Sound effect " + parts[1] + " does not exist.");
+                                continue;
+                            }
+                            break;
+
 
                         case "TNT":
                             Integer fuseTime = null;
@@ -255,12 +306,12 @@ public class CPTTV_EventHandler {
     public static ArrayList<Event> getActions(FileConfiguration config, EventType type) {
         if (actions.get(type) != null) return actions.get(type); // Give stored dictionary if it was already fetched
 
-        String key = type.toString().toUpperCase() + "_REWARDS";
+        String key = type.toString().toUpperCase() + "_EVENTS";
         ArrayList<Event> action_list = new ArrayList<>();
 
         if (!config.contains(key)) return null; // No configured rewards for this type
 
-        if (type.equals(EventType.FOLLOW)) {
+        if (type.equals(TwitchEventType.FOLLOW) || type.equals(TikTokEventType.FOLLOW) || type.equals(TikTokEventType.SHARE)) {
             if (config.isConfigurationSection(key)) { // Streamer-specific?
                 Set<String> keys = (config.getConfigurationSection(key)).getKeys(false);
                 for (String channel : keys) {
@@ -269,7 +320,7 @@ public class CPTTV_EventHandler {
             } else if (config.isList(key)) {
                 action_list.add(new Event(type, EVERYONE, null, config.getStringList(key)));
             } else {
-                ChatPointsTTV.log.severe("ChatPointsTTV: Follow actions must be entered as a list (or a configuration section, if targeting specific streamers). Read the docs for more information.");
+                ChatPointsTTV.log.severe("ChatPointsTTV: " + type.toString() + " actions must be entered as a list (or a configuration section, if targeting specific streamers). Read the docs for more information.");
                 return null;
             }
         } else {
@@ -281,7 +332,7 @@ public class CPTTV_EventHandler {
                             ChatPointsTTV.log.severe("ChatPointsTTV: Invalid configuration for " + type.toString().toLowerCase() + " (" + subkey + ") actions. Read the docs for more information.");
                             continue;
                         }
-                        if (type.equals(EventType.CHEER) || type.equals(EventType.GIFT) || type.equals(EventType.RAID)) {
+                        if (type.equals(TwitchEventType.CHEER) || type.equals(TwitchEventType.GIFT) || type.equals(TwitchEventType.RAID)) {
                             try {
                                 Integer.valueOf(subkey);
                             } catch (NumberFormatException e) {
@@ -312,5 +363,11 @@ public class CPTTV_EventHandler {
         actions.put(type, action_list);
 
         return actions.get(type);
+    }
+
+    public static void clearActions(Platforms plat) {
+        for (EventType e : plat.getEventTypes()) {
+            actions.put(e, null);
+        }
     }
 }

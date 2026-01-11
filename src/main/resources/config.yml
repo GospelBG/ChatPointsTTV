@@ -1,8 +1,12 @@
 # This is the configuration file for ChatPointsTTV. For a fresh copy of this file, go to https://github.com/GospelBG/ChatPointsTTV/blob/master/src/main/resources/config.yml
-# For more information about how to use the plugin's configuration files, refer to the config.yml instructions in the README file at https://github.com/GospelBG/ChatPointsTTV/blob/master/README.md
+# For more information about how to use the plugin's configuration files, refer to the plugin documentation site at https://gosdev.me/chatpointsttv/config
 
-# If true, the plugin will automatically start the Twitch client.
+# If true, the plugin will automatically start the Twitch/TikTok client.
 ENABLE_TWITCH: true
+ENABLE_TIKTOK: true
+
+# To prevent leaking Device Codes, this option will not show Device Codes used for logging in in the chat. Instead, you will need to hover to see the code.
+HIDE_LOGIN_CODES: false
 
 # Whether events should be ignored if the streamer is offline.
 IGNORE_OFFLINE_STREAMERS: false
@@ -10,7 +14,7 @@ IGNORE_OFFLINE_STREAMERS: false
 # Whether stream chat messages should show up on the in-game chat
 SHOW_CHAT: true
 
-# Whether events should be printed to the server console. (GospelBG cheered 300 bits!; GospelBG has subscribed with a Tier 1 sub!; ...)
+# Whether events should be printed to the server console. (exampleViewer cheered 300 bits; exampleViewer has subscribed with a Tier 1 sub; ...)
 LOG_EVENTS: true
 
 # In-game event alerts mode.
@@ -21,14 +25,8 @@ LOG_EVENTS: true
 INGAME_ALERTS: chat
 
 # GLOBAL CONFIGURATION:
-
 # Adds glow effect to spawned mobs
 MOB_GLOW: true
 
 # Sets chatter's name to spawned mobs
 DISPLAY_NAME_ON_MOB: true
-
-#  Use Bukkit API color codes (https://hub.spigotmc.org/javadocs/spigot/org/bukkit/ChatColor.html)
-COLORS:
-  USER_COLOR: GOLD
-  EVENT_COLOR: YELLOW

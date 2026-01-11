@@ -1,11 +1,9 @@
 # Take a look at the documentation website for more information on this config file: https://gosdev.me/chatpointsttv/config/#tiktokyml
 
-# Automatically show and hide and mark as completed redemptions of Channel Point Rewards created by the plugin.
-MANAGE_CHANNEL_POINT_REWARDS: true
+# To avoid rate limits, use may use your own EulerStream API key.
+# EULERSTREAM_API_KEY:
 
-# You can set up here your Twitch events.
-# Add as many lines as needed. Replace [CONDITION] with the minimum amount of bits/subs/viewers, a subscription tier or a Channel Point Reward name.
-# For Channel Point Rewards make sure it's spelled EXACTLY as it appears on Twitch.
+# You can set up here your TikTok events and actions.
 # Actions format:
 #     SPAWN {ENTITY_NAME} [AMOUNT] [TARGET PLAYER]
 #     RUN {TARGET PLAYER / "TARGET" / "CONSOLE"} {COMMAND}
@@ -28,10 +26,9 @@ MANAGE_CHANNEL_POINT_REWARDS: true
 #  [] = Optional
 
 # Extra fields:
-#     {TEXT} Channel Points User Input
 #     {USER} Viewer's username
-#     {AMOUNT} Bits/Gifted Subs/Viewers amount.
-#     {EVENT} Extra event info (e.g., Reward Name).
+#     {AMOUNT} Like Combo/Gifted Items.
+#     {EVENT} Extra event info (e.g., Gift Item).
 #
 #  They will be replaced by the plugin automatically.
 
@@ -39,44 +36,31 @@ MANAGE_CHANNEL_POINT_REWARDS: true
 # To target all channels use "default" as the list key.
 # For more information, see examples in the documentation website.
 
-# Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
-# CHANNEL_POINTS_EVENTS:
-#  [REWARD NAME]:
-#    - {ACTION 1}
-#    - {ACTION 2}
-
 # If enabled, follow events from people who had already been following the channel will be ignored.
 FOLLOW_SPAM_PROTECTION: true
 
-# For follows, put the desired action after the colon as a list. You shouldn't add anything else.
-# FOLLOW_EVENTS:
-#   - {ACTION}
-#   - {ACTION}
+# Uncomment any event class to enable it. Then, replace the placeholders and add the desired actions.
+# For follows and shares, put the desired action after the colon as a list. You shouldn't add anything else.
+FOLLOW_EVENTS:
+  - {ACTION 1}
+  - {ACTION 2}
 
-# CHEER_EVENTS:
-#  [MINIMUM BITS AMOUNT]:
-#    - {ACTION}
+LIKE_EVENTS:
+  [MINIMUM LIKE COMBO]:
+    - {ACTION}
 
-# Subscription tier values: TWITCH_PRIME/TIER1/TIER2/TIER3.
-# SUB_EVENTS:
-#  TWITCH_PRIME:
-#    - {ACTION}
-#  [TIER1/2/3]:
-#    - {ACTION}
+GIFT_EVENTS:
+  [GIFTED ITEM]:
+    - {ACTION}
 
-# GIFT_EVENTS:
-#  [MINIMUM AMOUNT]:
-#    - {ACTION}
-
-# RAID_EVENTS:
-#  [VIEWER THRESHOLD]:
-#    - {ACTION}
+SHARE_EVENTS:
+   - {ACTION}
 
 # Add chat bot and other unwanted chatter usernames (in lowercase) to this list to prevent their messages displaying on the in-game chat.
 CHAT_BLACKLIST: []
 
 # OVERRIDEN CONFIGURATION:
-# Uncomment and change the values to override the default configuration for Twitch events.
+# Uncomment and change the values to override the default configuration for TikTok events.
 # If it is left commented, the default value in config.yml will be used.
 
 # Adds glow effect to spawned mobs

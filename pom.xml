@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.gosdev</groupId>
   <artifactId>chatpointsttv</artifactId>
-  <version>3.0.0-PRERELEASE-4</version>
+  <version>3.0</version>
   <packaging>jar</packaging>
   <name>ChatPointsTTV</name>
   <url>https://github.com/GospelBG/ChatPointsTTV</url>
@@ -22,16 +22,16 @@
               <shadedPattern>me.gosdev.chatpointsttv.libraries.bstats</shadedPattern>
             </relocation>
             <relocation>
-              <pattern>com.alessiodp.libby</pattern>
-              <shadedPattern>me.gosdev.chatpointsttv.libraries.libby</shadedPattern>
-            </relocation>
-            <relocation>
               <pattern>com.github.philippheuer.events4j</pattern>
               <shadedPattern>me.gosdev.chatpointsttv.libraries.events4j</shadedPattern>
             </relocation>
             <relocation>
               <pattern>com.github.twitch4j</pattern>
               <shadedPattern>me.gosdev.chatpointsttv.libraries.twitch4j</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.github.jwdeveloper.tiktok</pattern>
+              <shadedPattern>me.gosdev.chatpointsttv.libraries.tiktok</shadedPattern>
             </relocation>
             <relocation>
               <pattern>org.json</pattern>
@@ -62,7 +62,6 @@
   </build>
 
   <properties>
-      <revision>2.4.1</revision>
       <maven.compiler.target>11</maven.compiler.target>
   </properties>
 
@@ -75,6 +74,10 @@
       <id>maven-snapshots</id>
       <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
   </repositories>
 
   <dependencies>
@@ -84,18 +87,10 @@
       <version>3.1.0</version>
       <scope>compile</scope>
     </dependency>
-
-    <!-- <dependency>
-      <groupId>com.alessiodp.libby</groupId>
-      <artifactId>libby-bukkit</artifactId>
-      <version>2.0.0-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency> -->
-
     <dependency>
       <groupId>com.github.philippheuer.events4j</groupId>
       <artifactId>events4j-handler-simple</artifactId>
-      <version>0.12.2</version>
+      <version>0.12.3</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -105,9 +100,15 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>com.github.jwdeveloper.TikTok-Live-Java</groupId>
+      <artifactId>Client</artifactId>
+      <version>1.11.8-Release</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20240303</version>
+      <version>20250517</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
