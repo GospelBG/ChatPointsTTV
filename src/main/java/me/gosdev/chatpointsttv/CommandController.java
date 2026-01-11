@@ -16,7 +16,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
-    private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " -------------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " -------------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("cpttv").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv status: " + ChatColor.RESET + "Displays information about the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin along with all modules and reloads configuration files.\n" + 
@@ -70,7 +70,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(CommandSender p) {
-        BaseComponent msg = new TextComponent("  -------------  " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV Status" + ChatColor.RESET + " -------------\n");
+        BaseComponent msg = new TextComponent("  ----------  " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV Status" + ChatColor.RESET + " ----------\n");
         
         TextComponent updButton = new TextComponent("\n" + ChatColor.GRAY +  "  → " + ChatColor.GREEN + ChatColor.UNDERLINE + "Update Available!");
         updButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 

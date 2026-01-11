@@ -187,14 +187,15 @@ public class ChatPointsTTV extends JavaPlugin {
             public void onPlayerJoin(PlayerJoinEvent player) {
                 if (!player.getPlayer().hasPermission(permissions.MANAGE.permission_id)) return;
                 if (firstRun) {
-                    TextComponent welcomeMsg = new TextComponent("  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Welcome to ChatPointsTTV" + ChatColor.RESET + " -------------" + ChatColor.GRAY + "\nThanks for installing ChatPointsTTV!\nYou need to set up the configuration files in order to use the plugin.\nYou can take a look at the quick start guide ");
+                    TextComponent welcomeMsg = new TextComponent("  ------------ " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Welcome to ChatPointsTTV" + ChatColor.RESET + " ------------" + ChatColor.GRAY +
+                        "\nThanks for installing ChatPointsTTV!\nYou " + ChatColor.BOLD + "need to set up the configuration files " + ChatColor.RESET + ChatColor.GRAY + "in order to use the plugin.\nYou can take a look at the quick start guide ");
                     
                     TextComponent link = new TextComponent(ChatColor.DARK_PURPLE + "" + ChatColor.UNDERLINE + "here");
                     link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://gosdev.me/chatpointsttv/install"));
                     link.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create()));
 
                     welcomeMsg.addExtra(link);
-                    welcomeMsg.addExtra(".\n  -----------------------------------------");
+                    welcomeMsg.addExtra(".\n  -------------------------------------------------\n");
                     player.getPlayer().spigot().sendMessage(welcomeMsg);
                 }
                 if (!VersionCheck.runningLatest) {
@@ -205,7 +206,7 @@ public class ChatPointsTTV extends JavaPlugin {
                     updBtn.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, VersionCheck.download_url));
 
                     updPrompt.addExtra(updBtn);
-                    updPrompt.addExtra("" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version\n");
+                    updPrompt.addExtra("" + ChatColor.RESET + ChatColor.YELLOW + " to download the latest version.\n");
     
                     player.getPlayer().spigot().sendMessage(updPrompt);
                 }

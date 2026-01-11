@@ -26,7 +26,7 @@ import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class TwitchCommandController implements TabExecutor {
-    private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " -------------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " ----------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("twitch").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link a Twitch account.\n" +
@@ -191,7 +191,7 @@ public class TwitchCommandController implements TabExecutor {
 
     private void accounts(CommandSender sender) {
         java.util.ArrayList<String> channels = new java.util.ArrayList<>();
-        TextComponent msg = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Twitch Accounts" + ChatColor.RESET + " -------------\n\n");
+        TextComponent msg = new TextComponent("\n  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Twitch Accounts" + ChatColor.RESET + " ----------\n\n");
         
         if (!ChatPointsTTV.getTwitch().isStarted()) {
             sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
@@ -250,7 +250,7 @@ public class TwitchCommandController implements TabExecutor {
         }
         
         BaseComponent msg = new ComponentBuilder(
-            "  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Status" + ChatColor.RESET + " -------------\n" +
+            "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Status" + ChatColor.RESET + " ----------\n" +
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + ChatPointsTTV.getPlugin().getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" +
             "\n"
