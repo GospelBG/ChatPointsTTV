@@ -16,7 +16,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class CommandController implements TabExecutor {
-    private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " ----------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " -------------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("cpttv").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv status: " + ChatColor.RESET + "Displays information about the plugin.\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin along with all modules and reloads configuration files.\n" + 
@@ -38,10 +38,6 @@ public class CommandController implements TabExecutor {
                     return true;
 
                 case "reload":
-                    if (plugin.isReloading()) {
-                        sender.sendMessage(ChatColor.RED + "ChatPointsTTV is already reloading!");
-                        return true;
-                    }
                     plugin.reload(sender);
                     return true;
 
@@ -56,26 +52,6 @@ public class CommandController implements TabExecutor {
                     
             }
         }
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        ArrayList<String> available = new ArrayList<>();
-        ArrayList<String> result = new ArrayList<>();
-
-        if (args.length == 1) {
-            available.add("help");
-            available.add("reload");
-            available.add("status");
-        }
-
-        for (String s : available) {
-            if (s.startsWith(args[args.length - 1])) {
-                result.add(s);
-            }
-        }
-
-        return result;
     }
 
     private void help(CommandSender p) {
@@ -94,7 +70,7 @@ public class CommandController implements TabExecutor {
     }
 
     private void status(CommandSender p) {
-        BaseComponent msg = new TextComponent("---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV Status" + ChatColor.RESET + " ----------\n");
+        BaseComponent msg = new TextComponent("  -------------  " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "ChatPointsTTV Status" + ChatColor.RESET + " -------------\n");
         
         TextComponent updButton = new TextComponent("\n" + ChatColor.GRAY +  "  → " + ChatColor.GREEN + ChatColor.UNDERLINE + "Update Available!");
         updButton.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to open in browser").create())); 
@@ -116,8 +92,8 @@ public class CommandController implements TabExecutor {
         }
 
         TextComponent tiktokStatus = new TextComponent(ChatColor.LIGHT_PURPLE + "\nTikTok Module: " + ChatColor.RESET);
-        if (ChatPointsTTV.getTikTok().started) {
-            if (ChatPointsTTV.getTikTok().accountConnected) {
+        if (ChatPointsTTV.getTikTok().isStarted()) {
+            if (ChatPointsTTV.getTikTok().isAccountConnected()) {
                 tiktokStatus.addExtra("" + ChatColor.GREEN + ChatColor.BOLD + "LINKED");
             } else {
                 tiktokStatus.addExtra("" + ChatColor.YELLOW + ChatColor.BOLD + "ENABLED");
@@ -144,5 +120,25 @@ public class CommandController implements TabExecutor {
         msg.addExtra(docsBtn);
 
         p.spigot().sendMessage(msg);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        ArrayList<String> available = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
+
+        if (args.length == 1) {
+            available.add("help");
+            available.add("reload");
+            available.add("status");
+        }
+
+        for (String s : available) {
+            if (s.startsWith(args[args.length - 1])) {
+                result.add(s);
+            }
+        }
+
+        return result;
     }
 }

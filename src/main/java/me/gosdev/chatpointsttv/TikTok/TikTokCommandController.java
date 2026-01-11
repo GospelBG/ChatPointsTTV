@@ -2,16 +2,18 @@ package me.gosdev.chatpointsttv.TikTok;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokLikeEvent;
+import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
 import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -22,7 +24,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class TikTokCommandController implements TabExecutor {
 
-    private final BaseComponent helpMsg = new ComponentBuilder("---------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Help" + ChatColor.RESET + " ----------\n" + 
+    private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Help" + ChatColor.RESET + " -------------\n" + 
     ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("tiktok").getUsage() + ChatColor.RESET + "\n" +
     ChatColor.LIGHT_PURPLE + "/tiktok accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
     ChatColor.LIGHT_PURPLE + "/tiktok link <username>: " + ChatColor.RESET + "Use this command to connect to a TikTok LIVE.\n" +
@@ -43,33 +45,11 @@ public class TikTokCommandController implements TabExecutor {
 
         switch(args[0]) {
             case "start":
-                if (ChatPointsTTV.getTikTok().isReloading.get()) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
-                    return true;
-                }
-                if (ChatPointsTTV.getTikTok().started) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is already started.");
-                    return true;
-                }
-
-                sender.sendMessage("Enabling TikTok module...");
-
-                ChatPointsTTV.enableTikTok(sender);
+                start(sender);
                 return true;
 
             case "stop":
-                if (!ChatPointsTTV.getTikTok().started) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is stopped.");
-                    return true;
-                }
-                if (ChatPointsTTV.getTikTok().isReloading.get()) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is still stopping. Please wait.");
-                    return true;
-                }
-                
-                sender.sendMessage("Disabling TikTok module...");
-
-                ChatPointsTTV.getTikTok().stop(sender);
+                stop(sender);
                 return true;
 
             case "status":
@@ -77,42 +57,15 @@ public class TikTokCommandController implements TabExecutor {
                 return true;
 
             case "reload":
-                if (!ChatPointsTTV.getTikTok().isReloading.compareAndSet(false, true)) {
-                    sender.sendMessage(ChatColor.RED + "TikTok module is reloading!");
-                    return true;
-                }
-
-                Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-                    sender.sendMessage("Reloading ChatPointsTTV...");
-                    ChatPointsTTV.getTikTok().stop(sender);
-
-                    try {
-                        ChatPointsTTV.getTikTok().stopThread.join();
-                    } catch (InterruptedException e) {
-                    }
-
-                    ChatPointsTTV.enableTikTok(sender);
-                });
-
+                reload(sender);
                 return true;
 
             case "link":
-                if (args.length < 2) {
+                if (args.length != 2) {
                     sender.sendMessage(ChatColor.RED + "Usage: /tiktok link <username>");
                     return true;
                 }
-                if (ChatPointsTTV.getTikTok().isReloading.get()) {
-                    sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
-                    return true;
-                }
-                if (!ChatPointsTTV.getTikTok().isStarted()) {
-                    sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
-                    return true;
-                }
-
-                Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-                    ChatPointsTTV.getTikTok().link(sender, args[1], true);
-                });
+                link(sender, args[1]);
                 return true;
 
             case "unlink":
@@ -120,19 +73,7 @@ public class TikTokCommandController implements TabExecutor {
                     sender.sendMessage(ChatColor.RED + "Usage: /tiktok unlink [username]");
                     return true;
                 }
-                if (args.length == 1) {
-                   for (String acc : ChatPointsTTV.getTikTok().getClients().keySet()) {
-                        ChatPointsTTV.getTikTok().unlink(acc, true);
-                   }
-                   sender.sendMessage(ChatColor.GREEN + "All accounts have been unlinked successfully!");
-                } else {
-                    if (ChatPointsTTV.getTikTok().getClients().containsKey(args[1].toLowerCase())) {
-                        ChatPointsTTV.getTikTok().unlink(args[1], true);
-                        sender.sendMessage(ChatColor.GREEN + "TikTok account " + args[1] + " unlinked successfully!");
-                    } else {
-                        sender.sendMessage(ChatColor.RED + "Couldn't find " + args[1] + "'s LIVE linked!");
-                    }
-                }
+                unlink(sender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
                 return true;
 
             case "accounts":
@@ -140,7 +81,15 @@ public class TikTokCommandController implements TabExecutor {
                 return true;
             
             case "test":
+                if (args.length < 4) {
+                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test <type> ...");
+                    return true;
+                }
                 test(sender, args);
+                return true;
+
+            case "help":
+                help(sender);
                 return true;
 
             default:
@@ -150,104 +99,24 @@ public class TikTokCommandController implements TabExecutor {
         }
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
-        ArrayList<String> available = new ArrayList<>();
-        ArrayList<String> result = new ArrayList<>();
-
-        switch (args.length) {
-            case 1:
-                available.add("help");
-                available.add("reload");
-                available.add("status");
-                if (ChatPointsTTV.getTikTok().started) {
-                    available.add("stop");
-                    available.add("link");
-                    available.add("accounts");
-                    if (ChatPointsTTV.getTikTok().accountConnected) {
-                        available.add("test");
-                        available.add("accounts");  
-                        available.add("unlink");
-                    }
-                } else {
-                    available.add("start");
-                }
-                break;
-            
-            case 2:
-                if (ChatPointsTTV.getTikTok().started) {
-                    if (args[0].equalsIgnoreCase("link")) {
-                        available.add("<TikTok Username>");
-                    } else if (args[0].equalsIgnoreCase("unlink") && ChatPointsTTV.getTikTok().accountConnected) {
-                        available.addAll(ChatPointsTTV.getTikTok().getClients().keySet());
-                    } else if (args[0].equalsIgnoreCase("test")) {
-                        available.add("follow");
-                        available.add("like");
-                        available.add("gift");
-                        available.add("share");
-                    }
-                }
-                break;
-
-            case 3:
-                if (ChatPointsTTV.getTikTok().started) {
-                    if (args[0].equalsIgnoreCase("test")) {
-                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                            available.add("<Chatter Username>");
-                        }
-                    }
-                }
-                break;
-
-            case 4:
-                if (ChatPointsTTV.getTikTok().started) {
-                    if (args[0].equalsIgnoreCase("test")) {
-                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
-                            if (ChatPointsTTV.getTikTok().listenedProfiles != null || !ChatPointsTTV.getTikTok().listenedProfiles.isEmpty()) {
-                                available.addAll(ChatPointsTTV.getTikTok().listenedProfiles);
-                            } else {
-                                available.add("<Streamer Username>");
-                            }
-                        }
-                    }
-                }
-                break;
-
-            case 5:
-                if (ChatPointsTTV.getTikTok().started) {
-                    if (args[0].equalsIgnoreCase("test")) {
-                        if (args[1].equalsIgnoreCase("gift")) {
-                            available.add("<Gift>");
-                        } else if (args[1].equalsIgnoreCase("like")) {
-                            available.add("<Amount>");
-                        }
-                    }
-                }
-                break;
-
-            case 6:
-                if (ChatPointsTTV.getTikTok().started) {
-                    if (args[0].equalsIgnoreCase("test")) {
-                        if (args[1].equalsIgnoreCase("gift")) {
-                            available.add("<Amount>");
-                        }
-                    }
-                }
-                break;
+    private void start(CommandSender sender) {
+        if (ChatPointsTTV.getTikTok().reloading.get()) {
+            sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
+            return;
         }
-            
-        for (String s : available) {
-            if (s.replace("\"", "").toLowerCase().startsWith(args[args.length - 1].replace("\"", "").toLowerCase())) {
-                result.add(s);
-            }
+        if (ChatPointsTTV.getTikTok().isStarted()) {
+            sender.sendMessage(ChatColor.RED + "TikTok Module is already started.");
+            return;
         }
-        return result;
+
+        sender.sendMessage("Enabling TikTok module...");
+        ChatPointsTTV.enableTikTok(sender);
     }
 
-    public void help(CommandSender p) {
-        p.spigot().sendMessage(helpMsg);
+    private void help(CommandSender sender) {
+        sender.spigot().sendMessage(helpMsg);
 
-        if (!p.equals(Bukkit.getConsoleSender())){
+        if (!sender.equals(Bukkit.getConsoleSender())){
             TextComponent docsTip = new TextComponent("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "\nTip: " + ChatColor.RESET + ChatColor.GRAY + "Check out ");
 
             TextComponent link = new TextComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "ChatPointsTTV's website");
@@ -256,22 +125,22 @@ public class TikTokCommandController implements TabExecutor {
             docsTip.addExtra(link);
             docsTip.addExtra(ChatColor.GRAY + " for more information on its commands!");
             
-            p.spigot().sendMessage(docsTip);
+            sender.spigot().sendMessage(docsTip);
         }
     }
 
-    private void accounts(CommandSender p) {
+    private void accounts(CommandSender sender) {
         List<String> accounts = ChatPointsTTV.getTikTok().listenedProfiles;
         
-        if (!ChatPointsTTV.getTikTok().started) {
-            p.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+        if (!ChatPointsTTV.getTikTok().isStarted()) {
+            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
             return;
         }
 
-        TextComponent msg = new TextComponent("\n---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected TikTok LIVEs" + ChatColor.RESET + " ----------\n\n");
+        TextComponent msg = new TextComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected TikTok LIVEs" + ChatColor.RESET + " -------------\n\n");
         
         for (String account : accounts) {
-            if (p.equals(Bukkit.getConsoleSender())) {
+            if (sender.equals(Bukkit.getConsoleSender())) {
                 if (account.isBlank()) continue;
                 msg.addExtra(ChatColor.GRAY + "  -  @" + account + "\n");
             } else {
@@ -289,7 +158,7 @@ public class TikTokCommandController implements TabExecutor {
         }
 
         TextComponent footer;
-        if (p.equals(Bukkit.getConsoleSender())) {
+        if (sender.equals(Bukkit.getConsoleSender())) {
             footer = new TextComponent(ChatColor.ITALIC + "\nTo unlink a LIVE, use /tiktok unlink <username>\nTo add a LIVE, use /tiktok link <username>");
         } else {
             footer = TikTokButtonComponents.accountLink();
@@ -301,10 +170,76 @@ public class TikTokCommandController implements TabExecutor {
         
         msg.addExtra(footer);
         msg.addExtra("\n");
-        ((org.bukkit.entity.Player) p).spigot().sendMessage(msg);
+        sender.spigot().sendMessage(msg);
     }
 
-    private void displayStatus(CommandSender p, ChatPointsTTV plugin) {
+    private void stop(CommandSender sender) {
+        if (!ChatPointsTTV.getTikTok().isStarted()) {
+            sender.sendMessage(ChatColor.RED + "TikTok Module is stopped.");
+            return;
+        }
+        if (ChatPointsTTV.getTikTok().reloading.get()) {
+            sender.sendMessage(ChatColor.RED + "TikTok Module is still stopping. Please wait.");
+            return;
+        }
+        
+        sender.sendMessage("Disabling TikTok module...");
+
+        ChatPointsTTV.getTikTok().stop(sender);
+    }
+
+    private void reload(CommandSender sender) {
+        if (!ChatPointsTTV.getTikTok().reloading.compareAndSet(false, true)) {
+            sender.sendMessage(ChatColor.RED + "TikTok module is reloading!");
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            sender.sendMessage("Reloading ChatPointsTTV...");
+            ChatPointsTTV.getTikTok().stop(sender);
+
+            try {
+                ChatPointsTTV.getTikTok().stopThread.join();
+            } catch (InterruptedException e) {
+            }
+
+            ChatPointsTTV.enableTikTok(sender);
+        });
+    }
+
+    private void link(CommandSender sender, String username) {
+        if (ChatPointsTTV.getTikTok().reloading.get()) {
+            sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
+            return;
+        }
+        if (!ChatPointsTTV.getTikTok().isStarted()) {
+            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            ChatPointsTTV.getTikTok().link(sender, username, true);
+        });
+    }
+
+    private void unlink(CommandSender sender, Optional<String> channelField) {
+        if (channelField.isPresent()) {
+            for (String acc : ChatPointsTTV.getTikTok().getClients().keySet()) {
+                ChatPointsTTV.getTikTok().unlink(acc, true);
+            }
+            sender.sendMessage(ChatColor.GREEN + "All accounts have been unlinked successfully!");
+        } else {
+            if (ChatPointsTTV.getTikTok().getClients().containsKey(channelField.get().toLowerCase())) {
+                ChatPointsTTV.getTikTok().unlink(channelField.get(), true);
+                sender.sendMessage(ChatColor.GREEN + "TikTok account " + channelField.get() + " unlinked successfully!");
+            } else {
+                sender.sendMessage(ChatColor.RED + "Couldn't find " + channelField.get() + "'s LIVE linked!");
+            }
+        }
+
+    }
+
+    private void displayStatus(CommandSender sender, ChatPointsTTV plugin) {
         String strChannels = "";
         
         if (ChatPointsTTV.getTikTok().getClients() == null || ChatPointsTTV.getTikTok().getClients().isEmpty()) {
@@ -317,15 +252,15 @@ public class TikTokCommandController implements TabExecutor {
         }
 
         BaseComponent msg = new ComponentBuilder(
-            "---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Status" + ChatColor.RESET + " ----------\n" +
+            "  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Status" + ChatColor.RESET + " -------------\n" +
             ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.getDescription().getVersion() + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened LIVEs: " + ChatColor.RESET + strChannels + "\n" + 
             "\n"
         ).create()[0];
 
         String currentState = "";
-        if (ChatPointsTTV.getTikTok().started) {
-            if (ChatPointsTTV.getTikTok().accountConnected) {
+        if (ChatPointsTTV.getTikTok().isStarted()) {
+            if (ChatPointsTTV.getTikTok().isAccountConnected()) {
                 currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
             } else {
                 currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
@@ -337,9 +272,9 @@ public class TikTokCommandController implements TabExecutor {
         BaseComponent status = new ComponentBuilder(ChatColor.LIGHT_PURPLE + "Connection status: " + currentState).create()[0];
         msg.addExtra(status);
 
-        if (!p.equals(Bukkit.getConsoleSender())) {
+        if (!sender.equals(Bukkit.getConsoleSender())) {
             msg.addExtra("\n\n");
-            if (ChatPointsTTV.getTikTok().started) {
+            if (ChatPointsTTV.getTikTok().isStarted()) {
                 msg.addExtra(TikTokButtonComponents.manageAccounts());
                 msg.addExtra(ChatColor.GRAY + "  -  ");
                 msg.addExtra(TikTokButtonComponents.clientStop());
@@ -348,21 +283,16 @@ public class TikTokCommandController implements TabExecutor {
             }
         }
 
-        ((org.bukkit.entity.Player) p).spigot().sendMessage(msg);
+        sender.spigot().sendMessage(msg);
     }
 
     private void test(CommandSender sender, String[] cmdInput) {
-        if (cmdInput.length < 4) {
-            sender.sendMessage(ChatColor.RED + "Usage: /tiktok test <type> ...");
-            return;
-        }
-
         LiveClient c = null;
         io.github.jwdeveloper.tiktok.data.events.common.TikTokEvent event;
         String chatter = cmdInput[2];
         Boolean offlineTest = false;
 
-        if (!ChatPointsTTV.getTikTok().started) {
+        if (!ChatPointsTTV.getTikTok().isStarted()) {
             sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
             return;
         }
@@ -396,7 +326,7 @@ public class TikTokCommandController implements TabExecutor {
                 try {
                     event = TikTokEventTest.LikeEvent(chatter, Integer.valueOf(cmdInput[4]));
                     if (offlineTest) {
-                        ChatPointsTTV.getTikTok().getEventHandler().onLike((io.github.jwdeveloper.tiktok.data.events.social.TikTokLikeEvent) event, cmdInput[3].toLowerCase());
+                        ChatPointsTTV.getTikTok().getEventHandler().onLike((TikTokLikeEvent) event, cmdInput[3].toLowerCase());
                         return;
                     } 
                 } catch (NumberFormatException e) {
@@ -440,7 +370,7 @@ public class TikTokCommandController implements TabExecutor {
 
                 event = TikTokEventTest.ShareEvent(chatter);
                 if (offlineTest) {
-                    ChatPointsTTV.getTikTok().getEventHandler().onShare((io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent) event, cmdInput[3].toLowerCase());
+                    ChatPointsTTV.getTikTok().getEventHandler().onShare((TikTokShareEvent) event, cmdInput[3].toLowerCase());
                     return;
                 } 
                 break;
@@ -452,4 +382,99 @@ public class TikTokCommandController implements TabExecutor {
         c.publishEvent(event);
         sender.sendMessage(ChatColor.GREEN + "Test event sent!");
     }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String arg, String[] args) {
+        ArrayList<String> available = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<>();
+
+        switch (args.length) {
+            case 1:
+                available.add("help");
+                available.add("reload");
+                available.add("status");
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    available.add("stop");
+                    available.add("link");
+                    available.add("accounts");
+                    if (ChatPointsTTV.getTikTok().isAccountConnected()) {
+                        available.add("test");
+                        available.add("accounts");  
+                        available.add("unlink");
+                    }
+                } else {
+                    available.add("start");
+                }
+                break;
+            
+            case 2:
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    if (args[0].equalsIgnoreCase("link")) {
+                        available.add("<TikTok Username>");
+                    } else if (args[0].equalsIgnoreCase("unlink") && ChatPointsTTV.getTikTok().isAccountConnected()) {
+                        available.addAll(ChatPointsTTV.getTikTok().getClients().keySet());
+                    } else if (args[0].equalsIgnoreCase("test")) {
+                        available.add("follow");
+                        available.add("like");
+                        available.add("gift");
+                        available.add("share");
+                    }
+                }
+                break;
+
+            case 3:
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                            available.add("<Chatter Username>");
+                        }
+                    }
+                }
+                break;
+
+            case 4:
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("follow") || args[1].equalsIgnoreCase("gift") || args[1].equalsIgnoreCase("like") || args[1].equalsIgnoreCase("share")) {
+                            if (ChatPointsTTV.getTikTok().listenedProfiles != null || !ChatPointsTTV.getTikTok().listenedProfiles.isEmpty()) {
+                                available.addAll(ChatPointsTTV.getTikTok().listenedProfiles);
+                            } else {
+                                available.add("<Streamer Username>");
+                            }
+                        }
+                    }
+                }
+                break;
+
+            case 5:
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("gift")) {
+                            available.add("<Gift>");
+                        } else if (args[1].equalsIgnoreCase("like")) {
+                            available.add("<Amount>");
+                        }
+                    }
+                }
+                break;
+
+            case 6:
+                if (ChatPointsTTV.getTikTok().isStarted()) {
+                    if (args[0].equalsIgnoreCase("test")) {
+                        if (args[1].equalsIgnoreCase("gift")) {
+                            available.add("<Amount>");
+                        }
+                    }
+                }
+                break;
+        }
+            
+        for (String s : available) {
+            if (s.replace("\"", "").toLowerCase().startsWith(args[args.length - 1].replace("\"", "").toLowerCase())) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
 }

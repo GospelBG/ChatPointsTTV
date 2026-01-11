@@ -62,6 +62,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 public class TwitchClient {
     public Boolean ignoreOfflineStreamers = false;
     public ConcurrentHashMap<String, OAuth2Credential> credentialManager = new ConcurrentHashMap<>();
+    public Thread stopThread;
 
     private final AtomicBoolean started = new AtomicBoolean(false);
     private final AtomicBoolean accountConnected = new AtomicBoolean(false);
@@ -509,7 +510,7 @@ public class TwitchClient {
     }
 
     public void stop(CommandSender p) {
-        new Thread(() -> {
+        stopThread = new Thread(() -> {
             if (!isStarted()) {
                 p.sendMessage(ChatColor.RED + "Twitch Module is already stopped.");
                 return;
@@ -558,7 +559,8 @@ public class TwitchClient {
             accountConnected.set(false);
             p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has been successfully stopped!");
 
-        }).start();
+        });
+        stopThread.start();
     }
     private void setupTwitch4JLogs() {
         String[] loggers = {

@@ -39,21 +39,21 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 
 public class TikTokClient {
-    public Boolean accountConnected = false;
-    public volatile Boolean started = false;
-    public AtomicBoolean isReloading = new AtomicBoolean(true);
+    public AtomicBoolean reloading = new AtomicBoolean(true);
     public List<String> listenedProfiles;
     public Thread stopThread;
 
-    private TikTokEvents eventHandler;
-
+    private volatile Boolean started = false;
+    private volatile Boolean accountConnected = false;
+    
     private final ChatPointsTTV plugin = ChatPointsTTV.getPlugin();
     private final Integer maxRetries = 3;
-    private FileConfiguration tiktokConfig;
     private final ExecutorService tiktokExecutor = Executors.newSingleThreadExecutor();
-
     private final ConcurrentHashMap<String, LiveClient> clients = new ConcurrentHashMap<>();
-    private List<String> chatBlacklist = new ArrayList<>();
+
+    private TikTokEvents eventHandler;
+    private FileConfiguration tiktokConfig;
+    private List<String> chatBlacklist;
 
     public HashMap<String, LiveClient> getClients() {
         return new HashMap<>(clients);
@@ -64,6 +64,9 @@ public class TikTokClient {
     public Boolean isStarted() {
         return started;
     }
+    public Boolean isReloading() {
+        return reloading.get();
+    }
     public FileConfiguration getConfig() {
         return tiktokConfig;
     }
@@ -71,9 +74,40 @@ public class TikTokClient {
         return eventHandler;
     }
 
+    public TikTokClient(CommandSender p) {
+        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
+            reloading.set(true);
+            clearClients();
+            chatBlacklist = new ArrayList<>();
+            listenedProfiles = new ArrayList<>();
+
+            CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
+
+            File tiktokConfigFile = new File(plugin.getDataFolder(), "tiktok.yml");
+            if (!tiktokConfigFile.exists()) {
+                plugin.saveResource(tiktokConfigFile.getName(), false);
+            }
+
+            tiktokConfig = YamlConfiguration.loadConfiguration(tiktokConfigFile);
+            chatBlacklist = tiktokConfig.getStringList("CHAT_BLACKLIST");
+            eventHandler = new TikTokEvents();
+
+            started = true;
+            reloading.set(false);
+
+            for (String username : ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK)) {
+                if (username.isBlank()) continue;
+                link(p, username, false);
+            }
+
+            p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has started successfully!");
+        });
+    }
+
+
     public void link(CommandSender p, String handle, Boolean save) {
         if (!started) return;
-        if (isReloading.get()) {
+        if (reloading.get()) {
             p.sendMessage(ChatColor.RED + "Please wait until the TikTok Module has finished starting.");
             return;
         }
@@ -185,7 +219,7 @@ public class TikTokClient {
 
     public void stop(CommandSender p) {
         if (!started || tiktokExecutor.isShutdown()) return;
-        isReloading.set(true);
+        reloading.set(true);
 
         stopThread = new Thread(() -> {
             tiktokExecutor.shutdown();
@@ -206,7 +240,7 @@ public class TikTokClient {
             started = false;
             accountConnected = false;
 
-            isReloading.set(false);
+            reloading.set(false);
             p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has been successfully stopped!");
         });
 
@@ -225,39 +259,6 @@ public class TikTokClient {
                 break;
             }
         }
-    }
-
-    public TikTokClient(CommandSender p) {
-        Bukkit.getScheduler().runTaskAsynchronously(ChatPointsTTV.getPlugin(), () -> {
-            isReloading.set(true);
-            clearClients();
-            chatBlacklist = new ArrayList<>();
-            listenedProfiles = new ArrayList<>();
-
-            CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
-
-            File tiktokConfigFile = new File(plugin.getDataFolder(), "tiktok.yml");
-            if (!tiktokConfigFile.exists()) {
-                plugin.saveResource(tiktokConfigFile.getName(), false);
-            }
-
-            tiktokConfig = YamlConfiguration.loadConfiguration(tiktokConfigFile);
-            if (!tiktokConfig.getStringList("CHAT_BLACKLIST").isEmpty()) {
-                chatBlacklist.addAll(tiktokConfig.getStringList("CHAT_BLACKLIST"));
-            }
-
-            eventHandler = new TikTokEvents();
-
-            started = true;
-            isReloading.set(false);
-
-            for (String username : ChatPointsTTV.getAccountsManager().getAccounts(Platforms.TIKTOK)) {
-                if (username.isBlank()) continue;
-                link(p, username, false);
-            }
-
-            p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has started successfully!");
-        });
     }
 
     private void clearClients() {
