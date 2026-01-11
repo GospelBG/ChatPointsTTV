@@ -219,6 +219,12 @@ public class ChatPointsTTV extends JavaPlugin {
         if (twitch != null) twitch.stop(Bukkit.getConsoleSender());
         if (tiktok != null) tiktok.stop(Bukkit.getConsoleSender());
         FollowerLog.stop();
+
+        try {
+            twitch.stopThread.join();
+            tiktok.stopThread.join();
+        } catch (InterruptedException ex) {
+        }
         
         // Erase variables
         config = null;
