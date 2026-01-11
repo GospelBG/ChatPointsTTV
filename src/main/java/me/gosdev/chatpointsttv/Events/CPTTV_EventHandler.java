@@ -36,7 +36,7 @@ import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class CPTTV_EventHandler {
     public static final String EVERYONE = "*";
-    private static Map<EventType, ArrayList<Event>> actions = new HashMap<>();
+    private static final Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
@@ -63,14 +63,22 @@ public class CPTTV_EventHandler {
             Boolean nameSpawnedMobs;
             AlertMode alertMode;
 
-            if (platform.equals(Platforms.TWITCH)) {
-                shouldGlow = ChatPointsTTV.getTwitch().shouldMobsGlow;
-                nameSpawnedMobs = ChatPointsTTV.getTwitch().nameSpawnedMobs;
-                alertMode = ChatPointsTTV.getTwitch().alertMode;
-            } else {
-                shouldGlow = ChatPointsTTV.shouldMobsGlow;
-                nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
-                alertMode = ChatPointsTTV.alertMode;
+            switch (platform) {
+                case TWITCH:
+                    shouldGlow = ChatPointsTTV.getTwitch().shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.getTwitch().nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.getTwitch().alertMode;
+                    break;
+                case TIKTOK:
+                    shouldGlow = ChatPointsTTV.getTikTok().shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.getTikTok().nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.getTikTok().alertMode;
+                    break;
+                default:
+                    shouldGlow = ChatPointsTTV.shouldMobsGlow;
+                    nameSpawnedMobs = ChatPointsTTV.nameSpawnedMobs;
+                    alertMode = ChatPointsTTV.alertMode;
+                    break;
             }
 
             if (!alertMode.equals(AlertMode.NONE)) { // In-game alert

@@ -30,6 +30,7 @@ import io.github.jwdeveloper.tiktok.exceptions.TikTokLiveUnknownHostException;
 import io.github.jwdeveloper.tiktok.exceptions.TikTokSignServerException;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import io.github.jwdeveloper.tiktok.live.builder.LiveClientBuilder;
+import me.gosdev.chatpointsttv.AlertMode;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
@@ -54,6 +55,10 @@ public class TikTokClient {
     private TikTokEvents eventHandler;
     private FileConfiguration tiktokConfig;
     private List<String> chatBlacklist;
+
+    public Boolean shouldMobsGlow;
+    public Boolean nameSpawnedMobs;
+    public AlertMode alertMode;
 
     public HashMap<String, LiveClient> getClients() {
         return new HashMap<>(clients);
@@ -91,6 +96,12 @@ public class TikTokClient {
             tiktokConfig = YamlConfiguration.loadConfiguration(tiktokConfigFile);
             chatBlacklist = tiktokConfig.getStringList("CHAT_BLACKLIST");
             eventHandler = new TikTokEvents();
+
+            // Configuration overrides
+            shouldMobsGlow = tiktokConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
+            nameSpawnedMobs = tiktokConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
+            alertMode = AlertMode.valueOf(tiktokConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
+
 
             started = true;
             reloading.set(false);
