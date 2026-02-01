@@ -223,7 +223,7 @@ public class TikTokCommandController implements TabExecutor {
     }
 
     private void unlink(CommandSender sender, Optional<String> channelField) {
-        if (channelField.isPresent()) {
+        if (channelField.isEmpty()) {
             for (String acc : ChatPointsTTV.getTikTok().getClients().keySet()) {
                 ChatPointsTTV.getTikTok().unlink(acc, true);
             }
