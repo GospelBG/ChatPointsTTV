@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+defaultTasks 'build'
+
+subprojects {
+    apply plugin: 'java'
+
+    group = 'me.gosdev'
+    project.ext.pluginVersion = '3.0'
+    project.ext.website = 'https://gosdev.me/chatpointsttv'
+
+
+    repositories {
+        mavenLocal()
+        maven {
+            url = uri('https://s01.oss.sonatype.org/content/repositories/snapshots/')
+        }
+
+        maven {
+            url = uri('https://jitpack.io')
+        }
+
+        maven {
+            url = uri('https://repo.maven.apache.org/maven2/')
+        }
+    }
+}
+
+description = 'ChatPointsTTV'
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}

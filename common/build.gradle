@@ -1,0 +1,10 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api libs.com.github.philippheuer.events4j.events4j.handler.simple
+    api libs.com.github.twitch4j.twitch4j
+    api libs.com.github.jwdeveloper.tiktok.live.java.client
+    api libs.org.json.json
+}

@@ -1,0 +1,37 @@
+plugins {
+    id 'com.gradleup.shadow' version '9.3.1'
+    id 'java-library'
+}
+
+repositories {
+    maven {
+        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
+    }
+}
+
+dependencies {
+    api libs.org.bstats.bstats.bukkit
+    compileOnly libs.org.spigotmc.spigot.api
+
+    implementation project(':common')
+}
+
+shadowJar {
+    archiveFileName = 'ChatPointsTTV-' + project.ext.pluginVersion + '-spigot.jar'
+
+    relocate 'org.bstats', 'me.gosdev.chatpointsttv.libraries.bstats'
+    relocate 'com.github.philippheuer.events4j', 'me.gosdev.chatpointsttv.libraries.events4j'
+    relocate 'com.github.twitch4j', 'me.gosdev.chatpointsttv.libraries.twitch4j'
+    relocate 'com.github.jwdeveloper.tiktok', 'me.gosdev.chatpointsttv.libraries.tiktok'
+    relocate 'org.json', 'me.gosdev.chatpointsttv.libraries.json'
+    relocate 'com.fasterxml.jackson', 'me.gosdev.chatpointsttv.libraries.jackson'
+}
+
+processResources {
+    def pluginVersion = project.ext.pluginVersion
+    def website = project.website
+
+    filesMatching('plugin.yml') {
+        expand('pluginVersion': pluginVersion, 'website': website)
+    }
+}

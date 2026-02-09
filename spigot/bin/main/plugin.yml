@@ -1,0 +1,33 @@
+name: ChatPointsTTV
+description: Twitch and TikTok integration for Streamers
+version: ${project.version} #TODO
+author: GosDev
+website: ${project.url}
+main: 'me.gosdev.chatpointsttv.SpigotPlugin'
+api-version: '1.13'
+
+commands:
+  cpttv:
+    description: Main command for ChatPointsTTV. Use "/cpttv help" to get a full list of commands.
+    usage: /cpttv <function>
+    permission: chatpointsttv.manage
+
+  twitch:
+    description: Manage ChatPointsTTV's Twitch module from this command. Use "/twitch help" to get a full list of commands.
+    usage: /twitch <function>
+    permission: chatpointsttv.manage
+
+  tiktok:
+    description: Manage ChatPointsTTV's TikTok module from this command. Use "/tiktok help" to get a full list of commands.
+    usage: /tiktok <function>
+    permission: chatpointsttv.manage
+
+permissions:
+  chatpointsttv.manage:
+    default: op
+
+  chatpointsttv.target:
+    default: false
+
+  chatpointsttv.broadcast:
+    default: true
