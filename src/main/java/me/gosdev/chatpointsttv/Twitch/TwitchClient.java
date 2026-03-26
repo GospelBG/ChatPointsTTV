@@ -125,54 +125,60 @@ public class TwitchClient {
         twitchExecutor = Executors.newSingleThreadExecutor();
 
         twitchExecutor.submit(() -> {
-            CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
+            try {
+                CPTTV_EventHandler.clearActions(Platforms.TWITCH); // Make sure actions will be parsed again
 
-            File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
-            if (!twitchConfigFile.exists()) {
-                ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
-            }
-            twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
-
-            accountsFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "accounts");
-            accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
-            if (!accountsConfig.contains("twitch")) {
-                accountsConfig.createSection("twitch");
-            }
-            accounts = accountsConfig.getConfigurationSection("twitch");
-
-            exec = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
-            exec.setRemoveOnCancelPolicy(true);
-
-            chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
-            ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
-
-            // Configuration overrides
-            shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
-            nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
-            alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
-
-            setupTwitch4JLogs();
-
-            
-            if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
-                FollowerLog.start();
-            }
-
-            if (accounts != null) {
-                for (String userid : accounts.getKeys(false)) {
-                    // Try to refresh token
-                    try {
-                        link(p, refreshCredentials(userid));
-                    } catch (RuntimeException e) {
-                        ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
-                        ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
-                    }      
+                File twitchConfigFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "twitch.yml");
+                if (!twitchConfigFile.exists()) {
+                    ChatPointsTTV.getPlugin().saveResource(twitchConfigFile.getName(), false);
                 }
+                twitchConfig = YamlConfiguration.loadConfiguration(twitchConfigFile);
+
+                accountsFile = new File(ChatPointsTTV.getPlugin().getDataFolder(), "accounts");
+                accountsConfig = YamlConfiguration.loadConfiguration(accountsFile);
+                if (!accountsConfig.contains("twitch")) {
+                    accountsConfig.createSection("twitch");
+                }
+                accounts = accountsConfig.getConfigurationSection("twitch");
+
+                exec = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+                exec.setRemoveOnCancelPolicy(true);
+
+                chatBlacklist = twitchConfig.getStringList("CHAT_BLACKLIST");
+                ignoreOfflineStreamers = ChatPointsTTV.getPlugin().getConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+
+                // Configuration overrides
+                shouldMobsGlow = twitchConfig.getBoolean("MOB_GLOW", ChatPointsTTV.shouldMobsGlow);
+                nameSpawnedMobs = twitchConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.nameSpawnedMobs);
+                alertMode = AlertMode.valueOf(twitchConfig.getString("INGAME_ALERTS", ChatPointsTTV.alertMode.toString()).toUpperCase());
+
+                setupTwitch4JLogs();
+
+                
+                if (twitchConfig.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                    FollowerLog.start();
+                }
+
+                if (accounts != null) {
+                    for (String userid : accounts.getKeys(false)) {
+                        // Try to refresh token
+                        try {
+                            link(p, refreshCredentials(userid));
+                        } catch (RuntimeException e) {
+                            ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
+                            ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
+                        }      
+                    }
+                }
+                
+                p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has started successfully!");   
+                started.set(true);
+                reloading.set(false);
+            } catch (Exception e) {
+                ChatPointsTTV.log.severe(e.getMessage());
+                e.printStackTrace();
             }
-            
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has started successfully!");   
-            started.set(true);
-            reloading.set(false);
+
         });
     }
 
