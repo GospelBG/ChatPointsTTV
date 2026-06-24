@@ -29,8 +29,10 @@ target/
 # Maven Shade Plugin 
 **dependency-reduced-pom.xml
 
-# VSCode folder
+# IDE files
 .vscode/
+.idea/
+chatpointsttv.iml
 
 .hintrc
 .DS_Store
