@@ -23,7 +23,7 @@ This GitHub repository hosts both the source code of the plugin and compiled ver
 
 These are the only official download mirrors. Any downloads besides these links may not be genuine.
 
-For installation instructions and more information about the plugin, please visit the [documentation website](https://gosdev.me/chatpointsttv/install/)
+For installation instructions and more information about the plugin, please visit the [documentation website](https://gosdev.me/chatpointsttv/install/) or join the [Discord Server](https://gosdev.me/discord) to connect with the ChatPointsTTV community.
 
 ## Support the project
 
