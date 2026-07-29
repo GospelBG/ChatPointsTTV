@@ -237,8 +237,12 @@ public class CPTTV_EventHandler {
                             break;
 
                         case "SHUFFLE":
-                            if (parts[1].equalsIgnoreCase("ALL")) {
+                            if (!parts[1].equalsIgnoreCase("ALL")) {
                                 target = Bukkit.getPlayer(parts[1]);
+                                if (target == null || !target.isOnline()) {
+                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[1] + ".");
+                                    continue;
+                                }
                             }
                             
                             action = new InvShuffleAction(target);

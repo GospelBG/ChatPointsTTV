@@ -23,12 +23,14 @@ This GitHub repository hosts both the source code of the plugin and compiled ver
 
 These are the only official download mirrors. Any downloads besides these links may not be genuine.
 
-For installation instructions and more information about the plugin, please visit the [documentation website](https://gosdev.me/chatpointsttv/install/)
+For installation instructions and more information about the plugin, please visit the [documentation website](https://gosdev.me/chatpointsttv/install/) or join the [Discord Server](https://gosdev.me/discord) to connect with the ChatPointsTTV community.
 
 ## Support the project
 
 If you find this plugin helpful I would greately appreciate a positive review on the [SpigotMC Resource Page](https://www.spigotmc.org/resources/chatpointsttv-twitch-integration-for-streamers.112532/).  
 Additionally, if you feel generous, you can support further development of the project through my [Ko-fi page](https://ko-fi.com/gosdev).
+
+<a href='https://ko-fi.com/K3K61KS8LX' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi4.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ## Credits
 
