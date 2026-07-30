@@ -414,7 +414,7 @@ public class TwitchClient {
                 }
             }
         } catch (HystrixRuntimeException e) {
-            if (e.getCause().getMessage().contains("errorStatus=403")) {} // No affiliate privileges. Fail silently
+            if (e.getCause().getMessage() != null && e.getCause().getMessage().contains("errorStatus=403")) {} // No affiliate privileges. Fail silently
             else {
                 ChatPointsTTV.log.severe("There was an error while updating Channel Point Rewards for Twitch account " + account.getUserName() + ".");
                 e.printStackTrace();
