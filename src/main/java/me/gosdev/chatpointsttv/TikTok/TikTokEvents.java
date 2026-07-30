@@ -1,5 +1,7 @@
 package me.gosdev.chatpointsttv.TikTok;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 import io.github.jwdeveloper.tiktok.data.events.gift.TikTokGiftComboEvent;
@@ -13,15 +15,28 @@ import me.gosdev.chatpointsttv.Platforms;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
 
 public class TikTokEvents {
+    public HashMap<String, Combo> activeCombos = new HashMap<>();
+
     public void onLike(TikTokLikeEvent event, String hostName) {
+        String userId = event.getUser().getId().toString();
+        if (activeCombos.containsKey(userId)) {
+            activeCombos.get(userId).add(event.getLikes());
+            //ChatPointsTTV.log.info(event.getUser().getName() + " Added likes: " + event.getLikes());
+        } else {
+            activeCombos.put(userId, new Combo(event, hostName, event.getLikes()));
+            //ChatPointsTTV.log.info(event.getUser().getName() + " Created new combo: " + event.getLikes());
+        }
+    }
+
+    public void onLikeComboFinish(Combo combo) {
         for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTikTok().getConfig(), TikTokEventType.LIKE)) {
-            if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(hostName)) continue;
+            if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(combo.getHostName())) continue;
             try {
-                if (event.getLikes() >= Integer.parseInt(reward.getEvent())) {
-                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, event.getUser().getName(), hostName, Optional.empty(), Optional.of(event.getLikes()));
+                if (combo.getCount() >= Integer.parseInt(reward.getEvent())) {
+                    CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.LIKE, reward, combo.getUserName(), combo.getHostName(), Optional.empty(), Optional.of(combo.getCount()));
                     return;
                 }
-    
+
             } catch (NumberFormatException e) {
                 ChatPointsTTV.log.warning("Invalid like combo amount: " + reward.getEvent());
                 return;
