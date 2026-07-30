@@ -312,7 +312,7 @@ public class TwitchClient {
 
         // Join the twitch chat of this channel(s) and enable stream/follow events
         subscribeToEvents(credential);
-        
+
         accountConnected.set(true);
     }
     

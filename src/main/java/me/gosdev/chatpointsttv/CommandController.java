@@ -14,12 +14,16 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.permissions.PermissionAttachment;
 
 public class CommandController implements TabExecutor {
     private final BaseComponent helpMsg = new ComponentBuilder("  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Help" + ChatColor.RESET + " -------------\n" + 
         ChatColor.GRAY + "Usage: " + Bukkit.getPluginCommand("cpttv").getUsage() + ChatColor.RESET + "\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv status: " + ChatColor.RESET + "Displays information about the plugin.\n" +
-        ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin along with all modules and reloads configuration files.\n" + 
+        ChatColor.LIGHT_PURPLE + "/cpttv reload: " + ChatColor.RESET + "Restarts the plugin along with all modules and reloads configuration files.\n" +
+        ChatColor.LIGHT_PURPLE + "/cpttv set <player> <permission> [true|false|unset]: " + ChatColor.RESET + "Sets a ChatPointsTTV permission.\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv help: " + ChatColor.RESET + "Displays this help message.").create()[0];
 
     @Override
@@ -41,6 +45,10 @@ public class CommandController implements TabExecutor {
                     plugin.reload(sender);
                     return true;
 
+                case "set":
+                    setPermission(sender, args);
+                    return true;
+
                 case "help":
                     help(sender);
                     return true;
@@ -49,7 +57,6 @@ public class CommandController implements TabExecutor {
                     sender.sendMessage(ChatColor.RED + "Unknown command: /cpttv " + args[0]);
                     help(sender);
                     return true;
-                    
             }
         }
     }
@@ -122,6 +129,72 @@ public class CommandController implements TabExecutor {
         p.spigot().sendMessage(msg);
     }
 
+    private void setPermission(CommandSender sender, String[] args) {
+        if (args.length < 3) {
+            help(sender);
+            return;
+        }
+
+        String targetName = args[1];
+        String perm = args[2];
+        Boolean state = true;
+
+        if (args.length == 4) {
+            if (args[3].equalsIgnoreCase("unset")) state = null;
+            else if (args[3].equalsIgnoreCase("true")) state = true;
+            else if (args[3].equalsIgnoreCase("false")) state = false;
+            else {
+                sender.sendMessage(ChatColor.RED + "Invalid state: " + args[3]);
+                return;
+            }
+        }
+
+        try {
+            ChatPointsTTV.permissions.valueOf(perm.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(ChatColor.RED + "Invalid permission: " + perm);
+            return;
+        }
+
+        if (targetName.equals("@s")) {
+            if (sender.equals(Bukkit.getConsoleSender())) {
+                sender.sendMessage(ChatColor.RED + "No entity was found.");
+                return;
+            }
+            targetName = sender.getName();
+
+        }
+
+        if (targetName.equals("@a")) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                setAttachment(p, "chatpointsttv." + perm, state);
+            }
+        } else {
+            Player target = Bukkit.getPlayer(targetName);
+            if (target == null) {
+                sender.sendMessage(ChatColor.RED + "Couldn't find player " + targetName + ".");
+                return;
+            }
+            setAttachment(target, "chatpointsttv." + perm, state);
+        }
+
+        sender.sendMessage(ChatColor.GREEN + "Permission has been set successfully!");
+    }
+
+    private void setAttachment(Player p, String key, Boolean state) {
+        if (state != null) {
+            PermissionAttachment attachment = p.addAttachment(ChatPointsTTV.getPlugin(), key, state);
+            p.setMetadata(key, new FixedMetadataValue(ChatPointsTTV.getPlugin(), attachment));
+        } else {
+            PermissionAttachment attachment = (PermissionAttachment) p.getMetadata(key).get(0).value();
+
+            if (attachment != null) {
+                p.removeAttachment(attachment);
+                p.removeMetadata(key, ChatPointsTTV.getPlugin());
+            }
+        }
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         ArrayList<String> available = new ArrayList<>();
@@ -131,6 +204,25 @@ public class CommandController implements TabExecutor {
             available.add("help");
             available.add("reload");
             available.add("status");
+            available.add("set");
+        }
+
+        if (args[0].equalsIgnoreCase("set")) {
+            if (args.length == 2) {
+                available.add("@s");
+                available.add("@a");
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    available.add(p.getName());
+                }
+            } else if (args.length == 3) {
+                for (ChatPointsTTV.permissions p : ChatPointsTTV.permissions.values()) {
+                    available.add(p.permission_id.replace("chatpointsttv.", ""));
+                }
+            } else if (args.length == 4) {
+                available.add("true");
+                available.add("false");
+                available.add("unset");
+            }
         }
 
         for (String s : available) {
