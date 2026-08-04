@@ -386,14 +386,18 @@ public class TwitchClient {
                 .execute();
             return true;
         } catch (HystrixRuntimeException e) {
-            if (e.getCause().getMessage().contains("errorStatus=400")) { // Bad request. (Only possible cause is exceeding maximum rewards)
-                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " cannot create new Channel Point Rewards because they have reached the maximum number of rewards.");
-            } else if (e.getCause().getMessage().contains("errorStatus=403")) { // No affiliate privileges
-                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " has not enrolled to the monetisation program. Therefore they cannot create Channel Point Rewards.");
-            } else {
-                ChatPointsTTV.log.severe("There was an error while creating a new Channel Point Reward for Twitch account " + account.getUserName() + ".");
-                e.printStackTrace();
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                if (e.getCause().getMessage().contains("errorStatus=400")) { // Bad request. (Only possible cause is exceeding maximum rewards)
+                    ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " cannot create new Channel Point Rewards because they have reached the maximum number of rewards.");
+                    return false;
+                } else if (e.getCause().getMessage().contains("errorStatus=403")) { // No affiliate privileges
+                    ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " has not enrolled to the monetisation program. Therefore they cannot create Channel Point Rewards.");
+                    return false;
+                }
             }
+            
+            ChatPointsTTV.log.severe("There was an error while creating a new Channel Point Reward for Twitch account " + account.getUserName() + ".");
+            e.printStackTrace();
             return false;
         }
     }
