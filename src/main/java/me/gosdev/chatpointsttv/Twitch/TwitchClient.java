@@ -163,7 +163,7 @@ public class TwitchClient {
                     for (String userid : accounts.getKeys(false)) {
                         // Try to refresh token
                         try {
-                            link(p, refreshCredentials(userid));
+                            link(p, refreshCredentials(getCredential(userid)));
                         } catch (RuntimeException e) {
                             ChatPointsTTV.log.warning("Credentials for User ID: " + userid + " have expired. You will need to link your account again.");
                             ChatPointsTTV.getAccountsManager().removeAccount(Platforms.TWITCH, userid);
@@ -197,12 +197,12 @@ public class TwitchClient {
 
             p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
     
-            tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(ChatPointsTTV.getPlugin(), new Thread() {
-                @Override
-                public void run() {
-                    refreshCredentials(credential.getUserId());
-                }
-            }, credential.getExpiresIn() / 2 * 20, credential.getExpiresIn() / 2 * 20));
+            tokenRefreshTasks.put(credential.getUserId(), Bukkit.getScheduler().runTaskTimerAsynchronously(
+                    ChatPointsTTV.getPlugin(),
+                    () -> refreshCredentials(credential),
+                    credential.getExpiresIn() / 2 * 20,
+                    credential.getExpiresIn() / 2 * 20)
+            );
     
             if (accountConnected.get()) {
                 subscribeToEvents(credential);
@@ -384,10 +384,10 @@ public class TwitchClient {
                 .execute();
             return true;
         } catch (HystrixRuntimeException e) {
-            if (e.getCause().getMessage().contains("errorStatus=400")) { // Max rewards reached
+            if (e.getCause().getMessage().contains("errorStatus=400")) { // Bad request. (Only possible cause is exceeding maximum rewards)
                 ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " cannot create new Channel Point Rewards because they have reached the maximum number of rewards.");
-            } else if (e.getCause().getMessage().contains("errorStatus=403")) {
-                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " has no affiliate privileges. Therefore they cannot create Channel Point Rewards.");
+            } else if (e.getCause().getMessage().contains("errorStatus=403")) { // No affiliate privileges
+                ChatPointsTTV.log.warning("Twitch account " + account.getUserName() + " has not enrolled to the monetisation program. Therefore they cannot create Channel Point Rewards.");
             } else {
                 ChatPointsTTV.log.severe("There was an error while creating a new Channel Point Reward for Twitch account " + account.getUserName() + ".");
                 e.printStackTrace();
@@ -407,38 +407,37 @@ public class TwitchClient {
             }
         }
 
-        try {
-            for (CustomReward r : client.getHelix().getCustomRewards(account.getAccessToken(), account.getUserId(), null, true).execute().getRewards()) {
-                if (configRewardNames.contains(r.getTitle().toLowerCase())) {
+        for (CustomReward r : client.getHelix().getCustomRewards(account.getAccessToken(), account.getUserId(), null, true).execute().getRewards()) {
+            if (configRewardNames.contains(r.getTitle().toLowerCase())) {
+                try {
                     client.getHelix().updateCustomReward(account.getAccessToken(), account.getUserId(), r.getId(), r.withIsEnabled(state)).execute();
+                } catch (HystrixRuntimeException e) {
+                    if (e.getCause().getMessage() == null || !e.getCause().getMessage().contains("errorStatus=403")) { // No affiliate privileges. Fail silently
+                        ChatPointsTTV.log.severe("There was an error while updating Channel Point Rewards for Twitch account " + account.getUserName() + ".");
+                        e.printStackTrace();
+                    }
                 }
             }
-        } catch (HystrixRuntimeException e) {
-            if (e.getCause().getMessage() != null && e.getCause().getMessage().contains("errorStatus=403")) {} // No affiliate privileges. Fail silently
-            else {
-                ChatPointsTTV.log.severe("There was an error while updating Channel Point Rewards for Twitch account " + account.getUserName() + ".");
-                e.printStackTrace();
-            }
         }
-
     }
 
-    private OAuth2Credential refreshCredentials(String userId) {
-        OAuth2Credential oldCredential;
+    private OAuth2Credential getCredential(String userId) {
         if (!credentialManager.containsKey(userId)) {
             if (!accounts.contains(userId) || !accounts.contains(userId + ".access_token") || !accounts.contains(userId + ".refresh_token")) {
                 throw new NullPointerException("Couldn't retrieve credentials for user: " + userId);
             }
-            oldCredential = new OAuth2Credential(identityProvider.getProviderName(), accounts.getString(userId + ".access_token"), accounts.getString(userId + ".refresh_token"), userId, null, null, null);
+            return new OAuth2Credential(identityProvider.getProviderName(), accounts.getString(userId + ".access_token"), accounts.getString(userId + ".refresh_token"), userId, null, null, null);
         } else {
-            oldCredential = credentialManager.get(userId);
+            return credentialManager.get(userId);
         }
+    }
 
+    private OAuth2Credential refreshCredentials(OAuth2Credential oldCredential) {
         Optional<OAuth2Credential> refreshed = identityProvider.refreshCredential(oldCredential);
         if (refreshed.isPresent()) {
             OAuth2Credential fullCredential = identityProvider.getAdditionalCredentialInformation(refreshed.get()).get();
+            oldCredential.updateCredential(fullCredential);
             saveCredential(fullCredential.getUserId(), fullCredential);
-            credentialManager.put(fullCredential.getUserId(), fullCredential);
 
             return fullCredential;
         } else {
