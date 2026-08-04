@@ -301,11 +301,13 @@ public class TwitchClient {
                         new ComponentBuilder(mcColor + event.getMessageEvent().getUserDisplayName().get() + ": ").create()[0],
                         new ComponentBuilder(event.getMessage()).create()[0]
                     };
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        if (player.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
-                            player.spigot().sendMessage(components);
+                    Bukkit.getScheduler().runTask(ChatPointsTTV.getPlugin(), () -> {
+                        for (Player player : Bukkit.getOnlinePlayers()) {
+                            if (player.hasPermission(ChatPointsTTV.permissions.BROADCAST.permission_id)) {
+                                player.spigot().sendMessage(components);
+                            }
                         }
-                    }
+                    });
                 }
             });
         }
