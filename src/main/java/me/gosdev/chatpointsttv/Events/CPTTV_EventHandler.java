@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -127,17 +128,18 @@ public class CPTTV_EventHandler {
                 String[] parts = cmd.split(" ");
     
                 if (parts.length <= 1) {
-                    ChatPointsTTV.log.warning(errorStr + "Action \"" + parts[0] + "\" needs arguments!");
+                    notifyFailure(parts[0], errorStr + "Action \"" + parts[0] + "\" needs arguments!");
                     continue;
                 }
                 try {
                     BaseAction action;
                     Integer act_amount = null;
                     Player target = null;
+
                     switch (parts[0].toUpperCase()) {
                         case "SPAWN":
                             if (!EnumUtils.isValidEnum(EntityType.class, parts[1].toUpperCase())) {
-                                ChatPointsTTV.log.warning(errorStr + "Entity " + parts[1].toUpperCase() + " does not exist.");
+                                notifyFailure(parts[0], errorStr + "Entity " + parts[1].toUpperCase() + " does not exist.");
                                 continue;
                             }
                             if (parts.length > 2) {
@@ -156,7 +158,7 @@ public class CPTTV_EventHandler {
                             text = text.trim();
 
                             if (text == null || text.isBlank()) {
-                                ChatPointsTTV.log.warning(errorStr + "Trying to run a blank command.");
+                                notifyFailure(parts[0], errorStr + "Trying to run a blank command.");
                                 continue;
                             }
 
@@ -164,7 +166,7 @@ public class CPTTV_EventHandler {
                             break;
                         case "GIVE":
                             if (!EnumUtils.isValidEnum(Material.class, parts[1].toUpperCase())) {
-                                ChatPointsTTV.log.warning(errorStr + "Item " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + "Item " + parts[1] + " does not exist.");
                                 continue;
                             }
                             if (parts.length > 2) {
@@ -173,7 +175,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[3] + ".");
                                     continue;
                                 }
                             }
@@ -186,19 +188,19 @@ public class CPTTV_EventHandler {
                             Integer strength = null;
                             if (!effect.equalsIgnoreCase("clear")) {
                                 if (parts.length < 4) {
-                                    ChatPointsTTV.log.warning(errorStr + "This action needs at least 3 arguments.");
+                                    notifyFailure(parts[0], errorStr + "This action needs at least 3 arguments.");
                                 }
                                 duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
                                 strength = Integer.valueOf(parts[2]);
                             }
                             if (PotionEffectType.getByName(effect) == null && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
-                                ChatPointsTTV.log.warning(errorStr + "Potion effect " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + "Potion effect " + parts[1] + " does not exist.");
                                 continue;
                             }
                             if (parts.length > (effect.equalsIgnoreCase("clear") ? 2 : 4)) {
                                 target = Bukkit.getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
                                     continue;
                                 }
                             }
@@ -208,14 +210,14 @@ public class CPTTV_EventHandler {
 
                         case "DELETE":
                             if (!EnumUtils.isValidEnum(DeleteItemsAction.Type.class, parts[1].toUpperCase())) {
-                                ChatPointsTTV.log.warning(errorStr + "Invalid option: " + parts[1]);
+                                notifyFailure(parts[0], errorStr + "Invalid option: " + parts[1]);
                                 continue;
                             }
 
                             if (parts.length > 2) {
                                 target = Bukkit.getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[2] + ".");
                                     continue;
                                 }
                             }
@@ -229,7 +231,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 2) {
                                 target = Bukkit.getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[2] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[2] + ".");
                                     continue;
                                 }
                             }
@@ -240,11 +242,11 @@ public class CPTTV_EventHandler {
                             if (!parts[1].equalsIgnoreCase("ALL")) {
                                 target = Bukkit.getPlayer(parts[1]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[1] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[1] + ".");
                                     continue;
                                 }
                             }
-                            
+
                             action = new InvShuffleAction(target);
                             break;
 
@@ -254,7 +256,7 @@ public class CPTTV_EventHandler {
                             try {
                                 action = new SoundAction(target, Sound.valueOf(sound.toUpperCase()));
                             } catch (IllegalArgumentException e) {
-                                ChatPointsTTV.log.warning(errorStr + "Sound effect " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + "Sound effect " + parts[1] + " does not exist.");
                                 continue;
                             }
                             break;
@@ -269,7 +271,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 3) {
                                 target = Bukkit.getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
-                                    ChatPointsTTV.log.warning(errorStr + "Couldn't find player " + parts[3] + ".");
+                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[3] + ".");
                                     continue;
                                 }
                             }
@@ -278,15 +280,15 @@ public class CPTTV_EventHandler {
                         case "WAIT":
                             try {
                                 Thread.sleep((long) (Float.parseFloat(parts[1])*1000));
-                            } catch (InterruptedException e) {}
+                            } catch (InterruptedException ignored) {}
                             continue;
                         default:
-                            ChatPointsTTV.log.warning(errorStr + "Invalid action \"" + parts[0] + "\"");
+                            notifyFailure(parts[0], errorStr + "Invalid action \"" + parts[0] + "\"");
                             return;
                     }
                     action.run();
                 } catch (NumberFormatException e) {
-                    ChatPointsTTV.log.warning(errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
+                    notifyFailure(parts[0], errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
                 }
             }
         }).start();
@@ -372,6 +374,15 @@ public class CPTTV_EventHandler {
     public static void clearActions(Platforms plat) {
         for (EventType e : plat.getEventTypes()) {
             actions.put(e, null);
+        }
+    }
+
+    private static void notifyFailure(String action, String msg) {
+        ChatPointsTTV.log.warning(msg);
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.hasPermission("chatpointsttv.manage")) {
+                p.sendMessage(ChatColor.RED + action.toUpperCase() + " action failed: " + msg);
+            }
         }
     }
 }
