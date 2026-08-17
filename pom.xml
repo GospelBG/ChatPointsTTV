@@ -104,13 +104,13 @@
     <dependency>
       <groupId>com.github.twitch4j</groupId>
       <artifactId>twitch4j</artifactId>
-      <version>1.25.0</version>
+      <version>1.26.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.jwdeveloper.TikTok-Live-Java</groupId>
       <artifactId>Client</artifactId>
-      <version>1.11.8-Release</version>
+      <version>1.11.15-Release</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
