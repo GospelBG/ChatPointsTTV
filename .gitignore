@@ -23,8 +23,10 @@
 hs_err_pid*
 replay_pid*
 
-# Target folder
-target/
+# Gradle
+.gradle/
+build/
+runs/
 
 # Maven Shade Plugin 
 **dependency-reduced-pom.xml
