@@ -1,0 +1,152 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = "${mod_id}-${project.name}-${libs.minecraft.get().version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(Javadoc).configureEach {
+    failOnError false
+    options.addStringOption('Xdoclint:-missing', '-quiet')
+}
+
+repositories {
+    mavenCentral()
+    // https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring_content_exclusively_found_in_one_repository
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Sponge'
+                url = 'https://repo.spongepowered.org/repository/maven-public'
+            }
+        }
+        filter { includeGroupAndSubgroups("org.spongepowered") }
+    }
+    exclusiveContent {
+        forRepositories(
+                maven {
+                    name = 'ParchmentMC'
+                    url = 'https://maven.parchmentmc.org/'
+                },
+                maven {
+                    name = 'NeoForge'
+                    url = 'https://maven.neoforged.net/releases'
+                }
+        )
+        filter { includeGroup('org.parchmentmc.data') }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Minecraft'
+                url = 'https://libraries.minecraft.net/'
+            }
+        }
+        filter {
+            includeGroupAndSubgroups("com.mojang")
+            includeModule("org.lwjgl", "lwjgl-freetype")
+        }
+    }
+}
+
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    publishing.publications.configureEach {
+        suppressPomMetadataWarningsFor(variant)
+    }
+}
+
+def mod_name = project.findProperty("mod_name")
+def mod_author = project.findProperty("mod_author")
+def mod_id = project.findProperty("mod_id")
+
+sourcesJar {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+}
+
+jar {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${mod_name}" }
+    }
+
+    manifest {
+        attributes([
+                'Specification-Title'   : mod_name,
+                'Specification-Vendor'  : mod_author,
+                'Specification-Version' : project.jar.archiveVersion,
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Vendor' : mod_author,
+                'Built-On-Minecraft'    : libs.minecraft.get().version,
+                'MixinConfigs'          : "${mod_id}.mixins.json,${mod_id}.${project.name}.mixins.json",
+        ])
+    }
+}
+
+processResources {
+    def expandProps = [
+            "version": version,
+            "group": project.group, //Else we target the task's group.
+            "minecraft_version": libs.minecraft.get().version.replace('-pre', '-beta.'),
+            "forge_version": libs.forge.get().version,
+            "fabric_api_version": libs.fabricApi.get().version,
+            "fabric_loader_version": libs.fabricLoader.get().version,
+            "mod_name": mod_name,
+            "mod_main": mod_name.split(/\s+/).collect { word -> word.capitalize() }.join(""),
+            "mod_author": mod_author,
+            "mod_id": mod_id,
+            "license": license,
+            "description": project.description,
+            "neoforge_version": libs.neoForge.get().version,
+            "credits": credits,
+            "java_version": java_version,
+            "homepage": homepage,
+            "discord": discord,
+            "issues": issues,
+            "sources": sources,
+            "balm_version": libs.versions.balm.get().split('\\+')[0],
+    ]
+
+    def jsonExpandProps = expandProps.collectEntries {
+        key, value -> [(key): value instanceof String ? value.replace("\n", "\\\\n") : value]
+    }
+
+    filesMatching(['META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+        expand expandProps
+    }
+
+    filesMatching(['pack.mcmeta', 'fabric.mod.json', '*.mixins.json']) {
+        expand jsonExpandProps
+    }
+
+    inputs.properties(expandProps)
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            version = project.version
+            artifactId = "${mod_id.replace('_', '-')}-${project.name}"
+            from components.java
+        }
+    }
+    repositories {
+        def repoUrl = version.toString().endsWith("SNAPSHOT") ? findProperty("maven_snapshots") : findProperty("maven_releases")
+        if (repoUrl != null) {
+            maven {
+                url = uri(repoUrl)
+                name = "maven"
+                credentials(PasswordCredentials)
+            }
+        }
+    }
+}

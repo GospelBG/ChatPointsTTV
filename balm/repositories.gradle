@@ -1,0 +1,25 @@
+repositories {
+    maven {
+        name = 'Twelve Iterations'
+        url = 'https://maven.twelveiterations.com/repository/maven-public/'
+        content {
+            includeGroup 'net.blay09.mods'
+        }
+    }
+
+    maven {
+        name = 'CurseMaven'
+        url = 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
+    }
+
+    maven {
+        name = 'BlameJared'
+        url = 'https://maven.blamejared.com'
+        content {
+            includeGroup "mezz.jei"
+        }
+    }
+}

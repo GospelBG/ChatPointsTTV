@@ -165,7 +165,7 @@ public class TikTokCommands {
 
     }
 
-    public static void displayStatus(GenericSender sender, ChatPointsTTV plugin) {
+    public static void displayStatus(GenericSender sender) {
         String strChannels = "";
         
         if (ChatPointsTTV.getTikTok().getClients() == null || ChatPointsTTV.getTikTok().getClients().isEmpty()) {
@@ -179,7 +179,7 @@ public class TikTokCommands {
 
         ChatComponent msg = new ChatComponent(
             "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Status" + ChatColor.RESET + " ----------\n" +
-            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + plugin.version + "\n" +
+            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + ChatPointsTTV.getInstance().version + "\n" +
             ChatColor.LIGHT_PURPLE + "Listened LIVEs: " + ChatColor.RESET + strChannels + "\n" + 
             "\n"
         );

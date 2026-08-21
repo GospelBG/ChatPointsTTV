@@ -34,7 +34,7 @@ public class TikTokCommandController implements TabExecutor {
                 return true;
 
             case "status":
-                TikTokCommands.displayStatus(genericSender, ChatPointsTTV.getInstance());
+                TikTokCommands.displayStatus(genericSender);
                 return true;
 
             case "reload":

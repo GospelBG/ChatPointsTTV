@@ -1,0 +1,35 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="${license}"
+issueTrackerURL="${issues}"
+[[mods]]
+modId="${mod_id}"
+version="${version}"
+displayName="${mod_name}"
+displayURL="${homepage}"
+logoFile="${mod_id}.png"
+credits="${credits}"
+authors="${mod_author}"
+description='''${description}'''
+[[mixins]]
+config = "${mod_id}.mixins.json"
+[[mixins]]
+config = "${mod_id}.neoforge.mixins.json"
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="[${neoforge_version},)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="[${minecraft_version},)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.${mod_id}]]
+modId="balm"
+type="required"
+versionRange="[${balm_version},)"
+ordering="NONE"
+side="BOTH"

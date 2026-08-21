@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "contact": {
+    "homepage": "${homepage}",
+    "sources": "${sources}",
+    "issues": "${issues}"
+  },
+
+  "license": "${license}",
+  "icon": "${mod_id}.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.gosdev.chatpointsttv.fabric.FabricChatpointsttv"
+    ],
+    "client": [
+      "me.gosdev.chatpointsttv.fabric.client.FabricChatpointsttvClient"
+    ],
+    "fabric-datagen": [
+      "me.gosdev.chatpointsttv.fabric.datagen.ModDataGenerator"
+    ]
+  },
+  "mixins": [
+    "chatpointsttv.mixins.json",
+    "chatpointsttv.fabric.mixins.json"
+  ],
+  "depends": {
+    "java": ">=${java_version}",
+    "minecraft": ">=${minecraft_version}",
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": ">=${fabric_api_version}",
+    "balm-fabric": ">=${balm_version}"
+  },
+  "suggests": {
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "${discord}"
+      }
+    }
+  }
+}

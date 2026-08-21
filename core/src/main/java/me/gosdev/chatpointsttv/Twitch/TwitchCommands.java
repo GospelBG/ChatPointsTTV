@@ -108,8 +108,18 @@ public class TwitchCommands {
             sender.sendMessage(ChatColor.RED + "Twitch Module is already started.");
             return;
         }
-        
+
         ChatPointsTTV.getInstance().enableTwitch(sender);
+    }
+
+    public static void stop(GenericSender sender) {
+        if (!ChatPointsTTV.getTwitch().isStarted()) {
+            sender.sendMessage(ChatColor.RED + "Twitch Module is not started.");
+            return;
+        }
+        if (ChatPointsTTV.getTwitch().reloading.get()) {
+            sender.sendMessage(ChatColor.RED + "Twitch Module is reloading. Please wait until it finishes.");
+        }
     }
 
     public static void accounts(GenericSender sender) {

@@ -14,39 +14,6 @@ public class CommandController {
         ChatColor.LIGHT_PURPLE + "/cpttv set <player> <permission> [true|false|unset]: " + ChatColor.RESET + "Sets a ChatPointsTTV permission.\n" +
         ChatColor.LIGHT_PURPLE + "/cpttv help: " + ChatColor.RESET + "Displays this help message.");
 
-    public boolean onCommand(GenericSender sender, String[] args) {
-        if (ChatPointsTTV.getInstance().isReloading()) {
-            sender.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + " The plugin is currently reloading. Please wait a moment.");
-            return true;
-        } else if (args.length == 0) {
-            help(sender);
-            return true;
-        } else {
-            switch (args[0]) {
-                case "status":
-                    status(sender);
-                    return true;
-
-                case "reload":
-                    ChatPointsTTV.getInstance().reload(sender);
-                    return true;
-
-                case "help":
-                    help(sender);
-                    return true;
-                
-                case "set":
-                    // Delegated to the platform specific handler
-                    return false;
-
-                default:
-                    sender.sendMessage(ChatColor.RED + "Unknown command: /cpttv " + args[0]);
-                    help(sender);
-                    return true;
-            }
-        }
-    }
-
     public static void help(GenericSender p) {
         p.sendMessage(helpMsg);
 
@@ -111,5 +78,9 @@ public class CommandController {
         msg.addExtra(docsBtn);
 
         p.sendMessage(msg);
+    }
+
+    public static void reload(GenericSender p) {
+        ChatPointsTTV.getInstance().reload(p);
     }
 }

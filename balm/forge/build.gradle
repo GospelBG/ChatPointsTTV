@@ -1,0 +1,99 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'multiloader-loader'
+    alias libs.plugins.forgeGradle
+    alias libs.plugins.curseForgeGradle
+    alias libs.plugins.modrinthMinotaur
+}
+
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+minecraft {
+    mappings channel: 'official', version: libs.minecraft.get().version
+
+    runs {
+        configureEach {
+            workingDir.convention layout.projectDirectory.dir('run')
+            args "--mixin.config=${mod_id}.mixins.json"
+            args "--mixin.config=${mod_id}.forge.mixins.json"
+        }
+        register('client') {
+            systemProperty 'forge.enabledGameTestNamespaces', mod_id
+        }
+    }
+}
+
+repositories {
+    maven minecraft.mavenizer
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+dependencies {
+    def mcVersion = libs.minecraft.get().version
+    def forgeVersion = libs.forge.get().version
+    implementation minecraft.dependency("net.minecraftforge:forge:$mcVersion-$forgeVersion")
+    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+tasks.named('jar', Jar) {
+    manifest {
+        attributes["MixinConfigs"] = "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    }
+}
+
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+apply from: rootProject.file('balm/repositories.gradle')
+apply from: 'dependencies.gradle'
+
+tasks.register('curseforge', TaskPublishCurseForge) {
+    dependsOn('build')
+    description = 'Publishes the Forge build to CurseForge.'
+    group = 'publishing'
+
+    apiToken = project.findProperty("curseforge.api_key") ?: System.getenv("CURSEFORGE_TOKEN") ?: "none"
+
+    def projectId = findProperty("curseforge_project_id")
+    onlyIf {
+        projectId != null
+    }
+    if (projectId) {
+        def mainFile = upload(findProperty("curseforge_project_id"), jar.archiveFile.get().asFile)
+        mainFile.changelog = rootProject.file('CHANGELOG.md').text
+        mainFile.addRequirement("balm")
+        mainFile.addGameVersion(libs.minecraft.get().version)
+        mainFile.releaseType = "release"
+        project.findProperty("curseforge_environments")?.split(",")?.toList()?.each { mainFile.addEnvironment(it) }
+    }
+}
+
+modrinth {
+    token = project.findProperty("modrinth.token") ?: System.getenv("MODRINTH_TOKEN") ?: "none"
+    projectId = findProperty("modrinth_project_id")
+    versionType = "release"
+    versionNumber = project.version + "+forge-" + libs.minecraft.get().version
+    uploadFile = jar
+    def changelogFile = rootProject.file("CHANGELOG.md")
+    if (changelogFile.exists()) {
+        changelog = changelogFile.text
+    }
+    gameVersions = [libs.minecraft.get().version]
+    loaders = ['forge']
+    dependencies {
+        required.project "balm"
+    }
+}
+
+tasks.configureEach {
+    if (it.name.contains("Eclipse")) {
+        it.enabled = false
+    }
+}

@@ -1,0 +1,55 @@
+plugins {
+    id 'multiloader-common'
+}
+
+configurations {
+    commonJava {
+        canBeResolved = true
+    }
+    commonResources {
+        canBeResolved = true
+    }
+    commonGeneratedResources {
+        canBeResolved = true
+    }
+}
+
+dependencies {
+    compileOnly(project(':balm:common'))
+    commonJava project(path: ':balm:common', configuration: 'commonJava')
+    commonResources project(path: ':balm:common', configuration: 'commonResources')
+    commonGeneratedResources project(path: ':balm:common', configuration: 'commonGeneratedResources')
+
+    implementation project(':core')
+}
+
+tasks.named('compileJava', JavaCompile) {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+processResources {
+    dependsOn(configurations.commonResources)
+    dependsOn(configurations.commonGeneratedResources)
+    from(configurations.commonResources)
+    from(configurations.commonGeneratedResources)
+}
+
+tasks.named('javadoc', Javadoc).configure {
+    dependsOn(configurations.commonJava)
+    source(configurations.commonJava)
+}
+
+tasks.named("sourcesJar", Jar) {
+    dependsOn(configurations.commonJava)
+    from(configurations.commonJava)
+    dependsOn(configurations.commonResources)
+    from(configurations.commonResources)
+    dependsOn(configurations.commonGeneratedResources)
+    from(configurations.commonGeneratedResources)
+}
+
+tasks.named('jar', Jar).configure {
+    dependsOn project(':core').tasks.named('classes')
+    from project(':core').sourceSets.main.output
+}
