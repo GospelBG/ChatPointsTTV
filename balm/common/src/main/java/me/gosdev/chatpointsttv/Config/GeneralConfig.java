@@ -1,12 +1,13 @@
 package me.gosdev.chatpointsttv.Config;
 
 import me.gosdev.chatpointsttv.AlertMode;
+import me.gosdev.chatpointsttv.Config.Adapters.BalmAlertMode;
 import net.blay09.mods.balm.platform.config.reflection.Comment;
 import net.blay09.mods.balm.platform.config.reflection.Config;
 import net.minecraft.util.StringRepresentable;
 
-@Config(value = "chatpointsttv", type = "common")
-public class BalmGeneralConfig {
+@Config(value = "chatpoints", type = "common")
+public class GeneralConfig {
     public boolean enableTwitch = true;
 
     public boolean enableTikTok = true;
@@ -25,38 +26,6 @@ public class BalmGeneralConfig {
 
     @Comment("In-game event alerts mode.")
     public BalmAlertMode ingameAlerts = BalmAlertMode.CHAT;
-
-    public enum BalmAlertMode implements StringRepresentable {
-        NONE(AlertMode.NONE),
-        CHAT(AlertMode.CHAT),
-        TITLE(AlertMode.TITLE),
-        ALL(AlertMode.ALL);
-
-        private final AlertMode alertMode;
-
-        BalmAlertMode(AlertMode alertMode) {
-            this.alertMode = alertMode;
-        }
-
-        public AlertMode toAlertMode() {
-            return alertMode;
-        }
-
-        @Override
-        public String getSerializedName() {
-            return alertMode.name().toLowerCase();
-        }
-
-        public static BalmAlertMode fromAlertMode(AlertMode alertMode) {
-            for (BalmAlertMode value : values()) {
-                if (value.alertMode == alertMode) {
-                    return value;
-                }
-            }
-
-            return NONE;
-        }
-    }
 
     @Comment("GLOBAL CONFIGURATION:\n" +
             "Adds glow effect to spawned mobs")

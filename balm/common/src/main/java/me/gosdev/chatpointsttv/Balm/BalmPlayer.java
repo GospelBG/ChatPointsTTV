@@ -6,7 +6,7 @@ import me.gosdev.chatpointsttv.Utils.ChatComponent;
 import net.blay09.mods.balm.Balm;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
@@ -37,9 +37,43 @@ public class BalmPlayer implements GenericPlayer {
         player.displayClientMessage(Component.literal(message), false);
     }
 
+    private MutableComponent convertComponent(ChatComponent comp) {
+        MutableComponent mc = Component.literal(comp.getText() == null ? "" : comp.getText());
+
+        mc = mc.withStyle(style -> {
+            Style s = style;
+            if (comp.getClickEvent() != null) {
+                try {
+                    switch (comp.getClickEvent().getAction()) {
+                        case OPEN_URL:
+                            s = s.withClickEvent(new ClickEvent.OpenUrl(new java.net.URI(comp.getClickEvent().getValue())));
+                            break;
+                        case RUN_COMMAND:
+                            s = s.withClickEvent(new ClickEvent.RunCommand(comp.getClickEvent().getValue()));
+                            break;
+                        case COMPLETE_COMMAND:
+                            s = s.withClickEvent(new ClickEvent.SuggestCommand(comp.getClickEvent().getValue()));
+                            break;
+                    }
+                } catch (Exception ignored) {}
+            }
+            if (comp.getHoverEvent() != null) {
+                if (comp.getHoverEvent().getAction() == me.gosdev.chatpointsttv.Utils.ChatEvent.HoverAction.SHOW_TEXT) {
+                    s = s.withHoverEvent(new HoverEvent.ShowText(Component.literal(comp.getHoverEvent().getValue())));
+                }
+            }
+            return s;
+        });
+
+        for (ChatComponent extra : comp.getExtra()) {
+            mc.append(convertComponent(extra));
+        }
+        return mc;
+    }
+
     @Override
     public void sendMessage(ChatComponent comp) {
-        player.displayClientMessage(Component.literal(comp.toString()), false); //TODO: Convert to Minecraft Component
+        player.displayClientMessage(convertComponent(comp), false);
     }
 
     @Override
@@ -53,7 +87,7 @@ public class BalmPlayer implements GenericPlayer {
         if (server != null) {
             String finalCmd = cmd;
             server.execute(() -> {
-                server.getCommands().performPrefixedCommand(player.createCommandSourceStackForNameResolution((ServerLevel) player.level()), finalCmd);
+                server.getCommands().performPrefixedCommand(player.createCommandSourceStackForNameResolution(player.level()), finalCmd);
             });
         }
 

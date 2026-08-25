@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import me.gosdev.chatpointsttv.Generic.ConfigFile;
+import me.gosdev.chatpointsttv.Generic.GenericTikTokConfig;
 import me.gosdev.chatpointsttv.Generic.GenericPlayer;
 import me.gosdev.chatpointsttv.Generic.GenericSender;
 import me.gosdev.chatpointsttv.Utils.ChatColor;
@@ -48,7 +48,7 @@ public class TikTokClient {
     private final ConcurrentHashMap<String, LiveClient> clients = new ConcurrentHashMap<>();
 
     private TikTokEvents eventHandler;
-    private ConfigFile tiktokConfig;
+    private GenericTikTokConfig tiktokConfig;
     private List<String> chatBlacklist;
 
     public Boolean shouldMobsGlow;
@@ -67,7 +67,7 @@ public class TikTokClient {
     public Boolean isReloading() {
         return reloading.get();
     }
-    public ConfigFile getConfig() {
+    public GenericTikTokConfig getConfig() {
         return tiktokConfig;
     }
     public TikTokEvents getEventHandler() {
@@ -85,13 +85,13 @@ public class TikTokClient {
 
             CPTTV_EventHandler.clearActions(Platforms.TIKTOK); // Make sure actions will be parsed again
 
-            chatBlacklist = tiktokConfig.getStringList("CHAT_BLACKLIST");
+            chatBlacklist = tiktokConfig.getChatBlacklist();
             eventHandler = new TikTokEvents();
 
             // Configuration overrides
-            shouldMobsGlow = tiktokConfig.getBoolean("MOB_GLOW", ChatPointsTTV.getInstance().shouldMobsGlow);
-            nameSpawnedMobs = tiktokConfig.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.getInstance().nameSpawnedMobs);
-            alertMode = AlertMode.valueOf(tiktokConfig.getString("INGAME_ALERTS", ChatPointsTTV.getInstance().alertMode.toString()).toUpperCase());
+            shouldMobsGlow = tiktokConfig.getMobGlow(ChatPointsTTV.getInstance().shouldMobsGlow);
+            nameSpawnedMobs = tiktokConfig.getDisplayNameOnMob(ChatPointsTTV.getInstance().nameSpawnedMobs);
+            alertMode = tiktokConfig.getIngameAlerts(ChatPointsTTV.getInstance().alertMode);
 
 
             started = true;
@@ -125,27 +125,27 @@ public class TikTokClient {
             p.sendMessage(ChatPointsTTV.msgPrefix + "Linking to @" + username + "'s LIVE");
 
             LiveClientBuilder builder = TikTokLive.newClient(username);
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.LIKE) != null) {
+            if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.LIKE) != null) {
                 builder.onLike((liveClient, event) -> {
                     eventHandler.onLike(event, clients.get(username).getRoomInfo().getHostName());
                 });
             }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.GIFT) != null) {
+            if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.GIFT) != null) {
                 builder.onGiftCombo((liveClient, event) -> {
                     if (event.getComboState().equals(GiftComboStateType.Finished)) eventHandler.onGift(event, clients.get(username).getRoomInfo().getHostName()); // Only handle Finished Combos
                 });
             }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.FOLLOW) != null) {
+            if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.FOLLOW) != null) {
                 builder.onFollow((liveClient, event) -> {
                     eventHandler.onFollow(event, clients.get(username).getRoomInfo().getHostName());
                 });
             }
-            if (CPTTV_EventHandler.getActions(tiktokConfig, TikTokEventType.SHARE) != null) {
+            if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.SHARE) != null) {
                 builder.onShare((liveClient, event) -> {
                     eventHandler.onShare(event, clients.get(username).getRoomInfo().getHostName());
                 });
             }
-            if (tiktokConfig.getBoolean("SHOW_CHAT", true)) {
+            if (ChatPointsTTV.getInstance().config.getGeneralConfig().getShowChat()) {
                 builder.onComment((liveClient, event) -> {
                     if (!chatBlacklist.contains(event.getUser().getName())) {
                         String message = ChatColor.DARK_PURPLE + event.getUser().getProfileName() + ": " + ChatColor.RESET + event.getText();
@@ -162,8 +162,8 @@ public class TikTokClient {
                 HttpClientSettings httpSettings = settings.getHttpSettings();
                 httpSettings.setTimeout(Duration.of(30L, SECONDS));
 
-                if (tiktokConfig.isString("EULERSTREAM_API_KEY")) {
-                    settings.setApiKey(tiktokConfig.getString("EULERSTREAM_API_KEY"));
+                if (tiktokConfig.hasEulerstreamApiKey()) {
+                    settings.setApiKey(tiktokConfig.getEulerstreamApiKey());
                 }
                 settings.setHttpSettings(httpSettings);
             });
@@ -197,7 +197,7 @@ public class TikTokClient {
                     }
                     if (i == maxRetries) {
                         if (ex instanceof TikTokSignServerException) {
-                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.isString("EULERSTREAM_API_KEY") ? " Please check your API key." : " Please try again."));
+                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.hasEulerstreamApiKey() ? " Please check your API key." : " Please try again."));
                         } else if (ex instanceof TikTokLiveRequestException && ex.getCause() instanceof HttpTimeoutException) {
                             p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
                         } else {

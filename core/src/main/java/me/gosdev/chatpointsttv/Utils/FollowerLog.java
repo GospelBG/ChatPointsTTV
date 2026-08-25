@@ -20,7 +20,6 @@ public class FollowerLog {
     public static void stop() {
         if (!isEnabled) return;
 
-        save();
         isEnabled = false;
     }
 
@@ -32,7 +31,6 @@ public class FollowerLog {
         List<String> list = accounts.getStringList(platform.name().toLowerCase() + "." + channelId);
         list.add(followerId);
         accounts.set(platform.name().toLowerCase() + "." + channelId, list);
-        save();
     }
 
     public static void populateList(Platforms platform, String channelId, List<String> followerList) {
@@ -44,14 +42,5 @@ public class FollowerLog {
             }
         }
         accounts.set(platform.name().toLowerCase() + "." + channelId, cachedList);
-        save();
-    }
-
-    static void save() {
-        try {
-            accounts.save();
-        } catch (IOException e) {
-            ChatPointsTTV.log.error("Failed to save followers file: " + e.getMessage());
-        }
     }
 }

@@ -1,14 +1,16 @@
 package me.gosdev.chatpointsttv;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import me.gosdev.chatpointsttv.Balm.BalmAccountManager;
 import me.gosdev.chatpointsttv.Balm.BalmLoader;
 import me.gosdev.chatpointsttv.Commands.*;
-import me.gosdev.chatpointsttv.Config.BalmGeneralConfig;
-import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Config.BalmConfigs;
+import me.gosdev.chatpointsttv.Config.GeneralConfig;
+import me.gosdev.chatpointsttv.Config.TikTokConfig;
+import me.gosdev.chatpointsttv.Config.TwitchConfig;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.platform.event.callback.ServerPlayerCallback;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.blay09.mods.balm.core.BalmRegistrars;
 import org.slf4j.Logger;
@@ -24,14 +26,16 @@ public class ChatPointsTTVBalm {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
-    public static BalmGeneralConfig config() {
-        return Balm.config().getActiveConfig(BalmGeneralConfig.class);
+    public static GeneralConfig config() {
+        return Balm.config().getActiveConfig(GeneralConfig.class);
     }
 
     private static ChatPointsTTV chatPointsTTV;
 
     public static void initialize(BalmRegistrars registrars) {
-        Balm.config().registerConfig(BalmGeneralConfig.class);
+        Balm.config().registerConfig(GeneralConfig.class);
+        Balm.config().registerConfig(TwitchConfig.class);
+        Balm.config().registerConfig(TikTokConfig.class);
 
         Balm.commands().register(dispatcher -> {
             dispatcher.register(Commands.literal("cpttv")
@@ -109,10 +113,13 @@ public class ChatPointsTTVBalm {
         });
 
         ServerPlayerCallback.Join.EVENT.register(player -> {
-            player.sendSystemMessage(Component.literal(ChatColor.AQUA + "JOINED!"));
-
             chatPointsTTV = new ChatPointsTTV(new BalmLoader(), new BalmConfigs(), new BalmAccountManager());
             chatPointsTTV.onEnable();
+        });
+
+        ServerPlayerCallback.Leave.EVENT.register(player -> {
+            chatPointsTTV.onDisable();
+            chatPointsTTV = null;
         });
     }
 

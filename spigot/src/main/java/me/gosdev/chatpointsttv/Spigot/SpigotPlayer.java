@@ -42,24 +42,6 @@ public class SpigotPlayer extends SpigotSender implements GenericPlayer {
         return player.isOnline();
     }
 
-
-    @Override
-    public void spawnEntity(String entity, String name, Boolean glow) {
-        Bukkit.getScheduler().runTask(ChatPointsTTVSpigot.getPlugin(), () -> { // Entities should only be spawned synchronously
-            try {
-                Entity e = player.getWorld().spawnEntity(player.getLocation(), EntityType.valueOf(entity));
-                e.setGlowing(glow);
-                if (name != null) {
-                    e.setCustomName(name);
-                    e.setCustomNameVisible(true);
-                }
-
-            } catch (IllegalArgumentException e) {
-                ChatPointsTTV.log.warn("Entity " + entity + " does not exist.");
-            }
-        });
-    }
-    
     @Override
     public void sendTitle(String title, String sub) {
         player.sendTitle(title, sub, 10, 70, 20);
@@ -177,19 +159,5 @@ public class SpigotPlayer extends SpigotSender implements GenericPlayer {
         Bukkit.getScheduler().runTask(ChatPointsTTVSpigot.getPlugin(), () -> {
             player.playSound(player.getLocation(), sound.toLowerCase(), 10, 1);
         });
-    }
-
-    @Override
-    public void shuffleInventory() {
-        ArrayList<ItemStack> inv = new ArrayList<>(Arrays.asList(player.getInventory().getStorageContents()));
-        inv.add(player.getInventory().getItemInOffHand());
-
-        Collections.shuffle(inv);
-
-        for (int i = 0; i < inv.size() - 1; i++) { // Don't include last item (offhand)
-            player.getInventory().setItem(i, inv.get(i));
-        }
-        player.getInventory().setItemInOffHand(inv.get(inv.size() - 1));
-
     }
 }

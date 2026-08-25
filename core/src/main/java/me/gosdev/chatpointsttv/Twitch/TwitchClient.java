@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import me.gosdev.chatpointsttv.Generic.ConfigFile;
+import me.gosdev.chatpointsttv.Generic.GenericTwitchConfig;
 import me.gosdev.chatpointsttv.Generic.GenericPlayer;
 import me.gosdev.chatpointsttv.Generic.GenericSender;
 import me.gosdev.chatpointsttv.Utils.*;
@@ -51,7 +51,7 @@ public class TwitchClient {
     private List<String> chatBlacklist;
     private final ConcurrentHashMap<String, Channel> channels = new ConcurrentHashMap<>();
     private TwitchEvents eventHandler;
-    private ConfigFile config;
+    private GenericTwitchConfig config;
     private IEventSubSocket eventSocket;
     private EventManager eventManager;
     private ITwitchClient client;
@@ -78,7 +78,7 @@ public class TwitchClient {
     public ITwitchClient getClient() {
         return client;
     }
-    public ConfigFile getConfig() {
+    public GenericTwitchConfig getConfig() {
         return config;
     }
 
@@ -126,17 +126,17 @@ public class TwitchClient {
                 exec = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
                 exec.setRemoveOnCancelPolicy(true);
 
-                chatBlacklist = config.getStringList("CHAT_BLACKLIST");
-                ignoreOfflineStreamers = ChatPointsTTV.getInstance().config.getGeneralConfig().getBoolean("IGNORE_OFFLINE_STREAMERS", false);
+                chatBlacklist = config.getChatBlacklist();
+                ignoreOfflineStreamers = ChatPointsTTV.getInstance().config.getGeneralConfig().getIgnoreOfflineStreamers();
 
                 // Configuration overrides
-                shouldMobsGlow = config.getBoolean("MOB_GLOW", ChatPointsTTV.getInstance().shouldMobsGlow);
-                nameSpawnedMobs = config.getBoolean("DISPLAY_NAME_ON_MOB", ChatPointsTTV.getInstance().nameSpawnedMobs);
-                alertMode = AlertMode.valueOf(config.getString("INGAME_ALERTS", ChatPointsTTV.getInstance().alertMode.toString()).toUpperCase());
+                shouldMobsGlow = config.getMobGlow(ChatPointsTTV.getInstance().shouldMobsGlow);
+                nameSpawnedMobs = config.getDisplayNameOnMob(ChatPointsTTV.getInstance().nameSpawnedMobs);
+                alertMode = config.getIngameAlerts(ChatPointsTTV.getInstance().alertMode);
 
                 setupTwitch4JLogs();
                 
-                if (config.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+                if (config.getFollowSpamProtection()) {
                     FollowerLog.start(ChatPointsTTV.getInstance().config.getFollowerLog());
                 }
 
@@ -193,7 +193,7 @@ public class TwitchClient {
 
             p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
 
-            if (config.getBoolean("FOLLOW_SPAM_PROTECTION", true)) {
+            if (config.getFollowSpamProtection()) {
                 List<String> followerIDs = new ArrayList<>();
                 String cursor = null;
                 while (true) { 
@@ -242,33 +242,33 @@ public class TwitchClient {
                 if (channel.getChannelUsername().equalsIgnoreCase(e.getChannel().getName())) channel.updateStatus(false);
             }
         });            
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.CHANNEL_POINTS) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHANNEL_POINTS) != null) {
             eventManager.onEvent(CustomRewardRedemptionAddEvent.class, (CustomRewardRedemptionAddEvent e) -> {
                 eventHandler.onChannelPointsRedemption(e);
             });
         }
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.FOLLOW) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.FOLLOW) != null) {
             eventManager.onEvent(ChannelFollowEvent.class, (ChannelFollowEvent e) -> {
                 eventHandler.onFollow(e);
             });
         }
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.CHEER) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHEER) != null) {
             eventManager.onEvent(ChannelChatMessageEvent.class, (ChannelChatMessageEvent e) -> {
                 eventHandler.onCheer(e);
             }); 
         }
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.SUB) != null || CPTTV_EventHandler.getActions(config, TwitchEventType.GIFT) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.SUB) != null || CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.GIFT) != null) {
             eventManager.onEvent(ChannelChatNotificationEvent.class, (ChannelChatNotificationEvent e) -> {
                     if (e.getNoticeType() == NoticeType.SUB || e.getNoticeType() == NoticeType.RESUB) eventHandler.onSub(e);
                     else if (e.getNoticeType() == NoticeType.COMMUNITY_SUB_GIFT) eventHandler.onSubGift(e);
             });
         }
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.RAID) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.RAID) != null) {
             eventManager.onEvent(ChannelRaidEvent.class, (ChannelRaidEvent e) -> {
                     eventHandler.onRaid(e);
             }); 
         }
-        if (ChatPointsTTV.getInstance().config.getGeneralConfig().getBoolean("SHOW_CHAT", true)) {
+        if (ChatPointsTTV.getInstance().config.getGeneralConfig().getShowChat()) {
             eventManager.onEvent(ChannelMessageEvent.class, event -> {
                 if (ignoreOfflineStreamers && !getListenedChannels().get(event.getChannel().getName().toLowerCase()).isLive()) return;
                 if (!chatBlacklist.contains(event.getUser().getName())) {
@@ -299,24 +299,24 @@ public class TwitchClient {
         String channel_id = credential.getUserId();
         ArrayList<EventSubSubscription> subs = new ArrayList<>();
 
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.CHANNEL_POINTS) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHANNEL_POINTS) != null) {
             toggleChannelPointRewards(credential, true);
             subs.add(SubscriptionTypes.CHANNEL_POINTS_CUSTOM_REWARD_REDEMPTION_ADD.prepareSubscription(b -> b.broadcasterUserId(channel_id).build(), null));
         }
 
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.FOLLOW) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.FOLLOW) != null) {
             subs.add(SubscriptionTypes.CHANNEL_FOLLOW_V2.prepareSubscription(b -> b.moderatorUserId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.CHEER) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHEER) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_MESSAGE.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.SUB) != null || CPTTV_EventHandler.getActions(config, TwitchEventType.GIFT) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.SUB) != null || CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.GIFT) != null) {
             subs.add(SubscriptionTypes.CHANNEL_CHAT_NOTIFICATION.prepareSubscription(b -> b.userId(channel_id).broadcasterUserId(channel_id).build(), null));
         }
 
-        if (CPTTV_EventHandler.getActions(config, TwitchEventType.RAID) != null) {
+        if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.RAID) != null) {
             subs.add(SubscriptionTypes.CHANNEL_RAID.prepareSubscription(b -> b.toBroadcasterUserId(channel_id).build(), null));
         }
 
@@ -380,8 +380,8 @@ public class TwitchClient {
     }
 
     public void toggleChannelPointRewards(OAuth2Credential account, Boolean state) {
-        if (!config.getBoolean("MANAGE_CHANNEL_POINT_REWARDS", true)) return;
-        ArrayList<Event> actions = CPTTV_EventHandler.getActions(config, TwitchEventType.CHANNEL_POINTS);
+        if (!config.getManageChannelPointRewards()) return;
+        ArrayList<Event> actions = CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHANNEL_POINTS);
         ArrayList<String> configRewardNames = new ArrayList<>();
 
         if (actions != null) {

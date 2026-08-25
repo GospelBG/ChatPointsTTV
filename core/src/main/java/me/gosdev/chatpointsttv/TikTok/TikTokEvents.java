@@ -29,7 +29,7 @@ public class TikTokEvents {
     }
 
     public void onLikeComboFinish(Combo combo) {
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTikTok().getConfig(), TikTokEventType.LIKE)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.LIKE)) {
             if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(combo.getHostName())) continue;
             try {
                 if (combo.getCount() >= Integer.parseInt(reward.getEvent())) {
@@ -45,7 +45,7 @@ public class TikTokEvents {
     }
 
     public void onGift(TikTokGiftComboEvent event, String hostName) {
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTikTok().getConfig(), TikTokEventType.GIFT)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.GIFT)) {
             if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(hostName)) continue;
 
             if (event.getGift().getName().equalsIgnoreCase(reward.getEvent()) || reward.getEvent().equalsIgnoreCase("any")) {
@@ -63,7 +63,7 @@ public class TikTokEvents {
             FollowerLog.addFollower(Platforms.TIKTOK, hostId, event.getUser().getId().toString());
         }
 
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTikTok().getConfig(), TikTokEventType.FOLLOW)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.FOLLOW)) {
             if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(hostName)) continue;
 
             CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.FOLLOW, reward, event.getUser().getProfileName(), hostName, Optional.empty(), Optional.empty());
@@ -72,7 +72,7 @@ public class TikTokEvents {
     }
 
     public void onShare(TikTokShareEvent event, String hostName) {
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTikTok().getConfig(), TikTokEventType.SHARE)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.SHARE)) {
             if (!reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE) && !reward.getTargetChannel().equals(hostName)) continue;
 
             CPTTV_EventHandler.onEvent(Platforms.TIKTOK, TikTokEventType.SHARE, reward, event.getUser().getProfileName(), hostName, Optional.empty(), Optional.empty());

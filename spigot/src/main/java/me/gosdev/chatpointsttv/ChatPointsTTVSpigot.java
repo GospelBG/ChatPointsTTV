@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import me.gosdev.chatpointsttv.Config.SpigotConfig;
+import me.gosdev.chatpointsttv.Config.SpigotConfigs;
 import me.gosdev.chatpointsttv.Config.SpigotConfigFile;
 import me.gosdev.chatpointsttv.Spigot.SpigotListeners;
 import me.gosdev.chatpointsttv.Spigot.SpigotLoader;
@@ -67,7 +67,7 @@ public class ChatPointsTTVSpigot extends JavaPlugin {
         this.saveDefaultConfig();
         reloadConfig();
 
-        chatPointsTTV = new ChatPointsTTV(new SpigotLoader(), new SpigotConfig(), new SpigotAccountsManager());
+        chatPointsTTV = new ChatPointsTTV(new SpigotLoader(), new SpigotConfigs(), new SpigotAccountsManager());
         chatPointsTTV.onEnable();
 
         File stringsFile = new File(plugin.getDataFolder(), "locales.yml");

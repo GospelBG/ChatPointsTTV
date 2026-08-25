@@ -3,35 +3,49 @@ package me.gosdev.chatpointsttv.Config;
 import me.gosdev.chatpointsttv.Generic.ConfigFile;
 import me.gosdev.chatpointsttv.Generic.GenericConfig;
 
-public class SpigotConfig implements GenericConfig {
-    private final SpigotConfigFile generalConfig;
-    private final SpigotConfigFile twitchConfig;
-    private final SpigotConfigFile tiktokConfig;
+import me.gosdev.chatpointsttv.Generic.GenericGeneralConfig;
+import me.gosdev.chatpointsttv.Generic.GenericTwitchConfig;
+import me.gosdev.chatpointsttv.Generic.GenericTikTokConfig;
+
+public class SpigotConfigs implements GenericConfig {
+    private final SpigotGeneralConfig generalConfig;
+    private final SpigotTwitchConfig twitchConfig;
+    private final SpigotTikTokConfig tiktokConfig;
     private final SpigotConfigFile localesConfig;
     private final SpigotConfigFile followerLog;
     private final SpigotConfigFile accounts;
 
-    public SpigotConfig() {
-        this.generalConfig = new SpigotConfigFile("config.yml");
-        this.twitchConfig = new SpigotConfigFile("twitch.yml");
-        this.tiktokConfig = new SpigotConfigFile("tiktok.yml");
+    public SpigotConfigs() {
+        this.generalConfig = new SpigotGeneralConfig("config.yml");
+        this.twitchConfig = new SpigotTwitchConfig("twitch.yml");
+        this.tiktokConfig = new SpigotTikTokConfig("tiktok.yml");
         this.localesConfig = new SpigotConfigFile("locales.yml");
         this.followerLog = new SpigotConfigFile("followers");
         this.accounts = new SpigotConfigFile("accounts");
     }
 
     @Override
-    public ConfigFile getGeneralConfig() {
+    public GenericGeneralConfig getGeneralConfig() {
         return generalConfig;
     }
 
     @Override
-    public ConfigFile getTwitchConfig() {
+    public GenericTwitchConfig getTwitchConfig() {
         return twitchConfig;
     }
 
     @Override
-    public ConfigFile getTikTokConfig() {
+    public GenericTikTokConfig getTikTokConfig() {
+        return tiktokConfig;
+    }
+
+    @Override
+    public ConfigFile getTwitchEventsConfig() {
+        return twitchConfig;
+    }
+
+    @Override
+    public ConfigFile getTikTokEventsConfig() {
         return tiktokConfig;
     }
 

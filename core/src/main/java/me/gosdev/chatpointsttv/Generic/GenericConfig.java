@@ -1,11 +1,15 @@
 package me.gosdev.chatpointsttv.Generic;
 
 public interface GenericConfig {
-    ConfigFile getGeneralConfig();
+    GenericGeneralConfig getGeneralConfig();
 
-    ConfigFile getTwitchConfig();
+    GenericTwitchConfig getTwitchConfig();
 
-    ConfigFile getTikTokConfig();
+    GenericTikTokConfig getTikTokConfig();
+
+    ConfigFile getTwitchEventsConfig();
+    
+    ConfigFile getTikTokEventsConfig();
 
     ConfigFile getLocalesConfig();
 

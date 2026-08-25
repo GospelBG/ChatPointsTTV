@@ -89,7 +89,7 @@ public class ChatPointsTTV {
         return instance != null ? instance.tiktok : null;
     }
 
-    public static ConfigFile getPluginConfig() {
+    public static GenericGeneralConfig getPluginConfig() {
         return instance != null && instance.config != null ? instance.config.getGeneralConfig() : null;
     }
 
@@ -102,13 +102,13 @@ public class ChatPointsTTV {
     }
 
     public void onEnable() {
-        this.logEvents = this.config.getGeneralConfig().getBoolean("LOG_EVENTS", false);
-        this.shouldMobsGlow = this.config.getGeneralConfig().getBoolean("MOB_GLOW", false);
-        this.alertMode = AlertMode.valueOf(this.config.getGeneralConfig().getString("INGAME_ALERTS", "NONE").toUpperCase());
-        this.nameSpawnedMobs = this.config.getGeneralConfig().getBoolean("DISPLAY_NAME_ON_MOB", true);
+        this.logEvents = this.config.getGeneralConfig().getLogEvents();
+        this.shouldMobsGlow = this.config.getGeneralConfig().getMobGlow();
+        this.alertMode = this.config.getGeneralConfig().getIngameAlerts();
+        this.nameSpawnedMobs = this.config.getGeneralConfig().getDisplayNameOnMob();
 
-        if (this.config.getGeneralConfig().getBoolean("ENABLE_TWITCH", true)) enableTwitch(this.consoleSender);
-        if (this.config.getGeneralConfig().getBoolean("ENABLE_TIKTOK", true)) enableTikTok(this.consoleSender);
+        if (this.config.getGeneralConfig().getEnableTwitch()) enableTwitch(this.consoleSender);
+        if (this.config.getGeneralConfig().getEnableTikTok()) enableTikTok(this.consoleSender);
 
         VersionCheck.check();
     }

@@ -34,7 +34,7 @@ public class TwitchCommands {
             return;
         }
 
-        Boolean shouldHideCode = ChatPointsTTV.getInstance().config.getTwitchConfig().getBoolean("HIDE_LOGIN_CODES", false);
+        Boolean shouldHideCode = ChatPointsTTV.getInstance().config.getGeneralConfig().getHideLoginCodes();
 
         sender.sendMessage(ChatColor.GRAY + "Please wait...");
         DeviceAuthorization auth = TwitchAuth.authorize(sender);

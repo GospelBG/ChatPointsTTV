@@ -22,7 +22,7 @@ import me.gosdev.chatpointsttv.Utils.FollowerLog;
 
 public class TwitchEvents {
     public void onChannelPointsRedemption(CustomRewardRedemptionAddEvent event) {
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.CHANNEL_POINTS)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHANNEL_POINTS)) {
             if (!reward.getEvent().equalsIgnoreCase(event.getReward().getTitle())) continue;
             if (!reward.getTargetChannel().equals(event.getBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
@@ -53,7 +53,7 @@ public class TwitchEvents {
             if (FollowerLog.wasFollowing(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId())) return;
             FollowerLog.addFollower(Platforms.TWITCH, event.getBroadcasterUserId(), event.getUserId());
         }
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.FOLLOW)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.FOLLOW)) {
             if (!reward.getTargetChannel().equals(event.getBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
             CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.FOLLOW, reward, event.getUserName(), event.getBroadcasterUserName(), Optional.empty(), Optional.empty());
@@ -65,7 +65,7 @@ public class TwitchEvents {
         if (event.getCheer() == null) return;
         Integer amount = event.getCheer().getBits();
 
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.CHEER)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.CHEER)) {
             if (!reward.getTargetChannel().equals(event.getBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
             try {
                 if (amount >= Integer.valueOf(reward.getEvent())) {
@@ -99,7 +99,7 @@ public class TwitchEvents {
             
         }
 
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.SUB)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.SUB)) {
             if (!reward.getTargetChannel().equals(event.getBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
 
             if (reward.getEvent().equals(TwitchUtils.PlanToConfig(tier))) {
@@ -112,7 +112,7 @@ public class TwitchEvents {
     public void onSubGift(ChannelChatNotificationEvent event) {
         Integer amount = event.getCommunitySubGift().getTotal();
 
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.GIFT)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.GIFT)) {
             if (!reward.getTargetChannel().equals(event.getBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
                 CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.GIFT, reward, event.getChatterUserName(), event.getBroadcasterUserName(), Optional.empty(), Optional.of(amount));
@@ -125,7 +125,7 @@ public class TwitchEvents {
         String raiderName = event.getFromBroadcasterUserName();
         Integer amount = event.getViewers();
 
-        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getTwitch().getConfig(), TwitchEventType.RAID)) {
+        for (Event reward : CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTwitchEventsConfig(), TwitchEventType.RAID)) {
             if (!reward.getTargetChannel().equals(event.getToBroadcasterUserLogin()) && !reward.getTargetChannel().equals(CPTTV_EventHandler.EVERYONE)) continue;
             if (amount >= Integer.valueOf(reward.getEvent())) {
                 CPTTV_EventHandler.onEvent(Platforms.TWITCH, TwitchEventType.RAID, reward, raiderName, event.getToBroadcasterUserName(), Optional.empty(), Optional.of(amount));

@@ -45,19 +45,17 @@ public class SpigotConfigFile implements ConfigFile {
     @Override
     public void set(String key, Object value) {
         config.set(key, value);
+        try { save(); } catch (IOException e) { e.printStackTrace(); }
     }
 
-    @Override
     public Boolean getBoolean(String key, Boolean def) {
         return config.getBoolean(key, def);
     }
 
-    @Override
     public String getString(String key) {
         return config.getString(key);
     }
 
-    @Override
     public String getString(String key, String def) {
         return config.getString(key, def);
     }
@@ -89,7 +87,6 @@ public class SpigotConfigFile implements ConfigFile {
         return config.isList(key);
     }
 
-    @Override
     public void save() throws IOException {
         if (file != null) {
             config.save(file);
