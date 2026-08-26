@@ -51,7 +51,7 @@
   "commands.usage": "Usage:",
 
   "commands.status.header": "%sChatPointsTTV Status%s",
-  "commands.status.header.tiktok": "%ChatPointsTTV TikTok Status%s",
+  "commands.status.header.tiktok": "%sChatPointsTTV TikTok Status%s",
   "commands.status.header.twitch": "%sChatPointsTTV Twitch Status%s",
   "commands.status.plugin_version": "Plugin version:",
   "commands.status.accounts.tiktok": "Connected LIVEs:",
