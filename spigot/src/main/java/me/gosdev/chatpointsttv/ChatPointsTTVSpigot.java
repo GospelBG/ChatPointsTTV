@@ -110,10 +110,6 @@ public class ChatPointsTTVSpigot extends JavaPlugin {
             }
         }
 
-        if (firstRun) {
-            Bukkit.getConsoleSender().sendMessage(ChatPointsTTV.msgPrefix + "Configuration files have just been created. You need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
-        }
-
         pm.registerEvents(new SpigotListeners(), this);
         pm.registerEvents(new Listener() {
             @EventHandler
