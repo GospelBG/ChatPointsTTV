@@ -30,17 +30,17 @@ public class BalmGeneralConfig implements GenericGeneralConfig {
 
     @Override
     public boolean getMobGlow() {
-        return config.mobGlow;
+        return config.overridenConfig.mobGlow;
     }
 
     @Override
     public AlertMode getIngameAlerts() {
-        return config.ingameAlerts.toAlertMode();
+        return config.overridenConfig.ingameAlerts.toAlertMode();
     }
 
     @Override
     public boolean getDisplayNameOnMob() {
-        return config.displayNameOnMob;
+        return config.overridenConfig.displayNameOnMob;
     }
 
     @Override
@@ -73,21 +73,21 @@ public class BalmGeneralConfig implements GenericGeneralConfig {
     @Override
     public void setMobGlow(boolean mobGlow) {
         Balm.config().updateLocalConfig(GeneralConfig.class, config -> {
-            config.mobGlow = mobGlow;
+            config.overridenConfig.mobGlow = mobGlow;
         });
     }
 
     @Override
     public void setIngameAlerts(AlertMode alertMode) {
         Balm.config().updateLocalConfig(GeneralConfig.class, config -> {
-            config.ingameAlerts = BalmAlertMode.fromAlertMode(alertMode);
+            config.overridenConfig.ingameAlerts = BalmAlertMode.fromAlertMode(alertMode);
         });
     }
 
     @Override
     public void setDisplayNameOnMob(boolean displayNameOnMob) {
         Balm.config().updateLocalConfig(GeneralConfig.class, config -> {
-            config.displayNameOnMob = displayNameOnMob;
+            config.overridenConfig.displayNameOnMob = displayNameOnMob;
         });
     }
 

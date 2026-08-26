@@ -72,13 +72,13 @@ public class BalmTwitchConfig implements GenericTwitchConfig {
 
     @Override
     public AlertMode getIngameAlerts(AlertMode def) {
-        return AlertMode.valueOf(config.overridenConfig.ingameAlerts);
+        return config.overridenConfig.ingameAlerts.toAlertMode();
     }
 
     @Override
     public void setIngameAlerts(AlertMode ingameAlerts) {
         Balm.config().updateLocalConfig(TwitchConfig.class, config -> {
-            config.overridenConfig.ingameAlerts = ingameAlerts.name();
+            config.overridenConfig.ingameAlerts = BalmAlertMode.fromAlertMode(ingameAlerts);
         });
     }
 }

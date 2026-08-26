@@ -9,10 +9,10 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.List;
 
-@Config(value = "chatpointsttv-tiktok")
+@Config(value = "chatpointsttv", type = "tiktok")
 public class TikTokConfig {
     @Comment("To avoid rate limits, use may use your own EulerStream API key.")
-    public String eulerstreamApiKey = null;
+    public String eulerstreamApiKey = "";
 
     @Comment("If enabled, follow events from people who had already been following the channel will be ignored.")
     public boolean followSpamProtection = true;

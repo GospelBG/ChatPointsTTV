@@ -9,7 +9,7 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.List;
 
-@Config(value = "chatpointsttv-twitch", type = "twitch")
+@Config(value = "chatpointsttv", type = "twitch")
 public class TwitchConfig {
     @Comment("Automatically show, hide and complete redemptions of Channel Point Rewards created by ChatPointsTTV.")
     public boolean manageChannelPointRewards = true;

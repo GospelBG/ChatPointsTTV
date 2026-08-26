@@ -38,7 +38,7 @@ public class ChatPointsTTVBalm {
     public static void initialize(BalmRegistrars registrars) {
         Balm.config().registerConfig(GeneralConfig.class);
         Balm.config().registerConfig(TwitchConfig.class);
-        //Balm.config().registerConfig(TikTokConfig.class);
+        Balm.config().registerConfig(TikTokConfig.class);
 
         Balm.commands().register(dispatcher -> {
             dispatcher.register(Commands.literal("cpttv")
