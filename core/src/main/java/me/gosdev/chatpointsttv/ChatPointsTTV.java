@@ -103,6 +103,8 @@ public class ChatPointsTTV {
     }
 
     public void onEnable() {
+        Translatable.loadTranslationsFile("en_us"); //TODO: Change hard-coded value
+
         this.logEvents = this.config.getGeneralConfig().getLogEvents();
         this.shouldMobsGlow = this.config.getGeneralConfig().getMobGlow();
         this.alertMode = this.config.getGeneralConfig().getIngameAlerts();
@@ -110,8 +112,6 @@ public class ChatPointsTTV {
 
         if (this.config.getGeneralConfig().getEnableTwitch()) enableTwitch(this.consoleSender);
         if (this.config.getGeneralConfig().getEnableTikTok()) enableTikTok(this.consoleSender);
-
-        Translatable.loadTranslationsFile("en_us"); //TODO: Change hard-coded value
 
         VersionCheck.check();
     }
