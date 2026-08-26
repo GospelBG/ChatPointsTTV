@@ -4,42 +4,39 @@ import java.util.List;
 import java.util.Optional;
 
 import me.gosdev.chatpointsttv.Generic.GenericSender;
-import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Utils.*;
 
 import io.github.jwdeveloper.tiktok.data.events.social.TikTokLikeEvent;
 import io.github.jwdeveloper.tiktok.data.events.social.TikTokShareEvent;
 import io.github.jwdeveloper.tiktok.data.models.gifts.Gift;
 import io.github.jwdeveloper.tiktok.live.LiveClient;
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Utils.ChatComponent;
-import me.gosdev.chatpointsttv.Utils.ChatEvent;
-import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 
 public class TikTokCommands {
 
-    private static final ChatComponent helpMsg = new ChatComponent("  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Help" + ChatColor.RESET + " ----------\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok link <username>: " + ChatColor.RESET + "Use this command to connect to a TikTok LIVE.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok unlink [username]: " + ChatColor.RESET + "Disconnects from a user's LIVE. If a username is not provided all accounts will be disconencted.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok status: " + ChatColor.RESET + "Displays information about the plugin and the TikTok Module.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok start: " + ChatColor.RESET + "Starts the TikTok Module and logs in to any saved accounts.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok stop: " + ChatColor.RESET + "Stops the TikTok Module. All incoming events will be ignored.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok reload: " + ChatColor.RESET + "Restarts the plugin and reloads configuration files.\n" + 
-    ChatColor.LIGHT_PURPLE + "/tiktok test <type> <...>: " + ChatColor.RESET + "Mocks an event.\n" +
-    ChatColor.LIGHT_PURPLE + "/tiktok help: " + ChatColor.RESET + "Displays this help message.");
+    private static final ChatComponent helpMsg = new ChatComponent(Translatable.getString("tiktok.help.header", "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " ----------\n" ) +
+    ChatColor.LIGHT_PURPLE + "/tiktok accounts: " + ChatColor.RESET + Translatable.getString("tiktok.help.accounts") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok link <username>: " + ChatColor.RESET + Translatable.getString("tiktok.help.link") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok unlink [username]: " + ChatColor.RESET + Translatable.getString("tiktok.help.unlink") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok status: " + ChatColor.RESET + Translatable.getString("tiktok.help.status") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok start: " + ChatColor.RESET + Translatable.getString("tiktok.help.start") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok stop: " + ChatColor.RESET + Translatable.getString("tiktok.help.stop") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok reload: " + ChatColor.RESET + Translatable.getString("tiktok.help.reload") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok test <type> <...>: " + ChatColor.RESET + Translatable.getString("tiktok.help.test") + "\n" +
+    ChatColor.LIGHT_PURPLE + "/tiktok help: " + ChatColor.RESET + Translatable.getString("tiktok.help.help"));
 
     public static void start(GenericSender sender) {
         if (ChatPointsTTV.getTikTok().reloading.get()) {
-            sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.still_starting", "TikTok"));
             return;
         }
         if (ChatPointsTTV.getTikTok().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "TikTok Module is already started.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_started", "TikTok"));
             return;
         }
 
-        sender.sendMessage("Enabling TikTok module...");
+        sender.sendMessage(Translatable.getString("tiktok.message.starting"));
         ChatPointsTTV.getInstance().enableTikTok(sender);
     }
 
@@ -47,13 +44,13 @@ public class TikTokCommands {
         sender.sendMessage(helpMsg);
 
         if (!sender.isConsole()) {
-            ChatComponent docsTip = new ChatComponent("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "\nTip: " + ChatColor.RESET + ChatColor.GRAY + "Check out ");
+            ChatComponent docsTip = new ChatComponent(Translatable.getString("generic.help.tip.commands", "" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, "" + ChatColor.RESET + ChatColor.GRAY).replaceAll("\\[.*", ""));
 
-            ChatComponent link = new ChatComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "ChatPointsTTV's website");
+            ChatComponent link = new ChatComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + Translatable.getString("generic.help.tip.commands").replaceAll("(?:^|\\])[^\\[]*\\[?", "")); // Get button text
             link.setClickEvent(new ChatEvent.ClickEvent(ChatEvent.ClickAction.OPEN_URL, "https://gosdev.me/chatpointsttv/commands/tiktok"));
-            link.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "Click to open in browser"));
+            link.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, Translatable.getString("generic.tooltip.open_browser")));
             docsTip.addExtra(link);
-            docsTip.addExtra(ChatColor.GRAY + " for more information on its commands!");
+            docsTip.addExtra(ChatColor.GRAY + Translatable.getString("generic.help.tip.commands").replaceAll(".*\\]", ""));
             
             sender.sendMessage(docsTip);
         }
@@ -63,11 +60,11 @@ public class TikTokCommands {
         List<String> accounts = ChatPointsTTV.getTikTok().listenedProfiles;
         
         if (!ChatPointsTTV.getTikTok().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "TikTok"));
             return;
         }
 
-        ChatComponent msg = new ChatComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected TikTok LIVEs" + ChatColor.RESET + " -------------\n\n");
+        ChatComponent msg = new ChatComponent(Translatable.getString("tiktok.accounts.header", "\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " -------------\n\n"));
         
         for (String account : accounts) {
             if (sender.equals(ChatPointsTTV.getConsole())) {
@@ -76,7 +73,7 @@ public class TikTokCommands {
             } else {
                 if (account.isBlank()) continue;
                 ChatComponent deleteButton = new ChatComponent(ChatColor.RED + "  [❌]");
-                deleteButton.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "Click to unlink this LIVE"));
+                deleteButton.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, Translatable.getString("tiktok.accounts.tooltip.unlink")));
                 deleteButton.setClickEvent(new ChatEvent.ClickEvent(ChatEvent.ClickAction.RUN_COMMAND, "/tiktok unlink " + account));
                 msg.addExtra(deleteButton);
                 msg.addExtra(new ChatComponent("  @" + account + "\n"));
@@ -84,12 +81,12 @@ public class TikTokCommands {
         }
 
         if (accounts.isEmpty()) {
-            msg.addExtra(ChatColor.GRAY + "  There are no connected LIVEs :(\n");
+            msg.addExtra(ChatColor.GRAY + "  " + Translatable.getString("tiktok.accounts.no_accounts") + "\n");
         }
 
         ChatComponent footer;
         if (sender.equals(ChatPointsTTV.getConsole())) {
-            footer = new ChatComponent(ChatColor.ITALIC + "\nTo unlink a LIVE, use /tiktok unlink <username>\nTo add a LIVE, use /tiktok link <username>");
+            footer = new ChatComponent(ChatColor.ITALIC + "\n" + Translatable.getString("tiktok.accounts.footer"));
         } else {
             footer = TikTokButtonComponents.accountLink();
             if (!accounts.isEmpty()) {
@@ -105,26 +102,25 @@ public class TikTokCommands {
 
     public static void stop(GenericSender sender) {
         if (!ChatPointsTTV.getTikTok().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "TikTok Module is stopped.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_stopped", "TikTok"));
             return;
         }
         if (ChatPointsTTV.getTikTok().reloading.get()) {
-            sender.sendMessage(ChatColor.RED + "TikTok Module is still stopping. Please wait.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.still_starting", "TikTok"));
             return;
         }
         
-        sender.sendMessage("Disabling TikTok module...");
-
+        sender.sendMessage(Translatable.getString("tiktok.message.stopping"));
         ChatPointsTTV.getTikTok().stop(sender);
     }
 
     public static void reload(GenericSender sender) {
         if (!ChatPointsTTV.getTikTok().reloading.compareAndSet(false, true)) {
-            sender.sendMessage(ChatColor.RED + "TikTok module is reloading!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_reloading", Translatable.getString("generic.tiktok_module")));
             return;
         }
 
-        sender.sendMessage("Reloading ChatPointsTTV...");
+        sender.sendMessage(Translatable.getString("tiktok.message.reloading"));
         ChatPointsTTV.getTikTok().stop(sender);
 
         try {
@@ -137,11 +133,11 @@ public class TikTokCommands {
 
     public static void link(GenericSender sender, String username) {
         if (ChatPointsTTV.getTikTok().reloading.get()) {
-            sender.sendMessage(ChatColor.RED + "TikTok Module is still starting. Please wait.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.still_starting", "TikTok"));
             return;
         }
         if (!ChatPointsTTV.getTikTok().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "TikTok"));
             return;
         }
 
@@ -153,13 +149,13 @@ public class TikTokCommands {
             for (String acc : ChatPointsTTV.getTikTok().getClients().keySet()) {
                 ChatPointsTTV.getTikTok().unlink(acc, true);
             }
-            sender.sendMessage(ChatColor.GREEN + "All accounts have been unlinked successfully!");
+            sender.sendMessage(ChatColor.GREEN + Translatable.getString("tiktok.message.unlink.success_all"));
         } else {
             if (ChatPointsTTV.getTikTok().getClients().containsKey(channelField.get().toLowerCase())) {
                 ChatPointsTTV.getTikTok().unlink(channelField.get(), true);
-                sender.sendMessage(ChatColor.GREEN + "TikTok account " + channelField.get() + " unlinked successfully!");
+                sender.sendMessage(ChatColor.GREEN + Translatable.getString("tiktok.message.unlink.success", channelField.get()));
             } else {
-                sender.sendMessage(ChatColor.RED + "Couldn't find " + channelField.get() + "'s LIVE linked!");
+                sender.sendMessage(ChatColor.RED + Translatable.getString("tiktok.message.unlink.not_linked", channelField.get()));
             }
         }
 
@@ -169,7 +165,7 @@ public class TikTokCommands {
         String strChannels = "";
         
         if (ChatPointsTTV.getTikTok().getClients() == null || ChatPointsTTV.getTikTok().getClients().isEmpty()) {
-            strChannels = "None";
+            strChannels = Translatable.getString("commands.status.no_accounts");
         } else {
             for (String profile : ChatPointsTTV.getTikTok().getClients().keySet()) {
                 strChannels += "@" + profile + ", ";
@@ -178,24 +174,24 @@ public class TikTokCommands {
         }
 
         ChatComponent msg = new ChatComponent(
-            "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV TikTok Status" + ChatColor.RESET + " ----------\n" +
-            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + ChatPointsTTV.getInstance().version + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened LIVEs: " + ChatColor.RESET + strChannels + "\n" + 
+            Translatable.getString("commands.status.header.tiktok", "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " ----------\n") +
+            ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.plugin_version") + " " + ChatColor.RESET + "v" + ChatPointsTTV.getInstance().version + "\n" +
+            ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.accounts.tiktok") + " " + ChatColor.RESET + strChannels + "\n" +
             "\n"
         );
 
         String currentState = "";
         if (ChatPointsTTV.getTikTok().isStarted()) {
             if (ChatPointsTTV.getTikTok().isAccountConnected()) {
-                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
+                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + Translatable.getString("commands.status.connected");
             } else {
-                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
+                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + Translatable.getString("commands.status.unlinked");
             }
         } else {
-            currentState = ChatColor.RED + "" + ChatColor.BOLD + "STOPPED";
+            currentState = ChatColor.RED + "" + ChatColor.BOLD + Translatable.getString("commands.status.stopped");
         }
 
-        ChatComponent status = new ChatComponent(ChatColor.LIGHT_PURPLE + "Connection status: " + currentState);
+        ChatComponent status = new ChatComponent(ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.connection_status") + " " + currentState);
         msg.addExtra(status);
 
         if (!sender.isConsole()) {
@@ -219,7 +215,7 @@ public class TikTokCommands {
         Boolean offlineTest = false;
 
         if (!ChatPointsTTV.getTikTok().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the TikTok Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "TikTok"));
             return;
         }
 
@@ -232,7 +228,7 @@ public class TikTokCommands {
         switch (cmdInput[1].toLowerCase()) {
             case "follow":
                 if (cmdInput.length != 4) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok test follow <chatter> <host>");
                     return;
                 }
 
@@ -245,7 +241,7 @@ public class TikTokCommands {
 
             case "like":
                 if (cmdInput.length != 5) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok test follow <chatter> <host>");
                     return;
                 }
 
@@ -256,7 +252,7 @@ public class TikTokCommands {
                         return;
                     } 
                 } catch (NumberFormatException e) {
-                    sender.sendMessage(ChatColor.RED + "Invalid Like amount: " + cmdInput[4]);
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_amount", Translatable.getString("tiktok.generic.like", cmdInput[4])));
                     return;
                 }
                 break;
@@ -264,7 +260,7 @@ public class TikTokCommands {
             case "gift":
                 cmdInput = LocalizationUtils.parseQuotes(cmdInput);
                 if (cmdInput.length != 6) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok test follow <chatter> <host>");
                     return;
                 }
 
@@ -275,13 +271,13 @@ public class TikTokCommands {
                     try {
                         Gift item = c.getGiftManager().getByName(cmdInput[4]);
                         if (item == Gift.UNDEFINED) {
-                            sender.sendMessage("Invalid Gift Item name: " + cmdInput[4]);
+                            sender.sendMessage(Translatable.getString("commands.test.invalid_name", Translatable.getString("tiktok.generic.gift_item", cmdInput[4])));
                             return;
                         } else {
                             event = TikTokEventTest.GiftEvent(chatter, c.getRoomInfo().getHost(), item, Integer.valueOf(cmdInput[5]));
                         }
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid Gift Combo amount: " + cmdInput[5]);
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_amount", Translatable.getString("tiktok.generic.gift_combo", cmdInput[5])));
                         return;
                     }
                 }
@@ -290,7 +286,7 @@ public class TikTokCommands {
             
             case "share":
                 if (cmdInput.length != 4) {
-                    sender.sendMessage(ChatColor.RED + "Usage: /tiktok test follow <chatter> <host>");
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok test follow <chatter> <host>");
                     return;
                 }
 
@@ -302,11 +298,12 @@ public class TikTokCommands {
                 break;
 
             default:
+                Translatable.getString("commands.test.unknown_event", cmdInput[1]);
                 return;
         }
 
         c.publishEvent(event);
-        sender.sendMessage(ChatColor.GREEN + "Test event sent!");
+        sender.sendMessage(ChatColor.GREEN + Translatable.getString("commands.test.event_sent"));
     }
 
 

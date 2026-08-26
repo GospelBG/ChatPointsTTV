@@ -8,6 +8,7 @@ import java.util.Optional;
 import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.TwitchCommands;
 import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -47,7 +48,7 @@ public class TwitchCommandController implements TabExecutor {
 
                 case "link":
                     if ((args.length > 1)) {
-                        genericSender.sendMessage(ChatColor.RED + "Usage: /twitch link");
+                        genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch link");
                         return true;
                     }
                     TwitchCommands.link(genericSender);
@@ -67,7 +68,7 @@ public class TwitchCommandController implements TabExecutor {
 
                 case "createreward":
                     if (args.length != 2) {
-                        genericSender.sendMessage(ChatColor.RED + "Usage: /twitch createreward <username>");
+                        genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch createreward <username>");
                         return true;
                     }
                     TwitchCommands.createReward(genericSender, args[1]);
@@ -78,7 +79,7 @@ public class TwitchCommandController implements TabExecutor {
                     return true;
 
                 default:
-                    genericSender.sendMessage(ChatColor.RED + "Unknown command: /twitch " + args[0]);
+                    genericSender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.unknown_command") + " /twitch " + args[0]);
                     TwitchCommands.help(genericSender);
                     return true;
             }

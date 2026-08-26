@@ -1,5 +1,6 @@
 package me.gosdev.chatpointsttv;
 
+import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import me.gosdev.chatpointsttv.Balm.BalmAccountManager;
 import me.gosdev.chatpointsttv.Balm.BalmLoader;
@@ -8,8 +9,10 @@ import me.gosdev.chatpointsttv.Config.BalmConfigs;
 import me.gosdev.chatpointsttv.Config.GeneralConfig;
 import me.gosdev.chatpointsttv.Config.TikTokConfig;
 import me.gosdev.chatpointsttv.Config.TwitchConfig;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.platform.event.callback.ServerPlayerCallback;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
 import net.minecraft.resources.Identifier;
 import net.blay09.mods.balm.core.BalmRegistrars;
@@ -35,7 +38,7 @@ public class ChatPointsTTVBalm {
     public static void initialize(BalmRegistrars registrars) {
         Balm.config().registerConfig(GeneralConfig.class);
         Balm.config().registerConfig(TwitchConfig.class);
-        Balm.config().registerConfig(TikTokConfig.class);
+        //Balm.config().registerConfig(TikTokConfig.class);
 
         Balm.commands().register(dispatcher -> {
             dispatcher.register(Commands.literal("cpttv")
@@ -113,6 +116,7 @@ public class ChatPointsTTVBalm {
         });
 
         ServerPlayerCallback.Join.EVENT.register(player -> {
+            Translatable.loadTranslationsFile(Minecraft.getInstance().options.languageCode);
             chatPointsTTV = new ChatPointsTTV(new BalmLoader(), new BalmConfigs(), new BalmAccountManager());
             chatPointsTTV.onEnable();
         });

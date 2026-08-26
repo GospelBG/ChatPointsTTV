@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.gosdev.chatpointsttv.CommandController;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,7 @@ public class SpigotCommandController implements TabExecutor {
         SpigotSender genericSender = new SpigotSender(sender);
 
         if (ChatPointsTTV.getInstance().isReloading()) {
-            sender.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + " The plugin is currently reloading. Please wait a moment.");
+            sender.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + Translatable.getString("generic.message.still_reloading", "The plugin"));
             return true;
         } else if (args.length == 0) {
             CommandController.help(genericSender);
@@ -48,7 +49,7 @@ public class SpigotCommandController implements TabExecutor {
                     return true;
 
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown command: /cpttv " + args[0]);
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.unknown_command", "/cpttv " + args[0]));
                     CommandController.help(genericSender);
                     return true;
             }
@@ -57,7 +58,7 @@ public class SpigotCommandController implements TabExecutor {
 
     private void setPermission(GenericSender sender, String[] args) {
         if (args.length < 3) {
-            sender.sendMessage(ChatColor.RED + "Usage: /cpttv set <player> <permission> [true|false|unset]");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /cpttv set <" + Translatable.getString("generic.player") + "> <" + Translatable.getString("generic.permission") + "> [true|false|unset]");
             return;
         }
 
@@ -70,7 +71,7 @@ public class SpigotCommandController implements TabExecutor {
             else if (args[3].equalsIgnoreCase("true")) state = true;
             else if (args[3].equalsIgnoreCase("false")) state = false;
             else {
-                sender.sendMessage(ChatColor.RED + "Invalid state: " + args[3]);
+                sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.invalid_state", args[3]));
                 return;
             }
         }
@@ -78,13 +79,13 @@ public class SpigotCommandController implements TabExecutor {
         try {
             ChatPointsTTV.permissions.valueOf(perm.toUpperCase());
         } catch (IllegalArgumentException e) {
-            sender.sendMessage(ChatColor.RED + "Invalid permission: " + perm);
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.invalid_permission", perm));
             return;
         }
 
         if (targetName.equals("@s")) {
             if (sender.isConsole()) {
-                sender.sendMessage(ChatColor.RED + "No entity was found.");
+                sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.no_entity_found"));
                 return;
             }
             targetName = sender.getName();
@@ -97,13 +98,13 @@ public class SpigotCommandController implements TabExecutor {
         } else {
             Player target = Bukkit.getPlayer(targetName);
             if (target == null) {
-                sender.sendMessage(ChatColor.RED + "Couldn't find player " + targetName + ".");
+                sender.sendMessage(ChatColor.RED + Translatable.getString("action.error.player_not_found", targetName));
                 return;
             }
             setAttachment(target, "chatpointsttv." + perm, state);
         }
 
-        sender.sendMessage(ChatColor.GREEN + "Permission has been set successfully!");
+        sender.sendMessage(ChatColor.GREEN + Translatable.getString("generic.message.permission_set"));
     }
 
     private void setAttachment(Player p, String key, Boolean state) {

@@ -9,7 +9,7 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.List;
 
-@Config(value = "chatpointsttv", type = "tiktok")
+@Config(value = "chatpointsttv-tiktok")
 public class TikTokConfig {
     @Comment("To avoid rate limits, use may use your own EulerStream API key.")
     public String eulerstreamApiKey = null;

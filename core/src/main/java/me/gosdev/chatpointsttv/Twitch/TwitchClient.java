@@ -152,7 +152,7 @@ public class TwitchClient {
                     }
                 }
                 
-                p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has started successfully!");   
+                p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.success.start"));
                 started.set(true);
                 reloading.set(false);
             } catch (Exception e) {
@@ -171,12 +171,12 @@ public class TwitchClient {
 
             for (Channel channel : channels.values()) {
                 if (credential.getUserId().equals(channel.getChannelId())) {
-                    p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link an account twice!");
+                    p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.duplicate_account"));
                     return;
                 }
             }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Logging in as: " + credential.getUserName());
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.logging_in", credential.getUserName()));
     
             tokenRefreshTasks.put(credential.getUserId(), refreshExecutor.scheduleAtFixedRate(
                     () -> refreshCredentials(credential),
@@ -191,7 +191,7 @@ public class TwitchClient {
                 start(credential);
             }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Logged in successfully!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.success.login"));
 
             if (config.getFollowSpamProtection()) {
                 List<String> followerIDs = new ArrayList<>();
@@ -210,7 +210,7 @@ public class TwitchClient {
                 FollowerLog.populateList(Platforms.TWITCH, credential.getUserId(), followerIDs);
             }
         } catch (Exception e) {
-            p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Twitch account linking failed.");
+            p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + Translatable.getString("twitch.message.error.link"));
             e.printStackTrace();
         }
         linkInProgress.set(false);
@@ -355,8 +355,8 @@ public class TwitchClient {
                 account.getAccessToken(),
                 account.getUserId(),
                 CustomReward.builder()
-                    .title("ChatPointsTTV Reward (" + uID.toString() + ")")
-                    .prompt("This reward was created by ChatPointsTTV and its redemptions will be managed automatically.")
+                    .title(Translatable.getString("twitch.reward.title", uID.toString()))
+                    .prompt(Translatable.getString("twitch.reward.prompt", uID.toString()))
                     .isEnabled(false)
                     .cost(1)
                     .build())
@@ -442,17 +442,17 @@ public class TwitchClient {
             linkInProgress.set(true);
             try {
                 if (!started.get()) {
-                    p.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
+                    p.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "Twitch"));
                     return;
                 }
                 if (!accountConnected.get()) {
-                    p.sendMessage(ChatColor.RED + "There are no accounts linked!");
+                    p.sendMessage(ChatColor.RED + Translatable.getString("twitch.message.no_accounts"));
                     return;
                 }
                 if (channelField.isPresent()) {
                     try {
                         removeAccount(channelField.get());
-                        p.sendMessage(ChatPointsTTV.msgPrefix + "Account unlinked!");
+                        p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.unlink.success"));
                     } catch (NullPointerException e) {
                         p.sendMessage(e.getMessage() + " " + channelField.get());
                     }
@@ -463,13 +463,13 @@ public class TwitchClient {
                         for (Channel channel : channelsSnapshot) {
                             removeAccount(channel.getChannelUsername());
                         }
-                        p.sendMessage(ChatPointsTTV.msgPrefix + "All accounts were unlinked successfully!");
+                        p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("twitch.message.unlink.success_all"));
                     } catch (NullPointerException e) {
                         p.sendMessage(e.getMessage() + " " + channelField.get());
                     }
                 }
             } catch (Exception e) {
-                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + "Failed to unlink an account.");
+                p.sendMessage(ChatPointsTTV.msgPrefix + ChatColor.RED + Translatable.getString("twitch.message.failure.unlink"));
                 e.printStackTrace();
             }
             linkInProgress.set(false);
@@ -501,7 +501,7 @@ public class TwitchClient {
     public void stop(GenericSender p) {
         stopThread = new Thread(() -> {
             if (!isStarted()) {
-                p.sendMessage(ChatColor.RED + "Twitch Module is already stopped.");
+                p.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_stopped", "Twitch"));
                 return;
             }
 
@@ -546,7 +546,7 @@ public class TwitchClient {
             started.set(false);
 
             accountConnected.set(false);
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module has been successfully stopped!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("generic.message.success.stop", "Twitch"));
 
         });
         stopThread.start();

@@ -26,6 +26,7 @@ import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
 import me.gosdev.chatpointsttv.Twitch.Channel;
 import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
 import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 
 public class CPTTV_EventHandler {
     public static final String EVERYONE = "*";
@@ -44,7 +45,7 @@ public class CPTTV_EventHandler {
 
     public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         new Thread (()-> {
-            String errorStr = "There was an error running a " + type + " action: ";
+            String errorStr = Translatable.getString("action.error.generic", type);
             if (ChatPointsTTV.getInstance().logEvents) ChatPointsTTV.getLoader().consoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event, amount));
             if (platform.equals(Platforms.TWITCH) && ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
@@ -118,11 +119,7 @@ public class CPTTV_EventHandler {
                 }
                 
                 String[] parts = cmd.split(" ");
-    
-                if (parts.length <= 1) {
-                    notifyFailure(parts[0], errorStr + "Action \"" + parts[0] + "\" needs arguments!");
-                    continue;
-                }
+
                 try {
                     BaseAction action;
                     Integer act_amount = null;
@@ -131,7 +128,7 @@ public class CPTTV_EventHandler {
                     switch (parts[0].toUpperCase()) {
                         case "SPAWN":
                             if (!ChatPointsTTV.getLoader().getEntities().contains(parts[1].toUpperCase())) {
-                                notifyFailure(parts[0], errorStr + "Entity " + parts[1].toUpperCase() + " does not exist.");
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.entity_not_found", parts[1].toUpperCase()));
                                 continue;
                             }
                             if (parts.length > 2) {
@@ -149,8 +146,8 @@ public class CPTTV_EventHandler {
                             }
                             text = text.trim();
 
-                            if (text == null || text.isBlank()) {
-                                notifyFailure(parts[0], errorStr + "Trying to run a blank command.");
+                            if (text == null || text.isBlank() || text.equals("/")) {
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.empty_command"));
                                 continue;
                             }
 
@@ -158,7 +155,7 @@ public class CPTTV_EventHandler {
                             break;
                         case "GIVE":
                             if (!ChatPointsTTV.getLoader().getItems().contains(parts[1].toUpperCase())) {
-                                notifyFailure(parts[0], errorStr + "Item " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.item_not_found", parts[1].toUpperCase()));
                                 continue;
                             }
                             if (parts.length > 2) {
@@ -167,7 +164,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 3) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[3] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[3]));
                                     continue;
                                 }
                             }
@@ -180,19 +177,19 @@ public class CPTTV_EventHandler {
                             Integer strength = null;
                             if (!effect.equalsIgnoreCase("clear")) {
                                 if (parts.length < 4) {
-                                    notifyFailure(parts[0], errorStr + "This action needs at least 3 arguments.");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.missing_arguments", "3"));
                                 }
                                 duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
                                 strength = Integer.valueOf(parts[2]);
                             }
                             if (!ChatPointsTTV.getLoader().getPotionEffects().contains(effect.toUpperCase()) && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
-                                notifyFailure(parts[0], errorStr + "Potion effect " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.effect_not_found", parts[1]));
                                 continue;
                             }
                             if (parts.length > (effect.equalsIgnoreCase("clear") ? 2 : 4)) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[parts.length -1] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[parts.length -1]));
                                     continue;
                                 }
                             }
@@ -204,14 +201,14 @@ public class CPTTV_EventHandler {
                             try {
                                 DeleteItemsAction.Type.valueOf(parts[1].toUpperCase());
                             } catch (IllegalArgumentException e) {
-                                notifyFailure(parts[0], errorStr + "Invalid type " + parts[1].toUpperCase() + ".");
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.invalid_option", parts[1].toUpperCase()));
                                 continue;
                             }
 
                             if (parts.length > 2) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[2] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[2]));
                                     continue;
                                 }
                             }
@@ -225,7 +222,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 2) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[2]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[2] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[2]));
                                     continue;
                                 }
                             }
@@ -236,7 +233,7 @@ public class CPTTV_EventHandler {
                             if (!parts[1].equalsIgnoreCase("ALL")) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[1]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[1] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[1]));
                                     continue;
                                 }
                             }
@@ -251,7 +248,7 @@ public class CPTTV_EventHandler {
                             try {
                                 action = new SoundAction(target, sound.toUpperCase());
                             } catch (IllegalArgumentException e) {
-                                notifyFailure(parts[0], errorStr + "Sound effect " + parts[1] + " does not exist.");
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.sound_not_found", parts[1]));
                                 continue;
                             }
                             break;
@@ -266,7 +263,7 @@ public class CPTTV_EventHandler {
                             if (parts.length > 3) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[3]);
                                 if (target == null || !target.isOnline()) {
-                                    notifyFailure(parts[0], errorStr + "Couldn't find player " + parts[3] + ".");
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.player_not_found", parts[3]));
                                     continue;
                                 }
                             }
@@ -278,12 +275,12 @@ public class CPTTV_EventHandler {
                             } catch (InterruptedException ignored) {}
                             continue;
                         default:
-                            notifyFailure(parts[0], errorStr + "Invalid action \"" + parts[0] + "\"");
+                            notifyFailure(parts[0], errorStr + Translatable.getString("action.error.invalid_action", parts[0]));
                             return;
                     }
                     action.run();
                 } catch (NumberFormatException e) {
-                    notifyFailure(parts[0], errorStr + "Invalid amount \"" + e.getMessage().substring(19, e.getMessage().length() - 1)+"\"");
+                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.invalid_amount", e.getMessage().substring(19, e.getMessage().length() - 1)));
                 }
             }
         }).start();
@@ -320,7 +317,7 @@ public class CPTTV_EventHandler {
             } else if (config.isList(key)) {
                 action_list.add(new Event(type, EVERYONE, null, config.getStringList(key)));
             } else {
-                ChatPointsTTV.log.error("ChatPointsTTV: " + type.toString() + " actions must be entered as a list (or a configuration section, if targeting specific streamers). Read the docs for more information.");
+                ChatPointsTTV.log.error("ChatPointsTTV: " + Translatable.getString("config.error.invalid_format", type.toString()));
                 return null;
             }
         } else {
@@ -335,7 +332,7 @@ public class CPTTV_EventHandler {
                         try {
                             Integer.valueOf(subkey);
                         } catch (NumberFormatException e) {
-                            ChatPointsTTV.log.error("ChatPointsTTV: \"" + subkey +  "\" must be a number.");
+                            ChatPointsTTV.log.error("ChatPointsTTV: " + Translatable.getString("events.error.must_be_number", subkey));
                             continue;
                         }
                     }
@@ -351,7 +348,7 @@ public class CPTTV_EventHandler {
                     }
                 }
             } else {
-                ChatPointsTTV.log.error("ChatPointsTTV: Invalid configuration for " + type.toString().toLowerCase() + " actions. Read the docs for more information.");
+                ChatPointsTTV.log.error("ChatPointsTTV: " + Translatable.getString("config.error.invalid_format", type.toString()));
                 return null;
             }
         }
@@ -372,7 +369,7 @@ public class CPTTV_EventHandler {
         ChatPointsTTV.log.warn(msg);
         for (GenericPlayer p : ChatPointsTTV.getLoader().getOnlinePlayers()) {
             if (p.hasPermission(ChatPointsTTV.permissions.MANAGE)) {
-                p.sendMessage(ChatColor.RED + action.toUpperCase() + " action failed: " + msg);
+                p.sendMessage(ChatColor.RED + msg);
             }
         }
     }

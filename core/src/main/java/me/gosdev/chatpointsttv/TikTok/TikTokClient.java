@@ -33,6 +33,7 @@ import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTV.permissions;
 import me.gosdev.chatpointsttv.Events.CPTTV_EventHandler;
 import me.gosdev.chatpointsttv.Platforms;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 
 public class TikTokClient {
     public AtomicBoolean reloading = new AtomicBoolean(true);
@@ -102,7 +103,7 @@ public class TikTokClient {
                 link(p, username, false);
             }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has started successfully!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("generic.message.success.start", "TikTok"));
         });
     }
 
@@ -110,7 +111,7 @@ public class TikTokClient {
     public void link(GenericSender p, String handle, Boolean save) {
         if (!started) return;
         if (reloading.get()) {
-            p.sendMessage(ChatColor.RED + "Please wait until the TikTok Module has finished starting.");
+            p.sendMessage(ChatColor.RED + Translatable.getString("generic.message.still_starting", "TikTok"));
             return;
         }
         tiktokExecutor.submit(() -> {
@@ -118,11 +119,11 @@ public class TikTokClient {
             String username = (handle.startsWith("@") ? handle.substring(1) : handle).toLowerCase();
 
             if (clients.containsKey(username)) {
-                p.sendMessage(ChatPointsTTV.msgPrefix + "You cannot link the same LIVE twice!");
+                p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("tiktok.message.already_linked"));
                 return;
             }
 
-            p.sendMessage(ChatPointsTTV.msgPrefix + "Linking to @" + username + "'s LIVE");
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("tiktok.message.linking", username));
 
             LiveClientBuilder builder = TikTokLive.newClient(username);
             if (CPTTV_EventHandler.getActions(ChatPointsTTV.getInstance().config.getTikTokEventsConfig(), TikTokEventType.LIKE) != null) {
@@ -184,29 +185,29 @@ public class TikTokClient {
                         ChatPointsTTV.getAccountsManager().saveAccount(Platforms.TIKTOK, username, Optional.empty());
                     }
 
-                    p.sendMessage(ChatPointsTTV.msgPrefix + "Linked succesfully to @" + c.getRoomInfo().getHostName() + "'s LIVE!");
+                    p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("tiktok.message.success.link", c.getRoomInfo().getHostName()));
                     break;
 
                 } catch (Exception ex) {
                     if (ex instanceof  TikTokLiveOfflineHostException) {
-                        p.sendMessage(ChatColor.RED + "Cannot connect to @" + username + " because they are currently offline!");
+                        p.sendMessage(ChatColor.RED + Translatable.getString("tiktok.message.failure.offline", username));
                         return;
                     } else if (ex instanceof TikTokLiveUnknownHostException) {
-                        p.sendMessage(ChatColor.RED + "Couldn't find TikTok user: @" + username);
+                        p.sendMessage(ChatColor.RED + Translatable.getString("tiktok.messsage.failure.not_found", username));
                         return;
                     }
                     if (i == maxRetries) {
                         if (ex instanceof TikTokSignServerException) {
-                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE." + (tiktokConfig.hasEulerstreamApiKey() ? " Please check your API key." : " Please try again."));
+                            p.sendMessage(ChatColor.RED + Translatable.getString("tiktok.message.failure.generic", username) + " " + (tiktokConfig.hasEulerstreamApiKey() ? Translatable.getString("tiktok.message.failure.server.api_key") : Translatable.getString("tiktok.message.failure.server.try_again")));
                         } else if (ex instanceof TikTokLiveRequestException && ex.getCause() instanceof HttpTimeoutException) {
-                            p.sendMessage(ChatColor.RED + "Connection timed out while connecting to @" + username + "'s LIVE. Please try again.");
+                            p.sendMessage(ChatColor.RED + Translatable.getString("tiktok.message.failure.timeout", username));
                         } else {
-                            p.sendMessage(ChatColor.RED + "There was an error while connecting to @" + username + "'s LIVE. Check the server console for details.");
+                            p.sendMessage(ChatColor.RED + Translatable.getString("tiktok.message.failure.generic", username) + " " + Translatable.getString("tiktok.message.failure.generic.check_console", username));
                             ex.printStackTrace();
                             return;
                         }
                     } else {
-                        ChatPointsTTV.log.warn("There was an error while connecting to @" + username + "'s LIVE. Retrying in a few seconds...");
+                        ChatPointsTTV.log.warn(Translatable.getString("tiktok.message.failure.generic", username) + " " +  Translatable.getString("tiktok.message.failure.generic.retrying"));
                         try {
                             Thread.sleep(3000);
                         } catch (InterruptedException e) {}
@@ -240,7 +241,7 @@ public class TikTokClient {
             accountConnected = false;
 
             reloading.set(false);
-            p.sendMessage(ChatPointsTTV.msgPrefix + "TikTok Module has been successfully stopped!");
+            p.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("generic.message.success.stop", "TikTok"));
         });
 
         stopThread.start();

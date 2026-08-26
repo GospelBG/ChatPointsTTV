@@ -8,6 +8,7 @@ import com.github.philippheuer.credentialmanager.identityprovider.OAuth2Identity
 import com.github.twitch4j.auth.providers.TwitchIdentityProvider;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 
 public class TwitchAuth {
     public static final String VERIFICATION_URL = "https://twitch.tv/activate";
@@ -29,15 +30,15 @@ public class TwitchAuth {
             } else {
                 switch(response.getError()) {
                     case ACCESS_DENIED:
-                        p.sendMessage("Authorization was denied by user.");
+                        p.sendMessage(Translatable.getString("twitch.message.auth.denied"));
                         break;
                         
                     case EXPIRED_TOKEN:
-                        p.sendMessage("Device code has expired. Please try again.");
+                        p.sendMessage(Translatable.getString("twitch.message.auth.expired"));
                         break;
                         
                     default:
-                        p.sendMessage("An error occurred while linking your account.");
+                        p.sendMessage(Translatable.getString("twitch.message.auth.error"));
                         break;
                 }
             }

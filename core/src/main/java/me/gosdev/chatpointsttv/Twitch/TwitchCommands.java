@@ -3,7 +3,7 @@ package me.gosdev.chatpointsttv.Twitch;
 import java.util.Optional;
 
 import me.gosdev.chatpointsttv.Generic.GenericSender;
-import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Utils.*;
 
 import com.github.philippheuer.credentialmanager.domain.DeviceAuthorization;
 import com.github.philippheuer.events4j.core.EventManager;
@@ -11,12 +11,9 @@ import com.github.twitch4j.common.enums.SubscriptionPlan;
 import com.github.twitch4j.eventsub.events.EventSubEvent;
 
 import me.gosdev.chatpointsttv.ChatPointsTTV;
-import me.gosdev.chatpointsttv.Utils.ChatComponent;
-import me.gosdev.chatpointsttv.Utils.ChatEvent;
-import me.gosdev.chatpointsttv.Utils.LocalizationUtils;
 
 public class TwitchCommands {
-    private static final String helpMsg = "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Help" + ChatColor.RESET + " ----------\n" +
+    private static final String helpMsg = Translatable.getString("twitch.help.header", "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " ----------\n") +
         ChatColor.LIGHT_PURPLE + "/twitch accounts: " + ChatColor.RESET + "Manage linked accounts.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch link: " + ChatColor.RESET + "Use this command to link a Twitch account.\n" +
         ChatColor.LIGHT_PURPLE + "/twitch unlink [username]: " + ChatColor.RESET + "Removes an account and the stored credentials. If a username is not provided all accounts will be unlinked.\n" +
@@ -30,34 +27,35 @@ public class TwitchCommands {
 
     public static void link(GenericSender sender) {
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "Twitch"));
             return;
         }
 
         Boolean shouldHideCode = ChatPointsTTV.getInstance().config.getGeneralConfig().getHideLoginCodes();
 
-        sender.sendMessage(ChatColor.GRAY + "Please wait...");
+        sender.sendMessage(ChatColor.GRAY + Translatable.getString("twitch.message.wait"));
         DeviceAuthorization auth = TwitchAuth.authorize(sender);
 
-        ChatComponent comp = new ChatComponent("\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD  + "Twitch Account Linking" + ChatColor.RESET + " -------------\n\n");
+        ChatComponent comp = new ChatComponent(Translatable.getString("twitch.link.header", "\n  ------------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " -------------\n\n"));
         if (sender.equals(ChatPointsTTV.getConsole())) {
-            comp.addExtra(new ChatComponent(ChatColor.LIGHT_PURPLE + "Go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + TwitchAuth.VERIFICATION_URL + ChatColor.LIGHT_PURPLE + " and enter the code: " + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode()));
+            comp.addExtra(new ChatComponent(ChatColor.LIGHT_PURPLE + Translatable.getString("twitch.link.instructions", "" + ChatColor.DARK_PURPLE + ChatColor.ITALIC + TwitchAuth.VERIFICATION_URL + ChatColor.LIGHT_PURPLE, "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode())));
         } else {
-            ChatComponent button = new ChatComponent("" + ChatColor.DARK_PURPLE + ChatColor.BOLD + ChatColor.UNDERLINE + "[Click here]");
+            ChatComponent button = new ChatComponent("" + ChatColor.DARK_PURPLE + ChatColor.BOLD + ChatColor.UNDERLINE + Translatable.getString("twitch.link.interactive.button", "[", "]") + " ");
             button.setClickEvent(new ChatEvent.ClickEvent(ChatEvent.ClickAction.OPEN_URL, auth.getVerificationUri()));
-            button.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "Click to open in browser"));
+            button.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, Translatable.getString("generic.tooltip.open_browser")));
 
             ChatComponent code;
             comp.addExtra(button);
+
+            String link = "" + ChatColor.DARK_PURPLE + ChatColor.ITALIC + TwitchAuth.VERIFICATION_URL + ChatColor.RESET + ChatColor.LIGHT_PURPLE;
             if (shouldHideCode) {
-                comp.addExtra(ChatColor.LIGHT_PURPLE + " to login with Twitch.\n" + ChatColor.GRAY + ChatColor.ITALIC + "Careful! Clicking the button above will show your device code as part of the link");
-                comp.addExtra(ChatColor.LIGHT_PURPLE + "\n\nYou may also go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + TwitchAuth.VERIFICATION_URL + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " and enter this code: ");
+                comp.addExtra(ChatColor.LIGHT_PURPLE + " " + Translatable.getString("twitch.link.interactive.no_code.text", "\n" + ChatColor.GRAY + ChatColor.ITALIC, "\n\n" + ChatColor.LIGHT_PURPLE, link) + " ");
                 code = new ChatComponent("" + ChatColor.DARK_PURPLE + ChatColor.OBFUSCATED + ChatColor.BOLD + "ABCDEFGH");
                 code.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode()));
 
-                code.addExtra("" + ChatColor.GRAY + ChatColor.ITALIC + " (Hover to view)");
+                code.addExtra(" " + ChatColor.GRAY + ChatColor.ITALIC + Translatable.getString("twitch.link.interactive.no_code.hover"));
             } else {
-                comp.addExtra(ChatColor.LIGHT_PURPLE + " or go to " + ChatColor.DARK_PURPLE + ChatColor.ITALIC + TwitchAuth.VERIFICATION_URL + ChatColor.RESET + ChatColor.LIGHT_PURPLE + " and enter this code:\n\n" + ChatColor.GRAY + "   ➡ ");
+                comp.addExtra(ChatColor.LIGHT_PURPLE + Translatable.getString("twitch.link.interactive.text", link, "\n\n" + ChatColor.GRAY + "   ➡ "));
                 code = new ChatComponent("" + ChatColor.DARK_PURPLE + ChatColor.BOLD + auth.getUserCode());
             }
             comp.addExtra(code);
@@ -69,7 +67,7 @@ public class TwitchCommands {
 
     public static void reload(GenericSender sender) {
         if (!ChatPointsTTV.getTwitch().reloading.compareAndSet(false, true)) {
-            sender.sendMessage(ChatColor.RED + "Twitch Module is already reloading!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_reloading", Translatable.getString("generic.twitch_module")));
             return;
         }
 
@@ -80,32 +78,32 @@ public class TwitchCommands {
         }
         ChatPointsTTV.getInstance().enableTwitch(sender);
 
-        sender.sendMessage(ChatPointsTTV.msgPrefix + "Twitch Module reloaded!");
+        sender.sendMessage(ChatPointsTTV.msgPrefix + Translatable.getString("generic.message.success.reload", "Twitch"));
     }
 
     public static void help(GenericSender sender) {
         sender.sendMessage(helpMsg);
 
         if (!sender.equals(ChatPointsTTV.getConsole())){
-            ChatComponent docsTip = new ChatComponent("" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "\nTip: " + ChatColor.RESET + ChatColor.GRAY + "Check out ");
+            ChatComponent docsTip = new ChatComponent(Translatable.getString("generic.help.tip.commands", "" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, "" + ChatColor.RESET + ChatColor.GRAY).replaceAll("\\[.*", ""));
 
-            ChatComponent link = new ChatComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + "ChatPointsTTV's website");
+            ChatComponent link = new ChatComponent("" + ChatColor.GRAY  + ChatColor.ITALIC + "" + ChatColor.UNDERLINE + Translatable.getString("generic.help.tip.commands").replaceAll("(?:^|\\])[^\\[]*\\[?", "")); // Get button text
             link.setClickEvent(new ChatEvent.ClickEvent(ChatEvent.ClickAction.OPEN_URL, "https://gosdev.me/chatpointsttv/commands/twitch"));
-            link.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "Click to open in browser"));
+            link.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, Translatable.getString("generic.tooltip.open_browser")));
             docsTip.addExtra(link);
-            docsTip.addExtra(ChatColor.GRAY + " for more information on its commands!");
-            
+            docsTip.addExtra(ChatColor.GRAY + Translatable.getString("generic.help.tip.commands").replaceAll(".*\\]", ""));
+
             sender.sendMessage(docsTip);
         }
     }
 
     public static void start(GenericSender sender) {
         if (ChatPointsTTV.getTwitch().reloading.get()) {
-            sender.sendMessage(ChatColor.RED + "Twitch Module is already starting.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.still_starting", "Twitch"));
             return;
         }
         if (ChatPointsTTV.getTwitch().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "Twitch Module is already started.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_started", "Twitch"));
             return;
         }
 
@@ -114,20 +112,23 @@ public class TwitchCommands {
 
     public static void stop(GenericSender sender) {
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "Twitch Module is not started.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_stopped", "Twitch"));
             return;
         }
         if (ChatPointsTTV.getTwitch().reloading.get()) {
-            sender.sendMessage(ChatColor.RED + "Twitch Module is reloading. Please wait until it finishes.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_reloading", Translatable.getString("generic.twitch_module")));
         }
+
+        ChatPointsTTV.getTwitch().stop(sender);
     }
 
     public static void accounts(GenericSender sender) {
         java.util.ArrayList<String> channels = new java.util.ArrayList<>();
-        ChatComponent msg = new ChatComponent("\n  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Connected Twitch Accounts" + ChatColor.RESET + " ----------\n\n");
+
+        ChatComponent msg = new ChatComponent( Translatable.getString("twitch.accounts.header", "\n  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " ----------\n\n"));
         
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "Twitch"));
             return;
         }
         
@@ -137,7 +138,7 @@ public class TwitchCommands {
 
         ChatComponent footer;
         if (sender.equals(ChatPointsTTV.getConsole())) {
-            footer = new ChatComponent(ChatColor.ITALIC + "\nTo unlink an account, use /twitch unlink <channel>\nTo add an account, use /twitch link");
+            footer = new ChatComponent(ChatColor.ITALIC + "\n" + Translatable.getString("twitch.accounts.footer.console"));
         } else {
             footer = TwitchButtonComponents.accountLink();
             if (!channels.isEmpty()) {
@@ -153,7 +154,7 @@ public class TwitchCommands {
         } else {
             for (String channel : channels) {
                 ChatComponent deleteButton = new ChatComponent(ChatColor.RED + "  [❌]");
-                deleteButton.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, "Click to unlink this account"));
+                deleteButton.setHoverEvent(new ChatEvent.HoverEvent(ChatEvent.HoverAction.SHOW_TEXT, Translatable.getString("twitch.accounts.tooltip.unlink")));
                 deleteButton.setClickEvent(new ChatEvent.ClickEvent(ChatEvent.ClickAction.RUN_COMMAND, "/twitch unlink " + channel));
                 msg.addExtra(deleteButton);
                 msg.addExtra(new ChatComponent("  " + channel + "\n"));
@@ -161,7 +162,7 @@ public class TwitchCommands {
         }
         
         if (channels.isEmpty()) {
-            msg.addExtra(ChatColor.GRAY + "  There are no connected accounts :(\n");
+            msg.addExtra(ChatColor.GRAY + "  " + Translatable.getString("twitch.accounts.no_accounts") + "\n");
         }
         
         msg.addExtra(footer);
@@ -183,24 +184,24 @@ public class TwitchCommands {
         }
 
         ChatComponent msg = new ChatComponent(
-            "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "ChatPointsTTV Twitch Status" + ChatColor.RESET + " ----------\n" +
-            ChatColor.LIGHT_PURPLE + "Plugin version: " + ChatColor.RESET + "v" + ChatPointsTTV.getInstance().version + "\n" +
-            ChatColor.LIGHT_PURPLE + "Listened channels: " + ChatColor.RESET + strChannels + "\n" +
+            Translatable.getString("commands.status.header.twitch", "  ---------- " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD, ChatColor.RESET + " ----------\n") +
+            ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.plugin_version") + " " + ChatColor.RESET + "v" + ChatPointsTTV.getInstance().version + "\n" +
+            ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.accounts.twitch") + " " + ChatColor.RESET + strChannels + "\n" +
             "\n"
         );
         
         String currentState;
         if (ChatPointsTTV.getTwitch().isStarted()) {
             if (ChatPointsTTV.getTwitch().isAccountConnected()) {
-                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + "CONNECTED";
+                currentState = ChatColor.GREEN + "" + ChatColor.BOLD + Translatable.getString("commands.status.connected");
             } else {
-                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + "UNLINKED";
+                currentState = ChatColor.YELLOW + "" + ChatColor.BOLD + Translatable.getString("commands.status.unlinked");
             }
         } else {
-            currentState = ChatColor.RED + "" + ChatColor.BOLD + "STOPPED";
+            currentState = ChatColor.RED + "" + ChatColor.BOLD + Translatable.getString("commands.status.stopped");
         }
 
-        ChatComponent status = new ChatComponent(ChatColor.LIGHT_PURPLE + "Connection status: " + currentState);
+        ChatComponent status = new ChatComponent(ChatColor.LIGHT_PURPLE + Translatable.getString("commands.status.connection_status") + " " + currentState);
         msg.addExtra(status);
         
         if (!sender.equals(ChatPointsTTV.getConsole())) {
@@ -219,17 +220,17 @@ public class TwitchCommands {
 
     public static void test(GenericSender sender, String[] cmdInput) {
         if (!ChatPointsTTV.getTwitch().isStarted() ) {
-            sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "Twitch"));
             return;
         }
 
         if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
-            sender.sendMessage(ChatColor.RED + "You must link a Twitch account in order to run test events!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.no_accounts.twitch"));
             return;
         }
         
         if (cmdInput.length < 2) {
-            sender.sendMessage(ChatColor.RED + "Usage: /twitch test <type> ...");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test <type> ...");
             return;
         }
 
@@ -242,7 +243,7 @@ public class TwitchCommands {
             switch (args[1].toLowerCase()) {
                 case "channelpoints":
                     if (args.length < 5) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test channelpoints <redeemer> <channel> <reward> [userInput]");
                         return;
                     }
     
@@ -268,7 +269,7 @@ public class TwitchCommands {
                     break;
                 case "follow":
                     if (args.length != 4) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test follow <user> <channel>");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test follow <user> <channel>");
                         return;
                     }
     
@@ -285,7 +286,7 @@ public class TwitchCommands {
     
                 case "cheer":
                     if (args.length != 5) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test cheer <user> <channel> <amount>");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test cheer <user> <channel> <amount>");
                         return;
                     }
     
@@ -296,7 +297,7 @@ public class TwitchCommands {
                     try {
                         cheerAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid cheer amount: " + args[4]);
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_amount", Translatable.getString("twitch.generic.cheer", args[4])));
                         return;
                     }
     
@@ -310,7 +311,7 @@ public class TwitchCommands {
     
                 case "sub":
                     if (args.length != 5) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test sub <user> <channel> <plan>");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test sub <user> <channel> <plan>");
                         return;
                     }
     
@@ -321,7 +322,7 @@ public class TwitchCommands {
                     try {
                         subTier = SubscriptionPlan.valueOf(args[4].toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid subscription tier: " + args[4]);
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_name", Translatable.getString("twitch.generic.sub_tier", args[4])));
                         return;
                     }
                     
@@ -336,7 +337,7 @@ public class TwitchCommands {
     
                 case "subgift":
                     if (args.length != 5) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test subgift <user> <channel> <amount>");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test subgift <user> <channel> <amount>");
                         return;
                     }
     
@@ -347,7 +348,7 @@ public class TwitchCommands {
                     try {
                         giftAmount = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid gifted subs amount: " + args[4]);
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_amount", Translatable.getString("twitch.generic.gifted_subs", args[4])));
                         return;
                     }
                     
@@ -361,7 +362,7 @@ public class TwitchCommands {
     
                 case "raid":
                     if (args.length != 5) {
-                        sender.sendMessage(ChatColor.RED + "Usage: /twitch test raid <raider> <channel> <viewer count>");
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /twitch test raid <raider> <channel> <viewer count>");
                         return;
                     }
     
@@ -372,7 +373,7 @@ public class TwitchCommands {
                     try {
                         raidViewers = Integer.parseInt(args[4]);
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(ChatColor.RED + "Invalid viewer amount: " + args[4]);
+                        sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.invalid_amount", Translatable.getString("twitch.generic.viewer", args[4])));
                         return;
                     }
                     
@@ -385,11 +386,11 @@ public class TwitchCommands {
                     break;
     
                 default:
-                    sender.sendMessage(ChatColor.RED + "Unknown test type: " + args[1]);
+                    sender.sendMessage(ChatColor.RED + Translatable.getString("commands.test.unknown_event", args[1]));
                     return;
             }
             eventManager.publish(event);
-            sender.sendMessage(ChatColor.GREEN + "Test event sent!");
+            sender.sendMessage(ChatColor.GREEN + Translatable.getString("commands.test.success"));
 
         } catch (IllegalArgumentException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
@@ -398,20 +399,20 @@ public class TwitchCommands {
 
     public static void createReward(GenericSender sender, String username) {
         if (!ChatPointsTTV.getTwitch().isStarted()) {
-            sender.sendMessage(ChatColor.RED + "You must start the Twitch Module first!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("generic.message.not_started", "Twitch"));
             return;
         }
 
         if (!ChatPointsTTV.getTwitch().isAccountConnected()) {
-            sender.sendMessage(ChatColor.RED + "You must link a Twitch account in order to create channel point rewards!");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("twitch.message.create_reward.no_account"));
             return;
         }
 
         String userId = ChatPointsTTV.getTwitch().getListenedChannels().get(username).getChannelId();
         if (ChatPointsTTV.getTwitch().createChannelPointRewards(ChatPointsTTV.getTwitch().credentialManager.get(userId))) {
-            sender.sendMessage(ChatColor.GREEN + "A new Channel Point Reward has been created. Check your Twitch Dashboard!");
+            sender.sendMessage(ChatColor.GREEN + Translatable.getString("twitch.message.create_reward.success"));
         } else {
-            sender.sendMessage(ChatColor.RED + "Failed to create a new Channel Point Reward. Check the server console for more information.");
+            sender.sendMessage(ChatColor.RED + Translatable.getString("twitch.message.create_reward.failed"));
         }
     }
 

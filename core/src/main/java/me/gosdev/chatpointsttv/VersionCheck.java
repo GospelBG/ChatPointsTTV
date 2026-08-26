@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 import org.json.JSONArray;
 
 public class VersionCheck {
@@ -33,11 +34,11 @@ public class VersionCheck {
 
             if (!ChatPointsTTV.getInstance().version.equals(latestVersion)) {
                 runningLatest = false;
-                ChatPointsTTV.getConsole().sendMessage(ChatColor.YELLOW + "ChatPointsTTV v" + latestVersion + " has been released! Download the latest version in " + download_url);
+                ChatPointsTTV.getConsole().sendMessage(Translatable.getString("versioncheck.new_version", ChatColor.YELLOW, latestVersion, download_url));
             }
 
         } catch (IOException | URISyntaxException e) {
-            ChatPointsTTV.log.warn("Couldn't fetch latest version." + e.toString());
+            ChatPointsTTV.log.warn(Translatable.getString("versioncheck.error", e.toString()));
         }
     }
 }

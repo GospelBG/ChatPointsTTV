@@ -9,6 +9,7 @@ import me.gosdev.chatpointsttv.Utils.ChatColor;
 import me.gosdev.chatpointsttv.TikTok.TikTokClient;
 import me.gosdev.chatpointsttv.Twitch.TwitchClient;
 import me.gosdev.chatpointsttv.Utils.FollowerLog;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 
 
 public class ChatPointsTTV {
@@ -57,7 +58,7 @@ public class ChatPointsTTV {
         this.consoleSender = loader.consoleSender();
 
         if (firstRun) {
-            this.consoleSender.sendMessage(msgPrefix + "Configuration files have just been created. You need to set up ChatPointsTTV before using it.\nCheck out the quick start guide at https://gosdev.me/chatpointsttv/install");
+            this.consoleSender.sendMessage(msgPrefix + Translatable.getString("generic.message.welcome.config_files", "\n", "https://gosdev.me/chatpointsttv/install"));
         }
     }
 
@@ -110,6 +111,8 @@ public class ChatPointsTTV {
         if (this.config.getGeneralConfig().getEnableTwitch()) enableTwitch(this.consoleSender);
         if (this.config.getGeneralConfig().getEnableTikTok()) enableTikTok(this.consoleSender);
 
+        Translatable.loadTranslationsFile("en_us"); //TODO: Change hard-coded value
+
         VersionCheck.check();
     }
 
@@ -127,11 +130,11 @@ public class ChatPointsTTV {
 
     public void reload(GenericSender p) {
         if (!isReloading.compareAndSet(false, true)) {
-            p.sendMessage(ChatColor.RED + "ChatPointsTTV is already reloading!");
+            p.sendMessage(ChatColor.RED + Translatable.getString("generic.message.already_reloading", "ChatPointsTTV"));
             return;
         }
 
-        if (!p.equals(consoleSender)) p.sendMessage(msgPrefix + "Reloading ChatPointsTTV...");
+        if (!p.equals(consoleSender)) p.sendMessage(msgPrefix + Translatable.getString("generic.message.reloading"));
         log.info("Reloading ChatPointsTTV...");
 
         onDisable();
@@ -139,7 +142,7 @@ public class ChatPointsTTV {
         try {
             onEnable();
         } catch (Exception e) {
-            p.sendMessage(ChatColor.RED + "There was an error reloading ChatPointsTTV. Please check the server console.");
+            p.sendMessage(ChatColor.RED + Translatable.getString("generic.message.reload.error"));
             e.printStackTrace();
         }
         

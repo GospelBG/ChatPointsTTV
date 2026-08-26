@@ -1,0 +1,195 @@
+{
+  "versioncheck.new_version": "%sChatPointsTTV %s has been released! Download the latest version in %s",
+  "versioncheck.error": "Couldn't fetch latest version: %s",
+
+  "generic.twitch_module": "Twitch Module",
+  "generic.tiktok_module": "TikTok Module",
+  "generic.player": "player",
+  "generic.permission": "permission",
+
+  "generic.tooltip.open_browser": "Click to open in browser",
+
+  "generic.help.tip.commands": "%sTip:%s Check out [ChatPointsTTV's website] for more information on its commands!",
+  "generic.help.tip.get_started": "%sTip:%s Get started easily by taking a look at the [installation guide].",
+
+  "generic.message.success.start": "%s Module has started successfully!",
+  "generic.message.success.stop": "%s Module has been successfully stopped!",
+  "generic.message.success.reload": "%s Module reloaded!",
+  "generic.message.still_starting": "%s Module is still starting. Please wait.",
+  "generic.message.still_stopping": "%s Module is still stopping. Please wait.",
+  "generic.message.already_started": "%s Module is already started.",
+  "generic.message.already_stopped": "%s Module is stopped.",
+  "generic.message.already_reloading": "%s is already reloading!",
+  "generic.message.not_started": "You must start the %s Module first!",
+  "generic.message.unknown_command": "Unknown command: %s",
+  "generic.message.invalid_state": "Invalid state: %s",
+  "generic.message.invalid_permission": "Invalid permission: %s",
+  "generic.message.no_entity_found": "No entity was found.",
+  "generic.message.permission_set": "Permission has been set successfully!",
+
+  "generic.message.reloading": "Reloading ChatPointsTTV...",
+  "generic.message.reloading.error": "There was an error reloading ChatPointsTTV. Please check the server console.",
+
+  "generic.message.welcome.config_files": "Configuration files have just been created. You need to set up ChatPointsTTV before using it.%sCheck out the quick start guide at %s",
+
+  "action.error.generic": "There was an error running a %s action.",
+  "action.error.invalid_action": "Invalid action: %s.",
+  "action.error.invalid_option": "Invalid option %s.",
+  "action.error.invalid_amount": "Invalid amount: %s.",
+  "action.error.missing_arguments": "This action requires %s argument(s).",
+  "action.error.entity_not_found": "Entity %s does not exist.",
+  "action.error.item_not_found": "Item %s does not exist.",
+  "action.error.sound_not_found": "Sound effect %s does not exist.",
+  "action.error.potion_not_found": "Potion effect %s does not exist.",
+  "action.error.player_not_found": "Couldn't find player %s.",
+  "action.error.empty_command": "You are trying to run a blank command.",
+  "action.error.blank_custom_message": "CUSTOM_MSG is blank. Falling back to default string.",
+
+  "events.error.invalid_format": "Invalid formatting for %s actions. Read the docs for more information.",
+  "events.error.must_be_number": "%s must be a number.",
+
+  "commands.usage": "Usage:",
+
+  "commands.status.header": "%sChatPointsTTV Status%s",
+  "commands.status.header.tiktok": "%ChatPointsTTV TikTok Status%s",
+  "commands.status.header.twitch": "%sChatPointsTTV Twitch Status%s",
+  "commands.status.plugin_version": "Plugin version:",
+  "commands.status.accounts.tiktok": "Connected LIVEs:",
+  "commands.status.accounts.twitch": "Listened channels:",
+  "commands.status.no_accounts": "None",
+  "commands.status.connection_status": "Connection status:",
+  "commands.status.connected": "CONNECTED",
+  "commands.status.linked": "LINKED",
+  "commands.status.unlinked": "UNLINKED",
+  "commands.status.stopped": "STOPPED",
+  "commands.status.enabled": "ENABLED",
+  "commands.status.disabled": "DISABLED",
+  "commands.status.update_available": "Update Available!",
+
+  "commands.test.invalid_name": "Invalid %s name: %s",
+  "commands.test.invalid_amount": "Invalid %s amount: %s",
+  "commands.test.success": "Test event sent!",
+  "commands.test.unknown_event": "Unknown test event: %s",
+  "commands.test.no_accounts.twitch": "You must link a Twitch account in order to run test events!",
+
+  "commands.help.header": "%sChatPointsTTV Help%s",
+  "commands.help.status": "Displays information about the plugin and the TikTok Module.",
+  "commands.help.reload": "Restarts the plugin along with all modules and reloads configuration files.",
+  "commands.help.set": "Sets a ChatPointsTTV permission.",
+  "commands.help.help": "Displays this help message.",
+
+  "button.stop.text": "%s Stop %s Module",
+  "button.stop.tooltip": "Click to stop listening to incoming %s events.",
+
+  "button.start.text": "%s Start %s Module",
+  "button.start.tooltip": "Click to start the %s Module.",
+
+  "button.manage.text": "%s Manage Accounts",
+  "button.manage.tooltip": "Click to add/remove accounts.",
+
+  "button.link.text": "%s Link Profile",
+  "button.link.tooltip": "Click to link another account.",
+
+  "button.unlink.text": "%s Unlink All Profiles",
+  "button.unlink.tooltip": "Click to unlink all accounts.",
+
+  "button.reload.text": "%s Reload ChatPointsTTV",
+  "button.reload.tooltip": "Click to reload ChatPointsTTV.",
+
+  "button.documentation.text": "%s Open Documentation",
+  "button.documentation.tooltip": "Click to open ChatPointsTTV's documentation in your web browser.",
+
+  "tiktok.generic.like": "Like",
+  "tiktok.generic.gift_item": "Gift Item",
+  "tiktok.generic.gift_combo": "Gift Combo",
+
+  "tiktok.message.success.link": "Linked succesfully to %s's LIVE!",
+
+  "tiktok.message.failure.offline": "Couldn't connect to %s's LIVE because they are currently offline!",
+  "tiktok.message.failure.not_found": "Couldn't find TikTok user: @%s",
+  "tiktok.message.failure.server.api_key": "Please check your API key.",
+  "tiktok.message.failure.server.try_again": "Please try again.",
+  "tiktok.message.failure.timeout": "Connection timed out while connecting to @%s's LIVE. Please try again.",
+  "tiktok.message.failure.generic": "There was an error while connecting to @%s's LIVE",
+  "tiktok.message.failure.generic.check_console": "Please check the server console for more details.",
+  "tiktok.message.failure.generic.retrying": "Retrying in a few seconds...",
+
+  "tiktok.message.already_linked": "You cannot link the same LIVE twice!",
+  "tiktok.message.linking": "Linking to %s's LIVE",
+  "tiktok.message.starting": "Enabling TikTok module...",
+  "tiktok.message.stopping": "Disabling TikTok module...",
+  "tiktok.message.reloading": "Reloading TikTok module...",
+
+  "tiktok.message.unlink.success_all": "All accounts have been unlinked successfully!",
+  "tiktok.message.unlink.success": "Successfully unlinked %s's LIVE!",
+  "tiktok.message.unlink.not_linked": "%s's LIVE is not linked!",
+
+  "tiktok.help.header": "%s ChatPointsTTV TikTok Help %s",
+  "tiktok.help.accounts": "Manage linked accounts.",
+  "tiktok.help.link": "Use this command to connect to a TikTok LIVE.",
+  "tiktok.help.unlink": "Disconnects from a user's LIVE. If a username is not provided all accounts will be disconencted.",
+  "tiktok.help.status": "Displays information about the plugin and the TikTok Module.",
+  "tiktok.help.start": "Starts the TikTok Module and logs in to any saved accounts.",
+  "tiktok.help.stop": "Stops the TikTok Module. All incoming events will be ignored.",
+  "tiktok.help.reload": "Restarts the TikTok module and reloads its configuration.",
+  "tiktok.help.test": "Mocks a TikTok event.",
+  "tiktok.help.help": "Displays this help message.",
+
+  "tiktok.accounts.header": "%sConnected TikTok LIVEs%s",
+  "tiktok.accounts.no_accounts": "There are no connected LIVEs :(",
+  "tiktok.accounts.tooltip.unlink": "Click to unlink this LIVE",
+  "tiktok.accounts.footer": "To unlink a LIVE, use /tiktok unlink <username>\nTo add a LIVE, use /tiktok link <username>",
+
+  "twitch.generic.cheer": "Cheer",
+  "twitch.generic.viewer": "Viewer",
+  "twitch.generic.sub_tier": "Subscription Tier",
+  "twitch.generic.gifted_subs": "Gifted Subs",
+
+  "twitch.message.auth.denied": "Authorization was denied by the user.",
+  "twitch.message.auth.expired": "The device code has expired. Please try again.",
+  "twitch.message.auth.error": "An error occurred while authorizing the application.",
+
+  "twitch.message.success.start": "Twitch Module has started successfully!",
+  "twitch.message.success.stop": "Twitch Module has been successfully stopped!",
+  "twitch.message.success.login": "Logged in successfully!",
+
+  "twitch.message.failure.stop": "There was an error stopping the Twitch Module.",
+  "twitch.message.failure.link": "Twitch account linking failed.",
+  "twitch.message.failure.unlink": "Failed to unlink an account.",
+
+  "twitch.message.duplicate_account": "This account is already linked.",
+  "twitch.message.no_accounts": "There are no connected Twitch accounts.",
+  "twitch.message.wait": "Please wait...",
+  "twitch.message.logging_in": "Logging in as %s",
+  "twitch.message.unlink.success": "Account unlinked!",
+  "twitch.message.unlink.success_all": "All accounts have been unlinked successfully!",
+  "twitch.message.create_reward.no_account": "You must link a Twitch account in order to create a channel point reward!",
+  "twitch.message.create_reward.success": "A new Channel Point Reward has been created. Check your Twitch Dashboard!",
+  "twitch.message.create_reward.failed": "Failed to create a new Channel Point Reward. Check the server console for more information.",
+
+  "twitch.reward.title": "ChatPointsTTV Reward (%s)",
+  "twitch.reward.description": "This reward was created by ChatPointsTTV and its redemptions will be managed automatically.",
+
+  "twitch.help.header": "%sChatPointsTTV Twitch Help%s",
+  "twitch.help.accounts": "Manage linked accounts.",
+  "twitch.help.link": "Use this command to link a Twitch account.",
+  "twitch.help.unlink": "Removes an account and the stored credentials. If a username is not provided all accounts will be unlinked.",
+  "twitch.help.status": "Displays information about the plugin and the Twitch module.",
+  "twitch.help.start": "Starts the Twitch module and logs in to any saved accounts.",
+  "twitch.help.stop": "Stops the Twitch module. All incoming events will be ignored.",
+  "twitch.help.reload": "Restarts the Twitch module and reloads its configuration.",
+  "twitch.help.test": "Mocks a Twitch event.",
+  "twitch.help.help": "Displays this help message.",
+
+  "twitch.link.header": "%sTwitch Account Linking%s",
+  "twitch.link.instructions": "Go to %s and enter the code: %s",
+  "twitch.link.interactive.button": "%sClick here%s",
+  "twitch.link.interactive.text": "or go to %s and enter this code: %s",
+  "twitch.link.interactive.no_code.text": "to login with Twitch.%sCareful! Clicking the button above will show your device code as part of the link%sYou may also go to %s and enter this code:",
+  "twitch.link.interactive.no_code.hover": "Hover to view",
+
+  "twitch.accounts.header": "%sConnected Twitch Accounts%s",
+  "twitch.accounts.footer.console": "To unlink an account, use /twitch unlink <channel>%sTo add an account, use /twitch link",
+  "twitch.accounts.tooltip.unlink": "Click to unlink this account",
+  "twitch.accounts.no_accounts": "There are no connected accounts :("
+}

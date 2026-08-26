@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import me.gosdev.chatpointsttv.TikTok.TikTokCommands;
 import me.gosdev.chatpointsttv.Utils.ChatColor;
+import me.gosdev.chatpointsttv.Utils.Translatable;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -43,7 +44,7 @@ public class TikTokCommandController implements TabExecutor {
 
             case "link":
                 if (args.length != 2) {
-                    genericSender.sendMessage(ChatColor.RED + "Usage: /tiktok link <username>");
+                    genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok link <username>");
                     return true;
                 }
                 TikTokCommands.link(genericSender, args[1]);
@@ -51,7 +52,7 @@ public class TikTokCommandController implements TabExecutor {
 
             case "unlink":
                 if (args.length < 1 || args.length > 2) {
-                    genericSender.sendMessage(ChatColor.RED + "Usage: /tiktok unlink [username]");
+                    genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok unlink [username]");
                     return true;
                 }
                 TikTokCommands.unlink(genericSender, args.length == 2 ? Optional.of(args[1]) : Optional.empty());
@@ -63,7 +64,7 @@ public class TikTokCommandController implements TabExecutor {
 
             case "test":
                 if (args.length < 4) {
-                    genericSender.sendMessage(ChatColor.RED + "Usage: /tiktok test <type> ...");
+                    genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + ": /tiktok test <type> ...");
                     return true;
                 }
                 TikTokCommands.test(genericSender, args);
@@ -74,7 +75,7 @@ public class TikTokCommandController implements TabExecutor {
                 return true;
 
             default:
-                genericSender.sendMessage(ChatColor.RED + "Unknown command: /tiktok " + args[0]);
+                genericSender.sendMessage(ChatColor.RED + Translatable.getString("commands.usage") + " /tiktok " + args[0]);
                 TikTokCommands.help(genericSender);
                 return false;
         }
