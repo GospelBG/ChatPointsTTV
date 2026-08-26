@@ -8,6 +8,16 @@ public class SpigotGeneralConfig extends SpigotConfigFile implements GenericGene
         super(fileName);
     }
 
+    @Override
+    public boolean getHideLoginCodes() {
+        return getBoolean("HIDE_LOGIN_CODES", false);
+    }
+
+    @Override
+    public void setHideLoginCodes(boolean hideLoginCodes) {
+        set("HIDE_LOGIN_CODES", hideLoginCodes);
+    }
+
     @Override public boolean getLogEvents() { return getBoolean("LOG_EVENTS", false); }
     @Override public void setLogEvents(boolean logEvents) { set("LOG_EVENTS", logEvents); }
 

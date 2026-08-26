@@ -43,6 +43,7 @@ public class SpigotAccountsManager implements AccountsManager {
         if (plat.equals(Platforms.TIKTOK)) {
             return accounts.getStringList(plat.getName().toLowerCase());
         } else {
+            if (accounts.getConfigurationSection(plat.getName().toLowerCase()) == null) return List.of();
             return accounts.getConfigurationSection(plat.getName().toLowerCase()).getKeys(false).stream().toList();
         }
     }

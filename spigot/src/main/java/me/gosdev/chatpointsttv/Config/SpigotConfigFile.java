@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import me.gosdev.chatpointsttv.ChatPointsTTV;
 import me.gosdev.chatpointsttv.ChatPointsTTVSpigot;
 import me.gosdev.chatpointsttv.Generic.ConfigFile;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,7 +20,16 @@ public class SpigotConfigFile implements ConfigFile {
     public SpigotConfigFile(String fileName) {
         this.file = new File(ChatPointsTTVSpigot.getPlugin().getDataFolder(), fileName);
         if (!this.file.exists()) {
-            ChatPointsTTVSpigot.getPlugin().saveResource(fileName, false);
+            if (ChatPointsTTVSpigot.getPlugin().getResource(fileName) != null) {
+                ChatPointsTTVSpigot.getPlugin().saveResource(fileName, false);
+            } else {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
         }
         this.config = YamlConfiguration.loadConfiguration(file);
     }
