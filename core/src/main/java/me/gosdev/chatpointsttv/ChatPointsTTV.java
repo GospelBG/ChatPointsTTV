@@ -103,6 +103,7 @@ public class ChatPointsTTV {
     }
 
     public void onEnable() {
+        this.config.reload();
         Translatable.loadTranslationsFile("en_us"); //TODO: Change hard-coded value
 
         this.logEvents = this.config.getGeneralConfig().getLogEvents();
