@@ -163,7 +163,7 @@ public class BalmPlayer implements GenericPlayer {
 
         if (potionOpt.isPresent()) {
             Balm.getRuntime().platform().server().execute(() -> {
-                player.addEffect(new MobEffectInstance(Holder.direct(potionOpt.get()), duration, strength));
+                player.addEffect(new MobEffectInstance(Holder.direct(potionOpt.get()), duration * 20, strength - 1));
             });
         }
     }

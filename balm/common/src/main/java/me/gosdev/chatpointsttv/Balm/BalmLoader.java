@@ -74,7 +74,7 @@ public class BalmLoader implements GenericLoader {
 
     @Override
     public List<String> getPotionEffects() {
-        return BuiltInRegistries.POTION.keySet().stream().map(Identifier::toString).toList();
+        return BuiltInRegistries.MOB_EFFECT.keySet().stream().map(Identifier::toString).toList();
     }
 
     @Override
