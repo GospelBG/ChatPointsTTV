@@ -42,7 +42,7 @@ public class TikTokCommandController {
     };
 
     public static int test(CommandContext<CommandSourceStack> context) {
-        TikTokCommands.test(new BalmPlayer(context.getSource().getPlayer()), null);
+        TikTokCommands.test(new BalmPlayer(context.getSource().getPlayer()), context.getInput().split(" "));
         return 1;
     };
 }

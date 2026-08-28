@@ -5,6 +5,8 @@ import me.gosdev.chatpointsttv.Balm.BalmPlayer;
 import me.gosdev.chatpointsttv.Twitch.TwitchCommands;
 import net.minecraft.commands.CommandSourceStack;
 
+import java.util.Arrays;
+
 public class TwitchCommandController {
     public static int accounts(CommandContext<CommandSourceStack> context) {
         TwitchCommands.accounts(new BalmPlayer(context.getSource().getPlayer()));
@@ -42,7 +44,7 @@ public class TwitchCommandController {
     };
 
     public static int test(CommandContext<CommandSourceStack> context) {
-        TwitchCommands.test(new BalmPlayer(context.getSource().getPlayer()), null);
+        TwitchCommands.test(new BalmPlayer(context.getSource().getPlayer()), Arrays.stream(context.getInput().split(" ")).skip(1).toArray(String[]::new));
         return 1;
     };
 }

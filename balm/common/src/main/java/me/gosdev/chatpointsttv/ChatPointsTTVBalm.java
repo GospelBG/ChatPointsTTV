@@ -1,6 +1,7 @@
 package me.gosdev.chatpointsttv;
 
 import com.mojang.authlib.minecraft.client.MinecraftClient;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import me.gosdev.chatpointsttv.Balm.BalmAccountManager;
 import me.gosdev.chatpointsttv.Balm.BalmLoader;
@@ -9,15 +10,20 @@ import me.gosdev.chatpointsttv.Config.BalmConfigs;
 import me.gosdev.chatpointsttv.Config.GeneralConfig;
 import me.gosdev.chatpointsttv.Config.TikTokConfig;
 import me.gosdev.chatpointsttv.Config.TwitchConfig;
+import me.gosdev.chatpointsttv.TikTok.TikTokEventType;
+import me.gosdev.chatpointsttv.Twitch.TwitchEventType;
 import me.gosdev.chatpointsttv.Utils.Translatable;
 import net.blay09.mods.balm.Balm;
 import net.blay09.mods.balm.platform.event.callback.ServerPlayerCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.resources.Identifier;
 import net.blay09.mods.balm.core.BalmRegistrars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 public class ChatPointsTTVBalm {
 
@@ -82,7 +88,22 @@ public class ChatPointsTTVBalm {
                             .executes(TwitchCommandController::stop))
 
                     .then(Commands.literal("test")
-                            .executes(TwitchCommandController::test))
+                            .executes(TwitchCommandController::test)
+                            .then(Commands.argument("event", StringArgumentType.word())
+                                .executes(TwitchCommandController::test)
+                                .suggests((context, builder) -> SharedSuggestionProvider.suggest(
+                                    Arrays.stream(TwitchEventType.values())
+                                        .map(e -> e.name().toLowerCase().replace("_", ""))
+                                        .toList(), builder
+                                ))
+                                .then(Commands.argument("chatter", StringArgumentType.word())
+                                    .executes(TwitchCommandController::test)
+                                    .then(Commands.argument("channel", StringArgumentType.word())
+                                        .executes(TwitchCommandController::test)
+                                        .then(Commands.argument("data", StringArgumentType.word())
+                                            .executes(TwitchCommandController::test)
+                                            .then(Commands.argument("extra", StringArgumentType.greedyString())
+                                                    .executes(TwitchCommandController::test)))))))
             );
 
             dispatcher.register(Commands.literal("tiktok")
@@ -99,19 +120,36 @@ public class ChatPointsTTVBalm {
                                 .executes(TikTokCommandController::link)))
 
                     .then(Commands.literal("reload")
-                            .executes(TikTokCommandController::reload))
+                        .executes(TikTokCommandController::reload))
 
                     .then(Commands.literal("status")
-                            .executes(TikTokCommandController::status))
+                        .executes(TikTokCommandController::status))
 
                     .then(Commands.literal("start")
-                            .executes(TikTokCommandController::start))
+                        .executes(TikTokCommandController::start))
 
                     .then(Commands.literal("stop")
-                            .executes(TikTokCommandController::stop))
+                        .executes(TikTokCommandController::stop))
 
                     .then(Commands.literal("test")
-                            .executes(TikTokCommandController::test))
+                        .executes(TikTokCommandController::test)
+
+                        .then(Commands.argument("event", StringArgumentType.word())
+                            .executes(TikTokCommandController::test)
+                            .suggests((context, builder) -> SharedSuggestionProvider.suggest(
+                                Arrays.stream(TikTokEventType.values())
+                                    .map(e -> e.name().toLowerCase())
+                                    .toList(), builder
+                                ))
+                            .then(Commands.argument("chatter", StringArgumentType.word())
+                                .executes(TikTokCommandController::test)
+                                .then(Commands.argument("channel", StringArgumentType.word())
+                                    .executes(TikTokCommandController::test)
+                                    .then(Commands.argument("data", StringArgumentType.word())
+                                        .executes(TikTokCommandController::test)
+                                        .then(Commands.argument("extra", StringArgumentType.greedyString())
+                                            .executes(TikTokCommandController::test)))))))
+
             );
         });
 
