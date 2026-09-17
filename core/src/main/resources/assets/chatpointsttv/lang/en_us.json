@@ -40,7 +40,7 @@
   "action.error.entity_not_found": "Entity %s does not exist.",
   "action.error.item_not_found": "Item %s does not exist.",
   "action.error.sound_not_found": "Sound effect %s does not exist.",
-  "action.error.effect_not_found": "Potion effect %s does not exist.",
+  "action.error.potion_not_found": "Potion effect %s does not exist.",
   "action.error.player_not_found": "Couldn't find player %s.",
   "action.error.empty_command": "You are trying to run a blank command.",
   "action.error.blank_custom_message": "CUSTOM_MSG is blank. Falling back to default string.",
