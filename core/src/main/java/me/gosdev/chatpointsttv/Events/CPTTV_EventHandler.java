@@ -47,7 +47,7 @@ public class CPTTV_EventHandler {
 
     public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
         new Thread (()-> {
-            String errorStr = Translatable.getString("action.error.generic", type);
+            String errorStr = Translatable.getString("action.error.generic", type) + " ";
             if (ChatPointsTTV.getInstance().logEvents) ChatPointsTTV.getLoader().consoleSender().sendMessage(getEventMessage(platform, type, chatter, channel, event, amount));
             if (platform.equals(Platforms.TWITCH) && ChatPointsTTV.getTwitch().ignoreOfflineStreamers) {
                 for (Channel ch : ChatPointsTTV.getTwitch().getListenedChannels().values()) {
