@@ -33,14 +33,16 @@ public class CPTTV_EventHandler {
     private static final Map<EventType, ArrayList<Event>> actions = new HashMap<>();
 
     public static String getEventMessage(Platforms platform, EventType type, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
-        String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
+        return Translatable.getString("twitch.event.channelpoints.title", chatter, event.get(), channel);
+
+        /*String key = "str_" + platform.getName().toLowerCase() + "_"+type.toString().toLowerCase();
         if (!ChatPointsTTV.getInstance().locales.containsKey(key)) {
             throw new NullPointerException("Missing Message for " + platform.getName() + " " + type.toString() + " events");
         }
         String str = ChatPointsTTV.getInstance().locales.get(key);
         str = LocalizationUtils.replacePlaceholders(str, chatter, channel, event.orElse(null), amount.orElse(null), platform);
 
-        return str;
+        return str;*/
     }
 
     public static void onEvent(Platforms platform, EventType type, Event reward, String chatter, String channel, Optional<String> event, Optional<Integer> amount) {
@@ -75,7 +77,7 @@ public class CPTTV_EventHandler {
                     break;
             }
 
-            if (!alertMode.equals(AlertMode.NONE)) { // In-game alert
+            /*if (!alertMode.equals(AlertMode.NONE)) { // In-game alert
                 String title;
                 String subtitle;
                 if (reward.getCustomMsg() != null) {
@@ -109,7 +111,7 @@ public class CPTTV_EventHandler {
                         ChatPointsTTV.log.warn("Invalid mode: " + ChatPointsTTV.getInstance().alertMode);
                         break;
                 }    
-            }
+            }*/
         
             for (String cmd : reward.getCommands()) { // Event actions
                 cmd = cmd.replace("{USER}", chatter);

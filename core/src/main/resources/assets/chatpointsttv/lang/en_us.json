@@ -191,5 +191,7 @@
   "twitch.accounts.header": "%sConnected Twitch Accounts%s",
   "twitch.accounts.footer.console": "To unlink an account, use /twitch unlink <channel>%sTo add an account, use /twitch link",
   "twitch.accounts.tooltip.unlink": "Click to unlink this account",
-  "twitch.accounts.no_accounts": "There are no connected accounts :("
+  "twitch.accounts.no_accounts": "There are no connected accounts :(",
+
+  "twitch.event.channelpoints.title": "%s has redeemed %s in %s"
 }
