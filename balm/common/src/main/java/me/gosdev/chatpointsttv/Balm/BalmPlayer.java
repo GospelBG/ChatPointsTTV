@@ -12,7 +12,6 @@ import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -214,5 +213,11 @@ public class BalmPlayer implements GenericPlayer {
     @Override
     public Boolean hasItem(int slot) {
         return !player.getInventory().getItem(slot).isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BalmPlayer)) return false;
+        return this.player.getUUID().equals(((BalmPlayer) o).player.getUUID());
     }
 }
