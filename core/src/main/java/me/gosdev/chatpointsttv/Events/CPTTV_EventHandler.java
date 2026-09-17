@@ -184,10 +184,16 @@ public class CPTTV_EventHandler {
                                 duration = parts.length >= 4 ? Integer.valueOf(parts[3]) : null;
                                 strength = Integer.valueOf(parts[2]);
                             }
-                            if (!ChatPointsTTV.getLoader().getPotionEffects().contains(effect.toUpperCase()) && !effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
-                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.effect_not_found", parts[1]));
-                                continue;
+                            if (!effect.equalsIgnoreCase("random") && !effect.equalsIgnoreCase("clear")) {
+                                String match = !effect.contains(":") ? "minecraft:" + effect.toLowerCase() : effect.toLowerCase();
+                                if (!ChatPointsTTV.getLoader().getPotionEffects().stream().anyMatch(e -> e.equalsIgnoreCase(match))) {
+                                    notifyFailure(parts[0], errorStr + Translatable.getString("action.error.effect_not_found", parts[1]));
+                                    continue;
+                                } else {
+                                    effect = match;
+                                }
                             }
+
                             if (parts.length > (effect.equalsIgnoreCase("clear") ? 2 : 4)) {
                                 target = ChatPointsTTV.getLoader().getPlayer(parts[parts.length -1]);
                                 if (target == null || !target.isOnline()) {
