@@ -156,8 +156,10 @@ public class CPTTV_EventHandler {
                             action = new RunCmdAction(parts[1], text);
                             break;
                         case "GIVE":
-                            if (!ChatPointsTTV.getLoader().getItems().contains(parts[1].toUpperCase())) {
-                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.item_not_found", parts[1].toUpperCase()));
+                            parts[1] = (!parts[1].contains(":") ? "minecraft:" : "") + parts[1].toLowerCase(); // Add minecraft namespace if not present and force lowercase
+
+                            if (!ChatPointsTTV.getLoader().getItems().contains(parts[1].toLowerCase())) {
+                                notifyFailure(parts[0], errorStr + Translatable.getString("action.error.item_not_found", parts[1]));
                                 continue;
                             }
                             if (parts.length > 2) {
@@ -170,7 +172,7 @@ public class CPTTV_EventHandler {
                                     continue;
                                 }
                             }
-                            action = new GiveAction(parts[1].toUpperCase(), Optional.ofNullable(act_amount), Optional.ofNullable(target));
+                            action = new GiveAction(parts[1], Optional.ofNullable(act_amount), Optional.ofNullable(target));
                             break;
 
                         case "EFFECT":

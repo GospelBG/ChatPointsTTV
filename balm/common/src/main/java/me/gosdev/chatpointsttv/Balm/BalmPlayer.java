@@ -146,7 +146,7 @@ public class BalmPlayer implements GenericPlayer {
 
     @Override
     public void giveItem(String item, Integer amount) {
-        Optional<Item> itemOpt = BuiltInRegistries.ITEM.getOptional(Identifier.parse(item));
+        Optional<Item> itemOpt = BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(item));
         if (itemOpt.isPresent()) {
             ItemStack stack = new ItemStack(itemOpt.get(), amount);
 
