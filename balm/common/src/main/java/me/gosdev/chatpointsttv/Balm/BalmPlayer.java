@@ -151,7 +151,11 @@ public class BalmPlayer implements GenericPlayer {
             ItemStack stack = new ItemStack(itemOpt.get(), amount);
 
             Balm.getRuntime().platform().server().execute(() -> {
-                player.getInventory().add(stack);
+                if (player.getInventory().getFreeSlot() == -1) { // Drop if there is no space
+                    player.drop(stack, true, true);
+                } else {
+                    player.getInventory().add(stack);
+                }
             });
         }
     }
