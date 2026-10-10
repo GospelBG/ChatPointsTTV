@@ -170,9 +170,7 @@ public class BalmPlayer implements GenericPlayer {
     @Override
     public void clearEffects() {
         Balm.getRuntime().platform().server().execute(() -> {
-            for (MobEffectInstance effect : player.getActiveEffects()) {
-                player.removeEffect(effect.getEffect());
-            }
+            player.removeAllEffects();
         });
     }
 
